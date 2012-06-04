@@ -1,9 +1,15 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
+#export DH_VERBOSE=1
+
+CPPFLAGS := "$(shell dpkg-buildflags --get CPPFLAGS)"
+CXXFLAGS := "$(shell dpkg-buildflags --get CXXFLAGS) $(CPPFLAGS)"
+LDFLAGS := "$(shell dpkg-buildflags --get LDFLAGS)"
+
 # use qmake + make to build this package
 override_dh_auto_build:
-	qmake "CONFIG+=debian" && make
+	CXXFLAGS=$(CXXFLAGS) LDFLAGS=$(LDFLAGS) qmake "CONFIG+=debian" && make
 
 %:
 	dh $@
