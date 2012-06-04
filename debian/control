@@ -7,7 +7,6 @@ Build-Depends: debhelper (>= 7.0.50~),
   pkg-config,
   qt4-qmake,
   libqt4-dev,
-  libusb-dev,
   libyubikey-dev,
   libykpers-1-dev
 Standards-Version: 3.9.3
