@@ -1,0 +1,23 @@
+Source: yubikey-personalization-gui
+Maintainer: Yubico Open Source Maintainers <ossmaint@yubico.com>
+Uploaders: Fredrik Thulin <fredrik@yubico.com>, Simon Josefsson <simon@josefsson.org>, Klas Lindfors <klas@yubico.com>
+Section: utils
+Priority: extra
+Build-Depends: debhelper (>= 7.0.50~),
+  pkg-config,
+  qt4-qmake,
+  libqt4-dev,
+  libusb-dev,
+  libyubikey-dev,
+  libykpers-1-dev
+Standards-Version: 3.9.3
+Homepage: https://github.com/Yubico/yubikey-personalization-gui
+
+Package: yubikey-personalization-gui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Graphical personalization tool for YubiKey tokens
+ YubiKeys are USB tokens from Yubico that act like keyboards and
+ generate one-time passwords, static passwords or work in
+ challenge-response mode.
+ This is a graphical tool to custoize the workings to the token.

@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# use qmake + make to build this package
+override_dh_auto_build:
+	qmake "CONFIG+=debian" && make
+
+%:
+	dh $@
