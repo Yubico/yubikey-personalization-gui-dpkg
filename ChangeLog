@@ -1,0 +1,149 @@
+2012-06-05  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: create a ChangeLog with git2cl
+
+2012-06-04  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS file
+
+2012-06-04  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: add small script for doing release
+
+2012-06-04  Klas Lindfors <klas@yubico.com>
+
+	* : commit 8bfa06bc2955d5b31046138bc7eb192e57ec28b6 Author: Simon
+	Josefsson <simon@josefsson.org> Date:   Mon Jun 4 15:04:03 2012
+	+0200
+
+2012-06-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/version.h: bump versions post-release
+
+2012-06-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/version.h: bump version to 3.0.3 for
+	release
+
+2012-06-01  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add inheriting of flags
+
+2012-06-01  Klas Lindfors <klas@yubico.com>
+
+	* resources/lin/yubikey-personalization-gui.1: add man page for
+	linux distribution
+
+2012-05-31  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add debian target for building with system
+	linked deps
+
+2012-05-31  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.h, src/yubikeywriter.h: includes for deps with
+	<>
+
+2012-05-10  Simon Josefsson <simon@josefsson.org>
+
+	* : Don't store libusb binary.
+
+2012-05-10  Simon Josefsson <simon@josefsson.org>
+
+	* README: Add more info.  Line wrap.
+
+2012-05-10  Simon Josefsson <simon@josefsson.org>
+
+	* README: Mention dependencies.
+
+2012-05-10  Simon Josefsson <simon@josefsson.org>
+
+	* COPYING, README: Add build instructions.
+
+2011-11-28  Simon Josefsson <simon@josefsson.org>
+
+	* COPYING, README, YKPersonalization.pro,
+	YKPersonalization.pro.user.lin, YKPersonalization.pro.user.mac,
+	YKPersonalization.pro.user.win, deps/libusb-1.0/libusb.h,
+	deps/libykpers/.gitignore, deps/libykpers/.gitmodules,
+	deps/libykpers/AUTHORS, deps/libykpers/COPYING,
+	deps/libykpers/Makefile.am, deps/libykpers/NEWS,
+	deps/libykpers/README, deps/libykpers/configure.ac,
+	deps/libykpers/contrib/README,
+	deps/libykpers/contrib/programming.sh,
+	deps/libykpers/libykpers-1.map, deps/libykpers/rfc4634/hmac.c,
+	deps/libykpers/rfc4634/sha-private.h, deps/libykpers/rfc4634/sha.h,
+	deps/libykpers/rfc4634/sha1.c, deps/libykpers/rfc4634/sha224-256.c,
+	deps/libykpers/rfc4634/sha384-512.c, deps/libykpers/rfc4634/usha.c,
+	deps/libykpers/tests/Makefile.am, deps/libykpers/tests/selftest.c,
+	deps/libykpers/tests/test_args_to_config.c,
+	deps/libykpers/tests/test_key_generation.c,
+	deps/libykpers/ykchalresp.1, deps/libykpers/ykchalresp.c,
+	deps/libykpers/ykcore/Makefile.am, deps/libykpers/ykcore/ykcore.c,
+	deps/libykpers/ykcore/ykcore.h,
+	deps/libykpers/ykcore/ykcore_backend.h,
+	deps/libykpers/ykcore/ykcore_lcl.h,
+	deps/libykpers/ykcore/ykcore_libusb-1.0.c,
+	deps/libykpers/ykcore/ykcore_libusb.c,
+	deps/libykpers/ykcore/ykcore_osx.c,
+	deps/libykpers/ykcore/ykcore_stub.c,
+	deps/libykpers/ykcore/ykcore_win32.c,
+	deps/libykpers/ykcore/ykcore_windows.c,
+	deps/libykpers/ykcore/ykdef.h, deps/libykpers/ykcore/ykstatus.c,
+	deps/libykpers/ykcore/ykstatus.h, deps/libykpers/ykcore/yktsd.h,
+	deps/libykpers/ykpbkdf2.c, deps/libykpers/ykpbkdf2.h,
+	deps/libykpers/ykpers-1.pc.in, deps/libykpers/ykpers.c,
+	deps/libykpers/ykpers.h, deps/libykpers/ykpers4win.mk,
+	deps/libykpers/ykpersonalize.1, deps/libykpers/ykpersonalize.c,
+	deps/libyubikey/AUTHORS, deps/libyubikey/COPYING,
+	deps/libyubikey/ChangeLog, deps/libyubikey/INSTALL,
+	deps/libyubikey/Makefile.am, deps/libyubikey/Makefile.in,
+	deps/libyubikey/NEWS, deps/libyubikey/README,
+	deps/libyubikey/THANKS, deps/libyubikey/aclocal.m4,
+	deps/libyubikey/config.guess, deps/libyubikey/config.sub,
+	deps/libyubikey/configure, deps/libyubikey/configure.ac,
+	deps/libyubikey/depcomp, deps/libyubikey/install-sh,
+	deps/libyubikey/libyubikey.map, deps/libyubikey/ltmain.sh,
+	deps/libyubikey/m4/ld-version-script.m4,
+	deps/libyubikey/m4/libtool.m4, deps/libyubikey/m4/ltoptions.m4,
+	deps/libyubikey/m4/ltsugar.m4, deps/libyubikey/m4/ltversion.m4,
+	deps/libyubikey/m4/lt~obsolete.m4, deps/libyubikey/missing,
+	deps/libyubikey/modhex.c, deps/libyubikey/selftest.c,
+	deps/libyubikey/simple.mk, deps/libyubikey/ykaes.c,
+	deps/libyubikey/ykcrc.c, deps/libyubikey/ykgenerate.c,
+	deps/libyubikey/ykhex.c, deps/libyubikey/ykmodhex.c,
+	deps/libyubikey/ykparse.c, deps/libyubikey/yktoken.c,
+	deps/libyubikey/yubikey.h, installer/win32/Installer.sln,
+	installer/win32/Installer/Installer.vdproj, resources/lin/YubiKey
+	Personalization Tool.sh, resources/mac/Info.plist.in,
+	resources/resources.qrc, resources/win/resources.rc, src/common.h,
+	src/crandom.cpp, src/crandom.h, src/main.cpp, src/otpdef.h,
+	src/ui/aboutpage.cpp, src/ui/aboutpage.h, src/ui/aboutpage.ui,
+	src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/chalresppage.ui, src/ui/confirmbox.cpp, src/ui/confirmbox.h,
+	src/ui/confirmbox.ui, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/helpbox.ui, src/ui/mainwindow.cpp, src/ui/mainwindow.h,
+	src/ui/mainwindow.ui, src/ui/oathpage.cpp, src/ui/oathpage.h,
+	src/ui/oathpage.ui, src/ui/otppage.cpp, src/ui/otppage.h,
+	src/ui/otppage.ui, src/ui/scanedit.cpp, src/ui/scanedit.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui, src/ui/staticpage.cpp, src/ui/staticpage.h,
+	src/ui/staticpage.ui, src/ui/toolpage.cpp, src/ui/toolpage.h,
+	src/ui/toolpage.ui, src/version.h, src/yubikeyconfig.cpp,
+	src/yubikeyconfig.h, src/yubikeyfinder.cpp, src/yubikeyfinder.h,
+	src/yubikeylogger.cpp, src/yubikeylogger.h, src/yubikeyutil.cpp,
+	src/yubikeyutil.h, src/yubikeywriter.cpp, src/yubikeywriter.h: 
+	Initial import.
+
+2011-11-28  Simon Josefsson <simon@josefsson.org>
+
+	* README: test
+
+2011-11-28  Simon Josefsson <simon@josefsson.org>
+
+	* README: typo
+
+2011-11-25  Simon Josefsson <simon@josefsson.org>
+
+	* Add.
+
