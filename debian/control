@@ -16,7 +16,8 @@ Package: yubikey-personalization-gui
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Graphical personalization tool for YubiKey tokens
- YubiKeys are USB tokens from Yubico that act like keyboards and
- generate one-time passwords, static passwords or work in
- challenge-response mode.
- This is a graphical tool to custoize the workings to the token.
+ YubiKeys are USB tokens that act like keyboards and generate one-time
+ passwords, static passwords or work in challenge-response mode.
+ .
+ This is a graphical tool to customize the token with your own
+ cryptographic key and options.
