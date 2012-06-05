@@ -1,5 +1,5 @@
 yubikey-personalization-gui (3.0.5-1) unstable; urgency=low
 
-  * Initial release
+  * Initial release (Closes: #676212)
 
  -- Klas Lindfors <klas@yubico.com>  Thu, 31 May 2012 13:49:48 +0100
