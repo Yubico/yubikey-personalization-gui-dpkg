@@ -1,7 +1,7 @@
 #
 # global definitions
 #
-VERSION         = "3.0.3"
+VERSION         = "3.0.4"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
@@ -197,7 +197,7 @@ unix:!macx {
     LIBS += -lyubikey
 
     CONFIG += link_pkgconfig
-    PKGCONFIG += ykpers-1 libusb
+    PKGCONFIG += ykpers-1
 
     QMAKE_CXXFLAGS += $$(CXXFLAGS)
     QMAKE_LFLAGS += $$(LDFLAGS)
