@@ -1,2 +1,2 @@
-# there is currently no official distribution point of source packaging
-#  other than https://github.com/Yubico/yubikey-personalization-gui/
+version=3
+http://code.google.com/p/yubikey-personalization/downloads/list?can=1 .*/yubikey-personalization-gui-(\d[\d.]*)\.(?:zip|tgz|tbz2|txz|tar\.gz|tar\.bz2|tar\.xz)
