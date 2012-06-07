@@ -1,3 +1,102 @@
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.0.6
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignore deps and libs
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* README: describe how you get dependencies
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: no need to remove dlls, removed from repo
+	now
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignores ignore Makefile ignore src/ui/ui_*.h ignore build/
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* deps/libusb-1.0/libusb.h, deps/libykpers/.gitignore,
+	deps/libykpers/.gitmodules, deps/libykpers/AUTHORS,
+	deps/libykpers/COPYING, deps/libykpers/Makefile.am,
+	deps/libykpers/NEWS, deps/libykpers/README,
+	deps/libykpers/configure.ac, deps/libykpers/contrib/README,
+	deps/libykpers/contrib/programming.sh,
+	deps/libykpers/libykpers-1.map, deps/libykpers/rfc4634/hmac.c,
+	deps/libykpers/rfc4634/sha-private.h, deps/libykpers/rfc4634/sha.h,
+	deps/libykpers/rfc4634/sha1.c, deps/libykpers/rfc4634/sha224-256.c,
+	deps/libykpers/rfc4634/sha384-512.c, deps/libykpers/rfc4634/usha.c,
+	deps/libykpers/tests/Makefile.am, deps/libykpers/tests/selftest.c,
+	deps/libykpers/tests/test_args_to_config.c,
+	deps/libykpers/tests/test_key_generation.c,
+	deps/libykpers/ykchalresp.1, deps/libykpers/ykchalresp.c,
+	deps/libykpers/ykcore/Makefile.am, deps/libykpers/ykcore/ykcore.c,
+	deps/libykpers/ykcore/ykcore.h,
+	deps/libykpers/ykcore/ykcore_backend.h,
+	deps/libykpers/ykcore/ykcore_lcl.h,
+	deps/libykpers/ykcore/ykcore_libusb-1.0.c,
+	deps/libykpers/ykcore/ykcore_libusb.c,
+	deps/libykpers/ykcore/ykcore_osx.c,
+	deps/libykpers/ykcore/ykcore_stub.c,
+	deps/libykpers/ykcore/ykcore_win32.c,
+	deps/libykpers/ykcore/ykcore_windows.c,
+	deps/libykpers/ykcore/ykdef.h, deps/libykpers/ykcore/ykstatus.c,
+	deps/libykpers/ykcore/ykstatus.h, deps/libykpers/ykcore/yktsd.h,
+	deps/libykpers/ykpbkdf2.c, deps/libykpers/ykpbkdf2.h,
+	deps/libykpers/ykpers-1.pc.in, deps/libykpers/ykpers.c,
+	deps/libykpers/ykpers.h, deps/libykpers/ykpers4win.mk,
+	deps/libykpers/ykpersonalize.1, deps/libykpers/ykpersonalize.c,
+	deps/libyubikey/AUTHORS, deps/libyubikey/COPYING,
+	deps/libyubikey/ChangeLog, deps/libyubikey/INSTALL,
+	deps/libyubikey/Makefile.am, deps/libyubikey/Makefile.in,
+	deps/libyubikey/NEWS, deps/libyubikey/README,
+	deps/libyubikey/THANKS, deps/libyubikey/aclocal.m4,
+	deps/libyubikey/config.guess, deps/libyubikey/config.sub,
+	deps/libyubikey/configure, deps/libyubikey/configure.ac,
+	deps/libyubikey/depcomp, deps/libyubikey/install-sh,
+	deps/libyubikey/libyubikey.map, deps/libyubikey/ltmain.sh,
+	deps/libyubikey/m4/ld-version-script.m4,
+	deps/libyubikey/m4/libtool.m4, deps/libyubikey/m4/ltoptions.m4,
+	deps/libyubikey/m4/ltsugar.m4, deps/libyubikey/m4/ltversion.m4,
+	deps/libyubikey/m4/lt~obsolete.m4, deps/libyubikey/missing,
+	deps/libyubikey/modhex.c, deps/libyubikey/selftest.c,
+	deps/libyubikey/simple.mk, deps/libyubikey/ykaes.c,
+	deps/libyubikey/ykcrc.c, deps/libyubikey/ykgenerate.c,
+	deps/libyubikey/ykhex.c, deps/libyubikey/ykmodhex.c,
+	deps/libyubikey/ykparse.c, deps/libyubikey/yktoken.c,
+	deps/libyubikey/yubikey.h: remove deps and libs, just copies from
+	elsewhere, see README for how to get them.
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignore YKPersonalization.pro.user
+
+2012-06-05  Simon Josefsson <simon@josefsson.org>
+
+	* COPYING, NEWS, src/common.h, src/crandom.cpp, src/crandom.h,
+	src/main.cpp, src/otpdef.h, src/ui/aboutpage.cpp,
+	src/ui/aboutpage.h, src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/confirmbox.cpp, src/ui/confirmbox.h, src/ui/helpbox.cpp,
+	src/ui/helpbox.h, src/ui/mainwindow.cpp, src/ui/mainwindow.h,
+	src/ui/oathpage.cpp, src/ui/oathpage.h, src/ui/otppage.cpp,
+	src/ui/otppage.h, src/ui/scanedit.cpp, src/ui/scanedit.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp,
+	src/ui/toolpage.h, src/version.h, src/yubikeyconfig.cpp,
+	src/yubikeyconfig.h, src/yubikeyfinder.cpp, src/yubikeyfinder.h,
+	src/yubikeylogger.cpp, src/yubikeylogger.h, src/yubikeyutil.cpp,
+	src/yubikeyutil.h, src/yubikeywriter.cpp, src/yubikeywriter.h: Bump
+	copyright years.
+
+2012-06-05  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/version.h: bump versions post-release
+
 2012-06-05  Klas Lindfors <klas@yubico.com>
 
 	* NEWS, src/version.h: prepare version 3.0.5
