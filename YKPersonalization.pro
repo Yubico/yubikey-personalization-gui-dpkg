@@ -1,7 +1,7 @@
 #
 # global definitions
 #
-VERSION         = "3.0.4"
+VERSION         = "3.1.0"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
@@ -9,7 +9,7 @@ APP_NAME        = $$quote(YubiKey Personalization Tool)
 #
 QT             += core gui
 TEMPLATE        = app
-TARGET          = YKPersonalization
+TARGET          = yubikey-personalization-gui
 
 DEFINES        += VERSION=\\\"$${VERSION}\\\"
 
@@ -18,7 +18,7 @@ CONFIG(debug, debug|release) {
 
     CONFIG     += console no_lflags_merge
 } else {
-    TARGET_DIR  = build/release
+    TARGET_DIR  = build$${DIR_SEPARATOR}release
 
     DEFINES    += QT_NO_DEBUG_OUTPUT
 }
@@ -90,11 +90,11 @@ RESOURCES += \
 OTHER_FILES += \
     resources/win/resources.rc \
     resources/mac/Yubico.icns \
-    resources/mac/Info.plist.in
+    resources/mac/Info.plist.in \
+    resources/mac/qt.conf
 
 !debian {
   HEADERS += \
-      deps/libusb-1.0/libusb.h \
       deps/libykpers/ykpers.h \
       deps/libykpers/ykpbkdf2.h \
       deps/libykpers/ykcore/yktsd.h \
@@ -110,6 +110,53 @@ OTHER_FILES += \
   INCLUDEPATH    += . src src/ui deps/libusb-1.0 deps/libykpers deps/libykpers/ykcore deps/libyubikey
 }
 
+cross {
+    message("Doing a cross platform build..")
+    QMAKE_CXXFLAGS += $$(CXXFLAGS)
+    QMAKE_LFLAGS += $$(LDFLAGS)
+
+    # pickup compiler from environment
+    _TARGET_ARCH = $$(TARGET_ARCH)
+    isEmpty(_TARGET_ARCH) {
+        error("Cross compiling without a target is completely invalid, set TARGET_ARCH")
+    }
+    QMAKE_CC = $$(TARGET_ARCH)-gcc
+    QMAKE_CXX = $$(TARGET_ARCH)-g++
+
+    QMAKE_LINK = $$QMAKE_CXX
+    QMAKE_LINK_C = $$QMAKE_CC
+
+    win32 {
+        QMAKE_LIB = $$(TARGET_ARCH)-ar -ru
+        QMAKE_RC = $$(TARGET_ARCH)-windres
+
+        QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
+        QMAKE_UIC = $$[QT_INSTALL_BINS]/uic
+        QMAKE_IDC = $$[QT_INSTALL_BINS]/idc
+
+        QMAKE_LFLAGS += -static-libstdc++ -static-libgcc
+    }
+
+    _QTDIR = $$(QTDIR)
+    !isEmpty (_QTDIR) {
+      _QT_INCDIR = $$(QTDIR)$${DIR_SEPARATOR}include
+      _QT_LIBDIR = $$(QTDIR)$${DIR_SEPARATOR}lib
+      _QT_BINDIR = $$(QTDIR)$${DIR_SEPARATOR}bin
+      _QT_PLUGINDIR = $$(QTDIR)$${DIR_SEPARATOR}plugins
+    } else {
+      _QT_INCDIR = $$(QT_INCDIR)
+      _QT_LIBDIR = $$(QT_LIBDIR)
+      _QT_BINDIR = $$(QT_BINDIR)
+      _QT_PLUGINDIR = $$(QT_PLUGINDIR)
+    }
+    !isEmpty (_QT_INCDIR) {
+        QMAKE_INCDIR_QT = $$_QT_INCDIR
+    }
+    !isEmpty (_QT_LIBDIR) {
+        QMAKE_LIBDIR_QT = $$_QT_LIBDIR
+    }
+}
+
 #
 # Windows specific configuration
 #
@@ -121,7 +168,7 @@ win32 {
     RC_FILE = resources/win/resources.rc
 
     # The application dependencies
-    !contains(QMAKE_HOST.arch, x86_64) {
+    !contains(QMAKE_TARGET.arch, x86_64) {
         message("Windows x86 build")
 
         LIBS += $$quote(-L./libs/win32) -llibyubikey-0 -llibykpers-1-1
@@ -131,36 +178,22 @@ win32 {
         LIBS += $$quote(-L./libs/win64) -llibyubikey-0 -llibykpers-1-1
     }
 
-    # Copy dependencies
-    !contains(QMAKE_HOST.arch, x86_64) {
-        CONFIG(debug, debug|release) {
-            LIB_FILES += \
-                $(QTDIR)/bin/QtCored4.dll \
-                $(QTDIR)/bin/QtGuid4.dll
-        } else {
-            LIB_FILES += \
-                $(QTDIR)/bin/QtCore4.dll \
-                $(QTDIR)/bin/QtGui4.dll
-        }
-
-        LIB_FILES += \
-            $(QTDIR)/bin/libgcc_s_dw2-1.dll \
-            $(QTDIR)/../mingw/bin/mingwm10.dll \
-            libs/win32/libyubikey-0.dll \
-            libs/win32/libykpers-1-1.dll
-    } else {
-        LIB_FILES += \
-            libs/win64/libyubikey-0.dll \
-            libs/win64/libykpers-1-1.dll
-    }
+     LIB_FILES += \
+         $$_QT_BINDIR$${DIR_SEPARATOR}QtCore4.dll \
+         $$_QT_BINDIR$${DIR_SEPARATOR}QtGui4.dll \
+         $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qgif4.dll \
+         $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
+         $$_QT_BINDIR$${DIR_SEPARATOR}mingwm10.dll \
+         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libyubikey-0.dll \
+         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libykpers-1-1.dll
 
     LIB_FILES_WIN = $${LIB_FILES}
-    LIB_FILES_WIN ~= s,/,\\,g
     TARGET_DIR_WIN = $${DESTDIR}
-    TARGET_DIR_WIN ~= s,/,\\,g
-
     for(FILE, LIB_FILES_WIN) {
-        QMAKE_POST_LINK +=$$quote(cmd /c copy /y $${FILE} $${TARGET_DIR_WIN}$$escape_expand(\\n\\t))
+        QMAKE_POST_LINK +=$$quote($$QMAKE_COPY $${FILE} $${TARGET_DIR_WIN}$$escape_expand(\\n\\t))
+    }
+    build_installer {
+        QMAKE_POST_LINK += $$quote("makensis -DYKPERS_VERSION=$${VERSION} installer/win-nsis/ykpers.nsi")
     }
 }
 
@@ -192,8 +225,6 @@ unix:!macx {
   debian {
     message("Debian build")
 
-    TARGET = yubikey-personalization-gui
-
     LIBS += -lyubikey
 
     CONFIG += link_pkgconfig
@@ -205,6 +236,7 @@ unix:!macx {
   } else {
     message("Linux build")
 
+    HEADERS += deps/libusb-1.0/libusb.h
     SOURCES += deps/libykpers/ykcore/ykcore_libusb-1.0.c
 
     # The application dependencies
@@ -247,13 +279,29 @@ unix:!macx {
 macx {
     message("Mac build")
 
-    CONFIG += x86
+    CONFIG += x86_64
 
     SOURCES += deps/libykpers/ykcore/ykcore_osx.c
 
+    DEFINES += QT_MAC_USE_COCOA
+
+    cross {
+        CONFIG += qt_framework
+        _SDK = $$(OSX_SDK)
+        !isEmpty (_SDK) {
+            # FIXME: this is prone to breaking with version numbers
+            INCLUDEPATH += $$(OSX_SDK)/usr/include/c++/4.2.1
+        }
+    }
+
+    QMAKE_CFLAGS_X86_64 -= -arch
+    QMAKE_CFLAGS_X86_64 -= x86_64
+    QMAKE_CXXFLAGS_X86_64 -= -arch
+    QMAKE_CXXFLAGS_X86_64 -= x86_64
+
     # The application dependencies
-    LIBS += /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
-    LIBS += /System/Library/Frameworks/IOKit.framework/Versions/A/IOKit
+    LIBS += $$_SDK/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
+    LIBS += $$_SDK/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit
 
     # The application executable name
     TARGET = $$APP_NAME
@@ -265,49 +313,87 @@ macx {
 
     # Copy required resources into the final app bundle and
     # put the current version number into Info.plist
-    QMAKE_POST_LINK = $$quote(mkdir -p $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources && \
+    QMAKE_POST_LINK += $$quote(mkdir -p $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources && \
         cp -R resources/mac/Yubico.icns $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/. && \
+        cp resources/mac/qt.conf $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/. && \
         sed -e \'s|@@version@@|$$VERSION|g\' \
         < resources/mac/Info.plist.in  > $${DESTDIR}/$${TARGET_MAC}.app/Contents/Info.plist)
 
-    # Create application dmg
-    shutup = ">/dev/null 2>&1"
-    isEmpty(MACDEPLOYQT):MACDEPLOYQT = macdeployqt"
-    !system($$MACDEPLOYQT $$shutup) {
-        warning("macdeployqt utility '$$MACDEPLOYQT' not found \
-                 will not create target for application bundling")
+    cross {
+        # copy the QT libraries into our bundle
+        _BASEDIR = $${DESTDIR}/$${TARGET_MAC}.app/Contents
+        _FRAMEWORKDIR = $${_BASEDIR}/Frameworks
+        _PLUGINDIR = $${_BASEDIR}/PlugIns
+        QMAKE_POST_LINK += $$quote( && mkdir -p $$_FRAMEWORKDIR && \
+            cp -R $$_QT_LIBDIR/QtCore.framework $$_FRAMEWORKDIR/QtCore.framework && \
+            cp -R $$_QT_LIBDIR/QtGui.framework $$_FRAMEWORKDIR/QtGui.framework && \
+            find $$_FRAMEWORKDIR -type l -print0 | xargs -0 rm -f  && \
+            mv $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources/qt_menu.nib $$_BASEDIR/Resources/qt_menu.nib && \
+            rmdir $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources && \
+            mkdir -p $$_PLUGINDIR/imageformats && \
+            cp -R $$_QT_PLUGINDIR/imageformats/libqgif.dylib $$_PLUGINDIR/imageformats)
+
+        # fixup all library paths..
+        _BASE = $$quote(@executable_path/../Frameworks)
+        _QTCORE = $$quote(QtCore.framework/Versions/4/QtCore)
+        _QTGUI = $$quote(QtGui.framework/Versions/4/QtGui)
+        QMAKE_POST_LINK += $$quote( && $$(TARGET_ARCH)-install_name_tool -change $$_QTCORE $$_BASE/$$_QTCORE $$_BASEDIR/MacOS/$$TARGET_MAC && \
+            $$(TARGET_ARCH)-install_name_tool -change $$_QTGUI $$_BASE/$$_QTGUI $$_BASEDIR/MacOS/$$TARGET_MAC && \
+            $$(TARGET_ARCH)-install_name_tool -change $$_QTCORE $$_BASE/$$_QTCORE $$_FRAMEWORKDIR/$$_QTGUI && \
+            $$(TARGET_ARCH)-install_name_tool -change $$_QTCORE $$_BASE/$$_QTCORE $$_PLUGINDIR/imageformats/libqgif.dylib && \
+            $$(TARGET_ARCH)-install_name_tool -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqgif.dylib)
+        
+        build_installer {
+            QMAKE_POST_LINK += $$quote( && mkdir -p $${DESTDIR}/temp/ && \
+                cp -R $${DESTDIR}/$${TARGET_MAC}.app $${DESTDIR}/temp/ && \
+                ln -s /Applications $${DESTDIR}/temp/Applications && \
+                mkdir $${DESTDIR}/temp/.background/ && \
+                cp resources/mac/yubico-logo.png $${DESTDIR}/temp/.background/background.png && \
+                genisoimage -V "$$TARGET_MAC" -r -apple --hfs-bless "/$${TARGET_MAC}.app" -o $${DESTDIR}/ykpers-pre.dmg  $${DESTDIR}/temp && \
+                rm -rf $${DESTDIR}/temp && \
+                dmg dmg $${DESTDIR}/ykpers-pre.dmg $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.dmg)
+        }
     } else {
-        macdeploy.depends  = $${DESTDIR}/$${TARGET_MAC}.app/Contents/MacOS/$${TARGET_MAC}
-        macdeploy.target   = macdeploy
-        macdeploy.commands = \
-            [ -f $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/qt.conf ] || \
-                $$MACDEPLOYQT $${DESTDIR}/$${TARGET_MAC}.app -no-strip;
 
-        QMAKE_EXTRA_TARGETS += macdeploy
-    }
+        # Create application dmg
+        shutup = ">/dev/null 2>&1"
+        isEmpty(MACDEPLOYQT):MACDEPLOYQT = macdeployqt
+        !system($$MACDEPLOYQT $$shutup) {
+            warning("macdeployqt utility '$$MACDEPLOYQT' not found \
+                     will not create target for application bundling")
+        } else {
+            macdeploy.depends  = $${DESTDIR}/$${TARGET_MAC}.app/Contents/MacOS/$${TARGET_MAC}
+            macdeploy.target   = macdeploy
+            macdeploy.commands = \
+                [ -f $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/qt.conf ] || \
+                    $$MACDEPLOYQT $${DESTDIR}/$${TARGET_MAC}.app -no-strip;
 
-    isEmpty(HDIUTIL):HDIUTIL = "hdiutil"
-    !system($$HDIUTIL help $$shutup) {
-        warning("hdiutil utility '$$HDIUTIL' not found \
-                 will not create target for disk image creation")
-    } else {
-        contains(QMAKE_EXTRA_TARGETS, macdeploy) {
-            IMAGEROOT = $${DESTDIR}/disk-image-root
-            IMAGEFILE = $${DESTDIR}/$${TARGET_MAC}\\ Installer-mac.dmg
+            QMAKE_EXTRA_TARGETS += macdeploy
+        }
 
-            #Note: Volume name for disk image should be passed without escaping quotes
-            macdisk.depends  = macdeploy
-            macdisk.target   = macdisk
-            macdisk.commands = \
-                rm -rf $${IMAGEROOT}; \
-                mkdir $${IMAGEROOT}; \
-                cp -R $${DESTDIR}/$${TARGET_MAC}.app $${IMAGEROOT}; \
-                rm -f $${IMAGEFILE}; \
-                $${HDIUTIL} create -srcfolder $${IMAGEROOT} -format UDBZ \
-                    -volname \'$${TARGET} $${VERSION}\' $${IMAGEFILE}; \
-                rm -rf $${IMAGEROOT}
+        isEmpty(HDIUTIL):HDIUTIL = "hdiutil"
+        !system($$HDIUTIL help $$shutup) {
+            warning("hdiutil utility '$$HDIUTIL' not found \
+                     will not create target for disk image creation")
+        } else {
+            contains(QMAKE_EXTRA_TARGETS, macdeploy) {
+                IMAGEROOT = $${DESTDIR}/disk-image-root
+                IMAGEFILE = $${DESTDIR}/$${TARGET_MAC}\\ Installer-mac.dmg
 
-            QMAKE_EXTRA_TARGETS += macdisk
+                #Note: Volume name for disk image should be passed without escaping quotes
+                macdisk.depends  = macdeploy
+                macdisk.target   = macdisk
+                macdisk.commands = \
+                    rm -rf $${IMAGEROOT}; \
+                    mkdir $${IMAGEROOT}; \
+                    cp -R $${DESTDIR}/$${TARGET_MAC}.app $${IMAGEROOT}; \
+                    rm -f $${IMAGEFILE}; \
+                    $${HDIUTIL} create -srcfolder $${IMAGEROOT} -format UDBZ \
+                        -volname \'$${TARGET} $${VERSION}\' $${IMAGEFILE}; \
+                    rm -rf $${IMAGEROOT}
+
+                QMAKE_EXTRA_TARGETS += macdisk
+            }
         }
     }
 }
@@ -317,10 +403,9 @@ macx {
 #
 win32 {
     TARGET_DIR_WIN = $${DESTDIR}
-    TARGET_DIR_WIN ~= s,/,\\,g
 
-    QMAKE_CLEAN += $${TARGET_DIR_WIN}\\*.exe \
-                   $${TARGET_DIR_WIN}\\*.dll
+    QMAKE_CLEAN += $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.exe \
+                   $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.dll
 } else:macx {
     QMAKE_CLEAN += -r $${DESTDIR}/*.app
 } else {

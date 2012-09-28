@@ -42,6 +42,8 @@ public:
         Mode_OathHotp,
         Mode_ChalRespYubico,
         Mode_ChalRespHmac,
+        Mode_Update,
+        Mode_Swap,
     };
 
     void setProgrammingMode(Mode mode)
@@ -184,9 +186,9 @@ public:
     bool oathHotp8() const
     {return m_oathHotp8;}
 
-    void setOathMovingFactorSeed(unsigned short oathMovingFactorSeed)
+    void setOathMovingFactorSeed(unsigned int oathMovingFactorSeed)
     {m_oathMovingFactorSeed = oathMovingFactorSeed;}
-    unsigned short oathMovingFactorSeed() const
+    unsigned int oathMovingFactorSeed() const
     {return m_oathMovingFactorSeed;}
 
     void setChalYubico(bool chalYubico)
@@ -224,6 +226,26 @@ public:
     bool serialApiVisible() const
     {return m_serialApiVisible;}
 
+    void setAllowUpdate(bool allowUpdate)
+    {m_allowUpdate = allowUpdate;}
+    bool allowUpdate() const
+    {return m_allowUpdate;}
+
+    void setDormant(bool dormant)
+    {m_dormant = dormant;}
+    bool dormant() const
+    {return m_dormant;}
+
+    void setFastTrig(bool fastTrig)
+    {m_fastTrig = fastTrig;}
+    bool fastTrig() const
+    {return m_fastTrig;}
+
+    void setUseNumericKeypad(bool useNumericKeypad)
+    {m_useNumericKeypad = useNumericKeypad;}
+    bool useNumericKeypad() const
+    {return m_useNumericKeypad;}
+
 private:
     Mode m_mode;
     int m_configSlot;
@@ -260,7 +282,7 @@ private:
     bool m_oathFixedModhex2;
     bool m_oathFixedModhex;
     bool m_oathHotp8;
-    unsigned short m_oathMovingFactorSeed;
+    unsigned int m_oathMovingFactorSeed;
 
     bool m_chalYubico;
     bool m_chalHmac;
@@ -270,6 +292,12 @@ private:
     bool m_serialBtnVisible;
     bool m_serialUsbVisible;
     bool m_serialApiVisible;
+
+    // v2.3 settings
+    bool m_allowUpdate;
+    bool m_dormant;
+    bool m_fastTrig;
+    bool m_useNumericKeypad;
 };
 
 #endif // YUBIKEYCONFIG_H

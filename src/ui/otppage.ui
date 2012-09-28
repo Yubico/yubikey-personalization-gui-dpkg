@@ -45,7 +45,7 @@ color: rgb(0, 0, 0);</string>
     <property name="styleSheet">
      <string notr="true">font: 18px &quot;Verdana&quot;;
 font-weight: bold;
-color: rgb(122, 171, 32);</string>
+color: rgb(140, 192, 65);</string>
     </property>
     <property name="text">
      <string>Program in Yubico OTP mode</string>
@@ -180,7 +180,7 @@ font-weight: bold;</string>
     <property name="styleSheet">
      <string notr="true">font: 18px &quot;Verdana&quot;;
 font-weight: bold;
-color: rgb(122, 171, 32);</string>
+color: rgb(140, 192, 65);</string>
     </property>
     <property name="text">
      <string>Program in Yubico OTP mode - Quick</string>
@@ -772,7 +772,7 @@ font-weight: bold;</string>
     <property name="styleSheet">
      <string notr="true">font: 18px &quot;Verdana&quot;;
 font-weight: bold;
-color: rgb(122, 171, 32);</string>
+color: rgb(140, 192, 65);</string>
     </property>
     <property name="text">
      <string>Program in Yubico OTP mode - Advanced</string>
@@ -1654,7 +1654,7 @@ font-weight: bold;</string>
     </widget>
     <widget class="QPushButton" name="advResetBtn">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -1762,13 +1762,18 @@ font-weight: bold;</string>
      </property>
      <item>
       <property name="text">
-       <string>Increment Identities; Randomize Secret</string>
+       <string>Increment Identity; Randomize Secrets</string>
       </property>
      </item>
      <item>
       <property name="text">
        <string>Randomize all parameters</string>
       </property>
+     </item>
+     <item>
+       <property name="text">
+         <string>Identity from serial; Randomize Secrets</string>
+       </property>
      </item>
     </widget>
     <widget class="QPushButton" name="advParamGenSchemeHelpBtn">
@@ -1909,7 +1914,7 @@ color: rgb(0, 0, 0);</string>
     <property name="styleSheet">
      <string notr="true">font: 18px &quot;Verdana&quot;;
 font-weight: bold;
-color: rgb(122, 171, 32);</string>
+color: rgb(140, 192, 65);</string>
     </property>
     <property name="text">
      <string>Upload to Yubico</string>

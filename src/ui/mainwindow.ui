@@ -111,7 +111,7 @@ background-color: rgb(255, 255, 255);</string>
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
-    <widget class="QLabel" name="deviceImg">
+    <widget class="QLabel" name="deviceImage">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -120,11 +120,8 @@ background-color: rgb(255, 255, 255);</string>
        <height>128</height>
       </rect>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="../../resources/resources.qrc">:/res/images/yk.png</pixmap>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
     <widget class="QLabel" name="versionLbl">
@@ -180,7 +177,7 @@ color: rgb(221, 97, 99);
        <x>8</x>
        <y>380</y>
        <width>155</width>
-       <height>155</height>
+       <height>200</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -427,6 +424,82 @@ background-color: rgb(255, 255, 255);</string>
       </property>
       <property name="text">
        <string>Scan Code Mode</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="updatableSupportDescLbl">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>145</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font-weight: normal;</string>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="text">
+       <string>Updatable</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="updatableSupportLbl">
+      <property name="geometry">
+       <rect>
+        <x>128</x>
+        <y>145</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font-weight: normal;</string>
+      </property>
+      <property name="text">
+       <string>N/A</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="ndefSupportDescLbl">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>165</y>
+        <width>121</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font-weight: normal;</string>
+      </property>
+      <property name="lineWidth">
+       <number>2</number>
+      </property>
+      <property name="text">
+       <string>Ndef </string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="ndefSupportLbl">
+      <property name="geometry">
+       <rect>
+        <x>128</x>
+        <y>165</y>
+        <width>21</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font-weight: normal;</string>
+      </property>
+      <property name="text">
+       <string>N/A</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
     </widget>
@@ -757,7 +830,7 @@ border-radius: 2px;</string>
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(122, 171, 32);</string>
+     <string notr="true">background-color: rgb(140, 192, 65);</string>
     </property>
     <property name="frameShadow">
      <enum>QFrame::Sunken</enum>
@@ -787,9 +860,9 @@ border-radius: 2px;</string>
     <property name="styleSheet">
      <string notr="true">font: 13px &quot;Verdana&quot;;
 font-weight: bold;
-color: rgb(122, 171, 32);
+color: rgb(140, 192, 65);
 background-color: rgb(255, 255, 255);
-border-color: rgb(122, 171, 32);
+border-color: rgb(140, 192, 65);
 selection-color: rgb(0, 0, 0);</string>
     </property>
     <widget class="QPushButton" name="otpMenuBtn">
@@ -1054,9 +1127,6 @@ border-radius: 5px;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-     <property name="buddy">
-      <cstring></cstring>
      </property>
     </widget>
    </widget>

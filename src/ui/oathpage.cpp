@@ -67,6 +67,9 @@ OathPage::OathPage(QWidget *parent) :
     connect(ui->advResetBtn, SIGNAL(clicked()),
             this, SLOT(resetAdvPage()));
 
+    connect(ui->advMovingFactorSeedTxt, SIGNAL(editingFinished()),
+            this, SLOT(on_advMovingFactorSeedTxt_editingFinished()));
+
     //Load settings
     loadSettings();
 
@@ -581,7 +584,6 @@ void OathPage::resetAdvPage() {
     on_advSecretKeyTxt_editingFinished();
 
     ui->advStopBtn->setEnabled(false);
-    ui->advResetBtn->setEnabled(false);
 }
 
 void OathPage::freezeAdvPage(bool freeze) {
@@ -797,9 +799,9 @@ void OathPage::on_advMovingFactorSeedCombo_currentIndexChanged(int index) {
         ui->advMovingFactorSeedTxt->setEnabled(true);
         break;
     case MOVING_FACTOR_RAND:
-        unsigned char tmp;
+        unsigned int tmp;
         YubiKeyUtil::generateRandom((unsigned char *) &tmp, sizeof(tmp));
-        ui->advMovingFactorSeedTxt->setText(QString::number((unsigned int)tmp));
+        ui->advMovingFactorSeedTxt->setText(QString::number(tmp));
         on_advMovingFactorSeedTxt_editingFinished();
         ui->advMovingFactorSeedTxt->setEnabled(true);
         break;
@@ -863,7 +865,7 @@ void OathPage::on_advStopBtn_clicked() {
 }
 
 void OathPage::stopAdvConfigWritting() {
-    qDebug() << "Stopping adv confgiuration writing...";
+    qDebug() << "Stopping adv configuration writing...";
 
     if(m_state >= State_Programming_Multiple) {
         ui->advStopBtn->setEnabled(true);
@@ -922,9 +924,9 @@ void OathPage::changeAdvConfigParams() {
 
     //HOTP Moving Factor Seed...
     if(ui->advMovingFactorSeedCombo->currentIndex() == MOVING_FACTOR_RAND) {
-        unsigned char tmp;
+        unsigned int tmp;
         YubiKeyUtil::generateRandom((unsigned char *) &tmp, sizeof(tmp));
-        ui->advMovingFactorSeedTxt->setText(QString::number((unsigned int)tmp));
+        ui->advMovingFactorSeedTxt->setText(QString::number(tmp));
         on_advMovingFactorSeedTxt_editingFinished();
     }
 
@@ -1036,7 +1038,7 @@ void OathPage::writeAdvConfig() {
             YubiKeyFinder::Feature_MovingFactor)) {
 
         m_ykConfig->setOathMovingFactorSeed(
-                ui->advMovingFactorSeedTxt->text().toUShort());
+                ui->advMovingFactorSeedTxt->text().toUInt());
     }
 
     //Secret Key...

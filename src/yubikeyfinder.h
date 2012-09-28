@@ -40,6 +40,8 @@ extern "C" {
 #include "common.h"
 #include "qtimer.h"
 
+#define YK_VERSION(MAJOR, MINOR, BUILD) (MAJOR * 100 + MINOR * 10 + BUILD)
+
 class YubiKeyFinder : public QObject {
     Q_OBJECT
 
@@ -49,7 +51,7 @@ public:
 
     enum State {
         State_Absent,
-        State_Preset,
+        State_Present,
         State_Processing
     };
 
@@ -64,6 +66,9 @@ public:
         Feature_ChallengeResponse,
         Feature_SerialNumber,
         Feature_MovingFactor,
+        Feature_ChallengeResponseFixed,
+        Feature_Updatable,
+        Feature_Ndef,
     };
 
     State state() const
@@ -88,6 +93,7 @@ private:
 
     static YubiKeyFinder* _instance;
     static const unsigned int FEATURE_MATRIX[][2];
+    static const unsigned int FEATURE_MATRIX_EXCLUDE[][2];
 
     State m_state;
     YK_KEY *m_yk;

@@ -1,3 +1,499 @@
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions for
+	release
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* README: information about cross compiling
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignores
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* : add logo for dmg (not working)
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: avoid rr-moved
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* : logo with correct color
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: more dmg building
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: switch to build_installer for both win and
+	mac. start with dmg building
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: only add libusb.h if we're building on
+	linux
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: move native dmg for mac into else of cross
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, resources/mac/qt.conf: add qt.conf for mac
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: change name of TARGET to TARGET_ARCH
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: properly change the name
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: finishing up the building of osx bundle
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: only remove -arch if cross is defined
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: remove trailing "
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: win-installer updates for new
+	compilation unit
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: mac updates
+
+2012-09-28  Klas Lindfors <klas@yubico.com>
+
+	* : new yubikey neo picture
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: call
+	makensis from make, output from nsis in build/release
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: more build
+	fixes, mostly win32 cross compiling.
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: 
+	static-libstdc++ and static-libgcc gets rid of some deps
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: att SDK includes to QT_INCDIR
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: take pointer to SDK and define
+	QT_MAC_USE_COCOA
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: x86_64 for macx, that's what qt
+	distributes.
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: start with support for cross-compiling
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: QMAKE_TARGET instead of QMAKE_HOST to find
+	out the target
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: new picture for
+	2.0 and 2.1 keys
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: correct \ instead of /
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: move up help button
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: base for nsi installer
+
+2012-09-27  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: use another constructor to work with older
+	qt
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: add picture for
+	2.3
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* : update 2.2 picture
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: shuffle things around on settingpage
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.ui: move boxes around on the toolpage
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.ui: help for manual
+	update
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: line up help buttons
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui: allow customer prefix to be entered in hex or
+	modhex as well
+
+2012-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: different wording on 2.3 features
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui, src/ui/toolpage.ui: move around some
+	elements
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: new 2.2 key image
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: store the challenge in a QByteArray to be
+	sure it isn't deallocated
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui,
+	src/yubikeywriter.cpp, src/yubikeywriter.h: ndef writing code
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: neo has oath-hotp and imf from 2.1.7
+
+2012-09-25  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: image fixing. images for
+	neo and devel key. use pngs.
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.ui: remove empty buddy
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeyfinder.h: more NEO support. add
+	ability to exclude versions from feature_matrix
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h: typo
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.ui,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: show if the key supports
+	Ndef
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/aboutpage.cpp, src/ui/aboutpage.ui: add link
+	to settings to main area in about.
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/settingpage.cpp, src/yubikeyconfig.cpp, src/yubikeyconfig.h,
+	src/yubikeywriter.cpp: change updatable to allow update
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/settingpage.ui,
+	src/yubikeyconfig.cpp, src/yubikeyconfig.h, src/yubikeywriter.cpp: 
+	add FAST_TRIG and USE_NUMERIC_KEYPAD
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.h, src/ui/settingpage.ui: 
+	enable swapping configurations in UI.
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui, src/yubikeyconfig.h,
+	src/yubikeylogger.cpp, src/yubikeywriter.cpp: support for slot
+	swapping
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui: controls for setting/disabling access code on
+	update
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: messages on key update
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/yubikeyconfig.cpp,
+	src/yubikeyconfig.h, src/yubikeywriter.cpp: support for dormant
+	configuration
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui: more stuff for doing key update
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyconfig.h, src/yubikeylogger.cpp, src/yubikeywriter.cpp: 
+	add support for updating configuration
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp: chalresppage doesn't need
+	QDesktopServices
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui: make settingpage into several pages, start
+	doing update stuff
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.h: toolpage doesn't need yubikeyconfig.h
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.ui,
+	src/yubikeyconfig.cpp, src/yubikeyconfig.h, src/yubikeywriter.cpp: 
+	add updatable flag
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/main.cpp, src/ui/settingpage.cpp: do all application setup in
+	main.cpp
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyconfig.cpp, src/yubikeywriter.cpp: use ykConfig object
+	instead of settings do proper setup of ykConfig in constructor
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyutil.cpp: mark as const
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: move help button and remove tabstop
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.ui: update texts
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.ui,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: add support label for
+	updatable
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.ui: make the
+	settingspage autosave
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/yubikeyfinder.cpp,
+	src/yubikeyfinder.h: disable fixed hmac-sha1 challenge for 2.2 key
+
+2012-09-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp: clean up when key is removed
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp,
+	src/ui/mainwindow.ui: show correct image for inserted yubikey some are animated, then build qmovie objects
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/version.h: add CompanyDomain to
+	QCoreApplication
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: turn off SERIAL_USB_VISIBLE by default
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: no need to get status for
+	challenge-response
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeyfinder.h: State_Preset ->
+	State_Present
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h: only enable perform button
+	when key is inserted
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/toolpage.cpp: show status message when more
+	options have to be selected
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: do yk_init()/yk_release() in start/stop
+	functions it should be a good idea to not do yk_init() for every openKey, this
+	should make our use of libusb more consistent.
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui,
+	src/yubikeywriter.cpp: implement a tool feature for testing
+	challenge-response in key
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/aboutpage.ui, src/ui/chalresppage.ui,
+	src/ui/mainwindow.ui, src/ui/oathpage.ui, src/ui/otppage.ui,
+	src/ui/settingpage.ui, src/ui/staticpage.ui, src/ui/toolpage.ui: 
+	change green color to correct Yubico green
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui: activate the tool base
+	page and add a backbutton to the converter page
+
+2012-09-21  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp, src/yubikeywriter.h: add function for doing
+	challenge-response
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.ui: trigger the
+	editingFinished on imf when user edited
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.ui: let the reset button be
+	enabled
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/yubikeyconfig.h: use int instead of
+	short/char for oath imf, gives us larger span
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: check if ykp_set_oath_imf() fails, then
+	throw.
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: don't bother with yk_core_config new (1.7) interface returns empty config
+
+2012-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: use ykp_set_oath_imf() instead of setting
+	manually in config
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/otppage.cpp, src/ui/otppage.ui: add a
+	multi-option for pubid from serial
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp: spelling on debug output
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp, src/ui/otppage.h: build default public id on
+	key serial
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/staticpage.cpp: spelling in debug messages
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp, src/ui/otppage.ui: private identity is a
+	secret and should be randomized
+
+2012-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.ui: add static secret
+	for multi hmac-sha1 chal-resp
+
+2012-09-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp, src/ui/otppage.ui: let the reset button be
+	enabled, resets the form
+
+2012-09-12  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: updates for new api in ykpers 1.7
+
+2012-09-12  Klas Lindfors <klas@yubico.com>
+
+	* src/otpdef.h, src/ui/otppage.cpp: don't insert the 0x28 prefix
+	before customer prefix
+
+2012-09-12  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: check version in YKPersonalization.pro and
+	src/version.h
+
+2012-09-12  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: bump forgotten version number
+
+2012-06-07  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/version.h: bump version post-release
+
 2012-06-07  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.0.6

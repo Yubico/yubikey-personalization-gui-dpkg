@@ -30,7 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TOOLPAGE_H
 
 #include <QStackedWidget>
-#include "yubikeyconfig.h"
 
 namespace Ui {
     class ToolPage;
@@ -49,6 +48,8 @@ private:
     enum Page {
         Page_Base,
         Page_Converter,
+        Page_ChalResp,
+        Page_Ndef,
     };
     int m_currentPage;
 
@@ -71,6 +72,18 @@ private slots:
     void on_converterModhexCopyBtn_clicked();
     void on_converterDecCopyBtn_clicked();
 
+    // Challenge Response Page
+    void resetChalRespPage();
+    void performChallengeResponse();
+    void on_chalRespChallenge_editingFinished();
+
+    // ndef page
+    void resetNdefPage();
+    void programNdef();
+    void on_ndefTextRadio_toggled(bool checked);
+    void ndefWritten(bool written, const QString &msg);
+
+    void keyFound(bool found, bool* featuresMatrix);
 signals:
     void showStatusMessage(const QString &text, int status = 0);
 };

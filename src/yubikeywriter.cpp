@@ -111,16 +111,21 @@ QString YubiKeyWriter::reportError() {
 void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     // Check features support
     bool flagSrNoSupport = false;
+    bool flagUpdateSupport = false;
     if(YubiKeyFinder::getInstance()->checkFeatureSupport(
             YubiKeyFinder::Feature_SerialNumber)) {
         flagSrNoSupport = true;
+    }
+    if(YubiKeyFinder::getInstance()->checkFeatureSupport(
+          YubiKeyFinder::Feature_Updatable)) {
+        flagUpdateSupport = true;
     }
 
     YubiKeyFinder::getInstance()->stop();
 
     YK_KEY *yk = 0;
     YK_STATUS *ykst = ykds_alloc();
-    YKP_CONFIG *cfg = ykp_create_config();
+    YKP_CONFIG *cfg = ykp_alloc();
 
     bool error = false;
 
@@ -141,24 +146,27 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             throw 0;
         }
 
+        ykp_configure_version(cfg, ykst);
+
         qDebug() << "writer:configuration slot:" << ykConfig->configSlot();
 
-        //Configuration slot...
-        if (!ykp_configure_for(cfg, ykConfig->configSlot(), ykst)) {
-            throw 0;
-        }
-
-        struct config_st *ycfg = (struct config_st *) ykp_core_config(cfg);
-
-        //Reset the default flags (particularly for slot 2)
-        ycfg->tktFlags = 0;
-        ycfg->cfgFlags = 0;
-        ycfg->extFlags = 0;
 
         //Programming Mode...
         bool longSecretKey = false;
 
+        int command = ykConfig->configSlot() == 2 ? SLOT_CONFIG2 : SLOT_CONFIG;
+
         switch(ykConfig->programmingMode()) {
+        case YubiKeyConfig::Mode_Update:
+            // if we're doing an update it's other commands.
+            command = ykConfig->configSlot() == 2 ? SLOT_UPDATE2 : SLOT_UPDATE1;
+            break;
+
+        case YubiKeyConfig::Mode_Swap:
+            // swap has it's own command
+            command = SLOT_SWAP;
+            break;
+
         case YubiKeyConfig::Mode_YubicoOtp:
             break;
 
@@ -180,8 +188,9 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             CFGFLAG(OATH_FIXED_MODHEX,  ykConfig->oathFixedModhex());
 
             //Moving Factor Seed...
-            ycfg->uid[4] = (unsigned char) (ykConfig->oathMovingFactorSeed() >> 8U);
-            ycfg->uid[5] = (unsigned char) ykConfig->oathMovingFactorSeed();
+            if(!ykp_set_oath_imf(cfg, ykConfig->oathMovingFactorSeed())) {
+              throw 0;
+            }
 
             //For OATH-HOTP, 160 bits key is also valid
             longSecretKey = true;
@@ -204,6 +213,11 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             //For HMAC (not Yubico) challenge-response, 160 bits key is also valid
             longSecretKey = true;
             break;
+        }
+
+        //Configuration slot...
+        if (!ykp_configure_command(cfg, command)) {
+            throw 0;
         }
 
         //Public ID...
@@ -346,42 +360,48 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             ykp_set_access_code(cfg, accessCode, accessCodeLen);
         }
 
-        //Output parameters...
-        QSettings settings;
-
-        TKTFLAG(TAB_FIRST,          settings.value(SG_TAB_FIRST).toBool());
-        TKTFLAG(APPEND_TAB1,        settings.value(SG_APPEND_TAB1).toBool());
-        TKTFLAG(APPEND_TAB2,        settings.value(SG_APPEND_TAB2).toBool());
-        TKTFLAG(APPEND_CR,          settings.value(SG_APPEND_CR).toBool());
-        TKTFLAG(APPEND_DELAY1,      settings.value(SG_APPEND_DELAY1).toBool());
-        TKTFLAG(APPEND_DELAY2,      settings.value(SG_APPEND_DELAY2).toBool());
+        TKTFLAG(TAB_FIRST,          ykConfig->tabFirst());
+        TKTFLAG(APPEND_TAB1,        ykConfig->appendTab1());
+        TKTFLAG(APPEND_TAB2,        ykConfig->appendTab2());
+        TKTFLAG(APPEND_CR,          ykConfig->appendCr());
+        TKTFLAG(APPEND_DELAY1,      ykConfig->appendDelay1());
+        TKTFLAG(APPEND_DELAY2,      ykConfig->appendDelay2());
         //TKTFLAG(PROTECT_CFG2,     ykConfig->protectCfg2());
 
         //CFGFLAG(SEND_REF,         ykConfig->sendRef());
         //CFGFLAG(TICKET_FIRST,     ykConfig->ticketFirst());
-        CFGFLAG(PACING_10MS,        settings.value(SG_PACING_10MS).toBool());
-        CFGFLAG(PACING_20MS,        settings.value(SG_PACING_20MS).toBool());
+        CFGFLAG(PACING_10MS,        ykConfig->pacing10ms());
+        CFGFLAG(PACING_20MS,        ykConfig->pacing20ms());
         //CFGFLAG(ALLOW_HIDTRIG,    ykConfig->allowHidtrig());
 
         //Serial # visibility...
         if(flagSrNoSupport) {
-            EXTFLAG(SERIAL_BTN_VISIBLE, settings.value(SG_SR_BTN_VISIBLE).toBool());
-            EXTFLAG(SERIAL_USB_VISIBLE, settings.value(SG_SR_USB_VISIBLE).toBool());
-            EXTFLAG(SERIAL_API_VISIBLE, settings.value(SG_SR_API_VISIBLE).toBool());
+            EXTFLAG(SERIAL_BTN_VISIBLE, ykConfig->serialBtnVisible());
+            EXTFLAG(SERIAL_USB_VISIBLE, ykConfig->serialUsbVisible());
+            EXTFLAG(SERIAL_API_VISIBLE, ykConfig->serialApiVisible());
+        }
+
+        if(flagUpdateSupport) {
+            EXTFLAG(ALLOW_UPDATE, ykConfig->allowUpdate());
+            // XXX: let update support mean these as well..
+            EXTFLAG(DORMANT, ykConfig->dormant());
+            EXTFLAG(FAST_TRIG, ykConfig->fastTrig());
+            EXTFLAG(USE_NUMERIC_KEYPAD, ykConfig->useNumericKeypad());
         }
 
         //Log configuration...
         qDebug() << "-------------------------";
         qDebug() << "Config data to be written to key configuration...";
+        qDebug() << "Command is: " << command;
 
         ykp_write_config(cfg, writer, stderr);
 
         qDebug() << "-------------------------";
 
         // Write configuration...
-        if (!yk_write_config(yk,
-                             ykp_core_config(cfg), ykp_config_num(cfg),
-                             useAccessCode ? accessCode : NULL)) {
+        if (!yk_write_command(yk,
+                              ykp_core_config(cfg), ykp_command(cfg),
+                              useAccessCode ? accessCode : NULL)) {
             qDebug() << "Failure";
             throw 0;
         }
@@ -422,3 +442,139 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     qDebug() << "Stopping write config";
     qDebug() << "-------------------------";
 }
+
+void YubiKeyWriter::doChallengeResponse(const QString challenge, QString  &response, int slot, bool hmac) {
+    YubiKeyFinder::getInstance()->stop();
+
+    YK_KEY *yk = 0;
+
+    bool error = false;
+
+    qDebug() << "Challenge to slot " << slot << " with challenge: " << challenge;
+
+    try {
+        int yk_cmd;
+        QByteArray chal_array = challenge.toAscii();
+        const unsigned char *chal = reinterpret_cast<const unsigned char*>(chal_array.constData());
+        unsigned char resp[64];
+        memset(resp, 0, sizeof(resp));
+        if (!yk_init()) {
+            throw 0;
+        } else if (!(yk = yk_open_first_key())) {
+            throw 0;
+        }
+
+        if (!(yk_check_firmware_version(yk))) {
+            throw 0;
+        }
+
+        switch(slot) {
+          case 1:
+            yk_cmd = (hmac == true) ? SLOT_CHAL_HMAC1 : SLOT_CHAL_OTP1;
+            break;
+          case 2:
+            yk_cmd = (hmac == true) ? SLOT_CHAL_HMAC2 : SLOT_CHAL_OTP2;
+            break;
+          default:
+            throw 0;
+            break;
+        }
+
+        if(! yk_challenge_response(yk, yk_cmd, 1, challenge.length(),
+              chal, sizeof(resp), resp)) {
+            throw 0;
+        }
+        // 20 (160 bits) for hmac-sha1 and 16 (128 bits) for yubico mode
+        if(hmac == true) {
+            response = YubiKeyUtil::qstrHexEncode(resp, 20);
+        } else {
+            response = YubiKeyUtil::qstrModhexEncode(resp, 16);
+        }
+    } catch(...) {
+        error = true;
+    }
+
+    if (yk && !yk_close_key(yk)) {
+        error = true;
+    }
+
+    if (!yk_release()) {
+        error = true;
+    }
+
+    YubiKeyFinder::getInstance()->start();
+
+
+    if(error) {
+        qDebug() << "Challenge response failed.";
+        QString errMsg = reportError();
+    }
+}
+
+void YubiKeyWriter::writeNdef(bool uri, const QString language, const QString payload) {
+    YubiKeyFinder::getInstance()->stop();
+
+    YK_KEY *yk = 0;
+    YK_NDEF *ndef = ykp_alloc_ndef();
+
+    bool error = false;
+
+    qDebug() << "Writing ndef " << payload << " of type " << uri;
+
+    try {
+        QByteArray payload_array = payload.toUtf8();
+        const char *ndef_payload = payload_array.constData();
+        qDebug() << "payload: " << ndef_payload;
+        if (!yk_init()) {
+            throw 0;
+        } else if (!(yk = yk_open_first_key())) {
+            throw 0;
+        }
+
+        if (!(yk_check_firmware_version(yk))) {
+            throw 0;
+        }
+
+        if(uri) {
+            if(!ykp_construct_ndef_uri(ndef, ndef_payload)) {
+                throw 0;
+            }
+        } else {
+            QByteArray lang_array = language.toUtf8();
+            const char *lang = lang_array.constData();
+            if(!ykp_construct_ndef_text(ndef, ndef_payload, lang, false)) {
+                throw 0;
+            }
+        }
+
+        qDebug() << "writing the ndef.";
+        if(! yk_write_ndef(yk, ndef)) {
+            throw 0;
+        }
+        emit configWritten(true, NULL);
+    } catch(...) {
+        error = true;
+    }
+
+    if(ndef && !ykp_free_ndef(ndef)) {
+        error = true;
+    }
+
+    if (yk && !yk_close_key(yk)) {
+        error = true;
+    }
+
+    if (!yk_release()) {
+        error = true;
+    }
+
+    YubiKeyFinder::getInstance()->start();
+
+
+    if(error) {
+        qDebug() << "Writing NDEF failed.";
+        QString errMsg = reportError();
+        emit configWritten(false, errMsg);
+    }
+}
+

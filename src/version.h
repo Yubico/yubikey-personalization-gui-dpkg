@@ -29,8 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef VERSION_H
 #define VERSION_H
 
-#define VER_PRODUCTVERSION          3,0,6,0
-#define VER_PRODUCTVERSION_STR      "3.0.6\0"
+#define VER_PRODUCTVERSION          3,1,0,0
+#define VER_PRODUCTVERSION_STR      "3.1.0\0"
 
 #define VER_FILEDESCRIPTION_STR     "YubiKey Personalization Tool"
 #define VER_INTERNALNAME_STR        "YKPersonalization"
@@ -39,5 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VER_ORIGINALFILENAME_STR    "YKPersonalization.exe"
 #define VER_PRODUCTNAME_STR         "YKPersonalization"
 #define VER_COMPANYNAME_STR         "Yubico"
+#define VER_COMPANYDOMAIN_STR       "yubico.com"
 
 #endif // VERSION_H
