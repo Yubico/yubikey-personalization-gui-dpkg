@@ -44,11 +44,13 @@ typedef std::vector<int>::size_type size_t;
 #define SCHEME_INCR_ID_RAND_SECRET  0
 #define SCHEME_RAND_SECRET          0
 #define SCHEME_RAND_ALL             1
+#define SCHEME_ID_FROM_SERIAL_RAND_SECRET 2
 #define SCHEME_FIXED                2
 
 #define GEN_SCHEME_FIXED            0
 #define GEN_SCHEME_INCR             1
 #define GEN_SCHEME_RAND             2
+#define GEN_SCHEME_SERIAL           3
 
 #define CONFIG_PROTECTION_DISABLED  0
 #define CONFIG_PROTECTION_ENABLE    1
@@ -86,8 +88,8 @@ typedef std::vector<int>::size_type size_t;
 #define SS_COPY_BTN                 "background-image: url(:/res/images/clipboard.png); border-radius: 2px;"
 #define SS_BLANK_BTN                "background-image: url(:/res/images/blank.png); border-radius: 2px;"
 
-#define SS_LINK_ENABLED             "font: 12px \"Verdana\"; text-decoration: underline; color: rgb(5, 67, 168);"
-#define SS_LINK_DISABLED            "font: 12px \"Verdana\"; text-decoration: underline; color: rgb(118,116,108);"
+#define SS_LINK_ENABLED             "font: 12px \"Verdana\"; text-decoration: underline; text-align: left; color: rgb(5, 67, 168);"
+#define SS_LINK_DISABLED            "font: 12px \"Verdana\"; text-decoration: underline; text-align: left; color: rgb(118,116,108);"
 
 
 //Messages
@@ -111,6 +113,7 @@ typedef std::vector<int>::size_type size_t;
 #define ERR_FIRMWARE_NOT_SUPPORTED  tr("This YubiKey firmware version is not supported")
 #define ERR_PROCESSING              tr("YubiKey could not be configured. Perhaps protected with configuration protection access code?")
 #define ERR_CONF_SLOT_NOT_SELECTED  tr("No configuration slot selected. Please select the configuration slot to be programmed")
+#define ERR_CHAL_TYPE_NOT_SELECTED  tr("No Challenge-Response Type selected. Please select the one to use")
 
 //Warnings
 
@@ -152,6 +155,10 @@ typedef std::vector<int>::size_type size_t;
 
 #define SG_MAN_UPDATE               "Flag/ManUpdate"
 
+#define SG_ALLOW_UPDATE             "Flag/AllowUpdate"
+#define SG_FAST_TRIG                "Flag/FastTrig"
+#define SG_USE_NUMERIC_KEYPAD       "Flag/UseNumericKeypad"
+
 #define SG_OVERWRITE_CONF_SLOT1     "DontAsk/Slot1Overwriting"
 #define SG_DIFF_PUBLIC_ID_LEN       "DontAsk/PublicIdLen"
 #define SG_ENABLE_CONF_PROTECTION   "DontAsk/ConfProtection"
@@ -190,4 +197,9 @@ typedef std::vector<int>::size_type size_t;
 
 #define HELP_CHALRESP_OPTION        tr("<p>If this option is selected, when a client-side interface software presents a Challenge to the YubiKey, the light starts flashing and the user has to touch the YubiKey button to acknowledge the challenge-response operation before the computed Response is sent back.</p>")
 
+#define HELP_ALLOW_UPDATE_OPTION       tr("<p>If this option is selected the YubiKey configuration will be updatable, without rewriting the aes-key. Only non-security related settings are changeable with this.</p>")
+
+#define HELP_SWAP_OPTION            tr("<p>If both slots are configured to allow updates they can be swapped with this option. That is slot 1 and slot 2 will change places.</p>")
+
+#define HELP_MAN_UPDATE_OPTION      tr("<p>The manual update setting is to allow the static password in the YubiKey to be changed without reprogramming the key. If it is set it can be triggered by holding the button for 10 seconds, releasing and then tapping it again, the YubiKey will then generate a new static password.</p>")
 #endif // COMMON_H

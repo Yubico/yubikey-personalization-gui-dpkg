@@ -47,7 +47,19 @@ ToolPage::ToolPage(QWidget *parent) :
     //Connect other signals and slots
     connect(ui->converterResetBtn, SIGNAL(clicked()),
             this, SLOT(resetConverterPage()));
+    connect(ui->chalRespResetBtn, SIGNAL(clicked()),
+            this, SLOT(resetChalRespPage()));
+    connect(ui->chalRespPerformBtn, SIGNAL(clicked()),
+            this, SLOT(performChallengeResponse()));
+    connect(ui->chalRespChallenge, SIGNAL(editingFinished()),
+            this, SLOT(on_chalRespChallenge_editingFinished()));
+    connect(ui->ndefResetBtn, SIGNAL(clicked()),
+            this, SLOT(resetNdefPage()));
+    connect(ui->ndefProgramBtn, SIGNAL(clicked()),
+            this, SLOT(programNdef()));
 
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+            this, SLOT(keyFound(bool, bool*)));
 }
 
 ToolPage::~ToolPage() {
@@ -67,11 +79,23 @@ void ToolPage::connectPages() {
 
     //Connect the clicked signal with the QSignalMapper
     connect(ui->converterBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    //connect(ui->converterBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->converterBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+
+    connect(ui->chalRespBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->chalRespBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+
+    connect(ui->ndefBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->ndefBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
     //Set a value for each button
     mapper->setMapping(ui->converterBtn, Page_Converter);
-    //mapper->setMapping(ui->converterBackBtn, Page_Base);
+    mapper->setMapping(ui->converterBackBtn, Page_Base);
+
+    mapper->setMapping(ui->chalRespBtn, Page_ChalResp);
+    mapper->setMapping(ui->chalRespBackBtn, Page_Base);
+
+    mapper->setMapping(ui->ndefBtn, Page_Ndef);
+    mapper->setMapping(ui->ndefBackBtn, Page_Base);
 
     //Connect the mapper to the widget
     //The mapper will set a value to each button and
@@ -81,7 +105,7 @@ void ToolPage::connectPages() {
 
     //Set the current page
     m_currentPage = 0;
-    setCurrentIndex(Page_Converter);
+    setCurrentIndex(Page_Base);
 }
 
 void ToolPage::setCurrentPage(int pageIndex) {
@@ -107,6 +131,41 @@ void ToolPage::helpBtn_pressed(int helpIndex) {
     help.exec();
 }
 
+void ToolPage::resetChalRespPage() {
+    ui->chalRespChallenge->clear();
+    ui->chalRespResponse->clear();
+}
+
+void ToolPage::on_chalRespChallenge_editingFinished() {
+    QString challenge = ui->chalRespChallenge->text().trimmed();
+    ui->chalRespChallenge->setText(challenge);
+}
+
+void ToolPage::performChallengeResponse() {
+    QString challenge = ui->chalRespChallenge->text();
+    QString response = "";
+    bool hmac;
+    int slot;
+    if(ui->chalRespHmacRadio->isChecked()) {
+        hmac = true;
+    } else if(ui->chalRespYubicoRadio->isChecked()) {
+        hmac = false;
+    } else {
+      emit showStatusMessage(ERR_CHAL_TYPE_NOT_SELECTED, 1);
+      return;
+    }
+    if(ui->chalRespSlot1Radio->isChecked()) {
+        slot = 1;
+    } else if(ui->chalRespSlot2Radio->isChecked()) {
+        slot = 2;
+    } else {
+      emit showStatusMessage(ERR_CONF_SLOT_NOT_SELECTED, 1);
+      return;
+    }
+    YubiKeyWriter::getInstance()->doChallengeResponse(challenge, response, slot, hmac);
+    qDebug() << "response was: " << response;
+    ui->chalRespResponse->setText(response);
+}
 /*
  Quick Page handling
 */
@@ -238,4 +297,62 @@ void ToolPage::on_converterModhexCopyBtn_clicked() {
 
 void ToolPage::on_converterDecCopyBtn_clicked() {
     copyToClipboard(ui->converterDecTxt->text());
+}
+
+void ToolPage::resetNdefPage() {
+    ui->ndefEdit->clear();
+    ui->ndefTextLangEdit->setText("en-US");
+    ui->ndefUriRadio->setChecked(true);
+}
+
+void ToolPage::programNdef() {
+    YubiKeyWriter *writer = YubiKeyWriter::getInstance();
+    bool uri = true;
+    QString language;
+    QString payload;
+    if(ui->ndefTextRadio->isChecked()) {
+        uri = false;
+        language = ui->ndefTextLangEdit->text().trimmed();
+        if(language.isEmpty()) {
+            return;
+        }
+    }
+    payload = ui->ndefEdit->text().trimmed();
+    if(payload.isEmpty()) {
+        return;
+    }
+
+    connect(writer, SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(ndefWritten(bool, const QString &)));
+    writer->writeNdef(uri, language, payload);
+}
+
+void ToolPage::ndefWritten(bool written, const QString &msg) {
+    disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(ndefWritten(bool, const QString &)));
+    if(written) {
+        showStatusMessage(tr("NDEF successfully written"));
+    }
+}
+
+void ToolPage::on_ndefTextRadio_toggled(bool checked) {
+    if(checked) {
+        ui->ndefTextLangEdit->setEnabled(true);
+    } else {
+        ui->ndefTextLangEdit->setText("en-US");
+        ui->ndefTextLangEdit->setEnabled(false);
+    }
+}
+
+void ToolPage::keyFound(bool found, bool* featuresMatrix) {
+    if(found && featuresMatrix[YubiKeyFinder::Feature_ChallengeResponse]) {
+        ui->chalRespPerformBtn->setEnabled(true);
+    } else {
+        ui->chalRespPerformBtn->setEnabled(false);
+    }
+    if(found && featuresMatrix[YubiKeyFinder::Feature_Ndef]) {
+        ui->ndefProgramBtn->setEnabled(true);
+    } else {
+        ui->ndefProgramBtn->setEnabled(false);
+    }
 }

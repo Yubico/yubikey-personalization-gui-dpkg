@@ -28,10 +28,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "yubikeyfinder.h"
 
-#define YK_VERSION(MAJOR, MINOR, BUILD) (MAJOR * 100 + MINOR * 10 + BUILD)
-
 YubiKeyFinder* YubiKeyFinder::_instance = 0;
 
+// first version is inclusive, second is exclusive
 const unsigned int YubiKeyFinder::FEATURE_MATRIX[][2] = {
     { YK_VERSION(2,0,0), 0 },   //Feature_MultipleConfigurations
     { YK_VERSION(2,0,0), 0 },   //Feature_ProtectConfiguration2
@@ -41,8 +40,28 @@ const unsigned int YubiKeyFinder::FEATURE_MATRIX[][2] = {
     { YK_VERSION(2,0,0), 0 },   //Feature_StrongPwd
     { YK_VERSION(2,1,0), 0 },   //Feature_OathHotp
     { YK_VERSION(2,2,0), 0 },   //Feature_ChallengeResponse
-    { YK_VERSION(2,2,0), 0 },   //Feature_SerialNumber
-    { YK_VERSION(2,2,0), 0 }    //Feature_MovingFactor
+    { YK_VERSION(2,1,4), 0 },   //Feature_SerialNumber
+    { YK_VERSION(2,1,7), 0 },   //Feature_MovingFactor
+    { YK_VERSION(2,3,0), 0 },   //Feature_ChallengeResponseFixed
+    { YK_VERSION(2,3,0), 0 },   //Feature_Updatable
+    { YK_VERSION(2,1,4), YK_VERSION(2,2,0)}, //Feature_Ndef
+};
+
+// when a featureset should be excluded from versions (NEO, I'm looking at you.)
+const unsigned int YubiKeyFinder::FEATURE_MATRIX_EXCLUDE[][2] = {
+    { YK_VERSION(2,1,4), YK_VERSION(2,2,0) }, //Feature_MultipleConfigurations
+    { YK_VERSION(2,1,4), YK_VERSION(2,2,0) }, //Feature_ProtectConfiguration2
+    { YK_VERSION(2,1,4), YK_VERSION(2,1,8) }, //Feature_StaticPassword
+    { YK_VERSION(2,1,4), YK_VERSION(2,1,8) }, //Feature_ScanCodeMode
+    { 0, 0 },                                 //Feature_ShortTicket
+    { YK_VERSION(2,1,4), YK_VERSION(2,1,8) }, //Feature_StrongPwd
+    { 0, 0 },                                 //Feature_OathHotp
+    { 0, 0 },                                 //Feature_ChallengeResponse
+    { 0, 0 },                                 //Feature_SerialNumber
+    { 0, 0 },                                 //Feature_MovingFactor
+    { 0, 0 },                                 //Feature_ChallengeResponseFixed
+    { 0, 0 },                                 //Feature_Updatable
+    { 0, 0 },                                 //Feature_Ndef
 };
 
 YubiKeyFinder::YubiKeyFinder() {
@@ -105,12 +124,17 @@ void YubiKeyFinder::reportError() {
 bool YubiKeyFinder::checkFeatureSupport(Feature feature) {
     if(m_version > 0 &&
        (unsigned int) feature < sizeof(FEATURE_MATRIX)/sizeof(FEATURE_MATRIX[0])) {
-        return (
+        bool supported = (
                 m_version >= FEATURE_MATRIX[feature][0] &&
-                (FEATURE_MATRIX[feature][1] == 0 || m_version <= FEATURE_MATRIX[feature][1])
+                (FEATURE_MATRIX[feature][1] == 0 || m_version < FEATURE_MATRIX[feature][1])
                 );
+        if(supported)
+            if(FEATURE_MATRIX_EXCLUDE[feature][0] != 0)
+                if(m_version >= FEATURE_MATRIX_EXCLUDE[feature][0])
+                    if(m_version < FEATURE_MATRIX_EXCLUDE[feature][1])
+                        return false;
+        return supported;
     }
-
     return false;
 }
 
@@ -129,6 +153,7 @@ void YubiKeyFinder::start() {
     if(m_timer && !m_timer->isActive()) {
         m_timer->start(TIMEOUT_FINDER);
     }
+    yk_init();
 }
 
 void YubiKeyFinder::stop() {
@@ -136,7 +161,8 @@ void YubiKeyFinder::stop() {
     if(m_timer && m_timer->isActive()) {
         m_timer->stop();
     }
-    //closeKey();
+    closeKey();
+    yk_release();
 }
 
 bool YubiKeyFinder::openKey() {
@@ -144,10 +170,7 @@ bool YubiKeyFinder::openKey() {
     if(m_yk != 0) {
         closeKey();
     }
-
-    if (!yk_init()) {
-        flag = false;
-    } else if (!(m_yk = yk_open_first_key())) {
+    if (!(m_yk = yk_open_first_key())) {
         flag = false;
     }
 
@@ -158,9 +181,6 @@ bool YubiKeyFinder::closeKey() {
     bool flag = true;
     if(m_yk != 0) {
         if (!yk_close_key(m_yk)) {
-            flag = false;
-        }
-        if (!yk_release()) {
             flag = false;
         }
     }
@@ -191,7 +211,7 @@ void YubiKeyFinder::findKey() {
         //Check pervious state
         if(m_state == State_Absent) {
 
-            m_state = State_Preset;
+            m_state = State_Present;
 
             //Get version
             m_versionMajor = ykds_version_major(ykst);

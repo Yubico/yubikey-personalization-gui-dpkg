@@ -32,27 +32,66 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 
 #include "common.h"
-#include "version.h"
+
+#define DECIMAL 0
+#define MODHEX 1
+#define HEX 2
 
 SettingPage::SettingPage(QWidget *parent) :
-        QWidget(parent),
+        QStackedWidget(parent),
         ui(new Ui::SettingPage)
 {
+    QSignalMapper *mapper = new QSignalMapper(this);
     ui->setupUi(this);
+
+    m_ykConfig = NULL;
 
     //Connect help buttons
     connectHelpButtons();
 
+    connect(ui->updateBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->updateBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(ui->updateBtn, Page_Update);
+    mapper->setMapping(ui->updateBackBtn, Page_Base);
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(setCurrentPage(int)));
+    m_currentPage = 0;
+    setCurrentIndex(Page_Base);
+
     //Connect other signals and slots
     connect(ui->saveBtn, SIGNAL(clicked()),
             this, SLOT(save()));
-    connect(ui->cancelBtn, SIGNAL(clicked()),
-            this, SLOT(load()));
     connect(ui->restoreBtn, SIGNAL(clicked()),
             this, SLOT(restore()));
+
+    // autosave when changing settings
+    connect(ui->custPrefixCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->logOutputCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->tabFirstBtn, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->appendTab1Btn, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->appendTab2Btn, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->appendCRBtn, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->appendDelay1Check, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->appendDelay2Check, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->srBtnVisibleCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->srUsbVisibleCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->srApiVisibleCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->manUpdateCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->updateCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->fastTrigCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->useNumericKeypadCheck, SIGNAL(clicked()), this, SLOT(save()));
+
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+            this, SLOT(keyFound(bool, bool*)));
+
+    QRegExp rx("^[cbdefghijklnrtuv]{0,4}$");
+    ui->custPrefixModhexTxt->setValidator(new QRegExpValidator(rx, this));
 }
 
 SettingPage::~SettingPage() {
+    delete ui->custPrefixModhexTxt->validator();
+    if(m_ykConfig != NULL) {
+        delete m_ykConfig;
+    }
     delete ui;
 }
 
@@ -66,14 +105,27 @@ void SettingPage::connectHelpButtons() {
     connect(ui->outFormatHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->outSpeedHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->srVisibilityHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->updateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->configProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->swapHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->manUpdateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
     //Set a value for each button
     mapper->setMapping(ui->outFormatHelpBtn, HelpBox::Help_OutputFormat);
     mapper->setMapping(ui->outSpeedHelpBtn, HelpBox::Help_OutputSpeed);
     mapper->setMapping(ui->srVisibilityHelpBtn, HelpBox::Help_SrNoVisibility);
+    mapper->setMapping(ui->updateHelpBtn, HelpBox::Help_AllowUpdate);
+    mapper->setMapping(ui->configProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
+    mapper->setMapping(ui->swapHelpBtn, HelpBox::Help_Swap);
+    mapper->setMapping(ui->manUpdateHelpBtn, HelpBox::Help_ManUpdate);
 
     //Connect the mapper
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
+}
+
+void SettingPage::setCurrentPage(int pageIndex) {
+    m_currentPage = pageIndex;
+    setCurrentIndex(pageIndex);
 }
 
 void SettingPage::helpBtn_pressed(int helpIndex) {
@@ -83,9 +135,6 @@ void SettingPage::helpBtn_pressed(int helpIndex) {
 }
 
 void SettingPage::init() {
-    QCoreApplication::setOrganizationName(VER_COMPANYNAME_STR);
-    QCoreApplication::setApplicationName(VER_PRODUCTNAME_STR);
-
     load();
 }
 
@@ -108,10 +157,14 @@ void SettingPage::restoreDefaults() {
     settings.setValue(SG_PACING_20MS,           false);
 
     settings.setValue(SG_SR_BTN_VISIBLE,        true);
-    settings.setValue(SG_SR_USB_VISIBLE,        true);
+    settings.setValue(SG_SR_USB_VISIBLE,        false);
     settings.setValue(SG_SR_API_VISIBLE,        true);
 
     settings.setValue(SG_MAN_UPDATE,            false);
+
+    settings.setValue(SG_ALLOW_UPDATE,          true);
+    settings.setValue(SG_FAST_TRIG,             false);
+    settings.setValue(SG_USE_NUMERIC_KEYPAD,    false);
 }
 
 void SettingPage::load() {
@@ -131,13 +184,21 @@ void SettingPage::load() {
         ui->custPrefixCheck->setChecked(true);
 
         int custPrefix = settings.value(SG_CUSTOMER_PREFIX).toInt();
-        ui->custPrefixTxt->setText(QString::number(custPrefix));
-        ui->custPrefixTxt->setEnabled(true);
+        if(custPrefix > 0) {
+            custPrefixChanged(DECIMAL, QString::number(custPrefix));
+            ui->custPrefixDecTxt->setEnabled(true);
+            ui->custPrefixModhexTxt->setEnabled(true);
+            ui->custPrefixHexTxt->setEnabled(true);
+        }
     } else {
         ui->custPrefixCheck->setChecked(false);
 
-        ui->custPrefixTxt->setText("0");
-        ui->custPrefixTxt->setEnabled(false);
+        ui->custPrefixDecTxt->clear();
+        ui->custPrefixDecTxt->setEnabled(false);
+        ui->custPrefixModhexTxt->clear();
+        ui->custPrefixModhexTxt->setEnabled(false);
+        ui->custPrefixHexTxt->clear();
+        ui->custPrefixHexTxt->setEnabled(false);
     }
 
 
@@ -172,6 +233,17 @@ void SettingPage::load() {
 
     //Static Password settings...
     ui->manUpdateCheck->setChecked(settings.value(SG_MAN_UPDATE).toBool());
+
+    //Updatable settings...
+    if(settings.contains(SG_ALLOW_UPDATE)) {
+        ui->updateCheck->setChecked(settings.value(SG_ALLOW_UPDATE).toBool());
+    } else {
+        ui->updateCheck->setChecked(true);
+    }
+
+    // extended settings..
+    ui->fastTrigCheck->setChecked(settings.value(SG_FAST_TRIG).toBool());
+    ui->useNumericKeypadCheck->setChecked(settings.value(SG_USE_NUMERIC_KEYPAD).toBool());
 
     //Logging settings...
     if(logDisabled) {
@@ -210,7 +282,7 @@ void SettingPage::save() {
     int custPrefix = 0;
     if(ui->custPrefixCheck->isChecked()) {
         settings.setValue(SG_CUSTOMER_PREFIX_USED, true);
-        custPrefix = ui->custPrefixTxt->text().toInt();
+        custPrefix = ui->custPrefixDecTxt->text().toInt();
     } else {
         settings.setValue(SG_CUSTOMER_PREFIX_USED, false);
     }
@@ -252,6 +324,13 @@ void SettingPage::save() {
     //Static Password settings...
     settings.setValue(SG_MAN_UPDATE,        ui->manUpdateCheck->isChecked());
 
+    // Updatable settings...
+    settings.setValue(SG_ALLOW_UPDATE, ui->updateCheck->isChecked());
+
+    // Extended settings
+    settings.setValue(SG_FAST_TRIG, ui->fastTrigCheck->isChecked());
+    settings.setValue(SG_USE_NUMERIC_KEYPAD, ui->useNumericKeypadCheck->isChecked());
+
     //Logging settings...
     if(ui->logOutputCheck->isChecked()) {
         settings.setValue(SG_LOG_DISABLED,  false);
@@ -291,16 +370,29 @@ void SettingPage::restore() {
 
 void SettingPage::on_custPrefixCheck_stateChanged(int state) {
     if(state == 0) {
-        ui->custPrefixTxt->setText("0");
-        ui->custPrefixTxt->setEnabled(false);
+        ui->custPrefixDecTxt->setEnabled(false);
+        ui->custPrefixModhexTxt->setEnabled(false);
+        ui->custPrefixHexTxt->setEnabled(false);
     } else {
-        ui->custPrefixTxt->setEnabled(true);
+        ui->custPrefixDecTxt->setEnabled(true);
+        ui->custPrefixModhexTxt->setEnabled(true);
+        ui->custPrefixHexTxt->setEnabled(true);
     }
 }
 
-void SettingPage::on_custPrefixTxt_editingFinished() {
-    int custPrefix = ui->custPrefixTxt->text().toInt();
-    ui->custPrefixTxt->setText(QString::number(custPrefix));
+void SettingPage::on_custPrefixDecTxt_editingFinished() {
+    custPrefixChanged(DECIMAL, ui->custPrefixDecTxt->text());
+    save();
+}
+
+void SettingPage::on_custPrefixModhexTxt_editingFinished() {
+    custPrefixChanged(MODHEX, ui->custPrefixModhexTxt->text());
+    save();
+}
+
+void SettingPage::on_custPrefixHexTxt_editingFinished() {
+    custPrefixChanged(HEX, ui->custPrefixHexTxt->text());
+    save();
 }
 
 void SettingPage::on_logOutputCheck_stateChanged(int state) {
@@ -321,5 +413,192 @@ void SettingPage::on_browseBtn_clicked() {
 
     if(!fileName.isEmpty()) {
         ui->logFileTxt->setText(fileName);
+        save();
+    }
+}
+
+void SettingPage::on_doUpdateBtn_clicked() {
+    int slot;
+
+    if(ui->updateSlot1Radio->isChecked()) {
+        slot = 1;
+    } else if(ui->updateSlot2Radio->isChecked()) {
+        slot = 2;
+    } else {
+      emit showStatusMessage(ERR_CONF_SLOT_NOT_SELECTED, 1);
+      return;
+    }
+
+    if(m_ykConfig != NULL) {
+        delete m_ykConfig;
+    }
+    m_ykConfig = new YubiKeyConfig();
+
+    m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Update);
+    m_ykConfig->setConfigSlot(slot);
+
+    // access code
+    m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());
+    if(ui->configProtectionCombo->currentIndex() ==
+        CONFIG_PROTECTION_DISABLE) {
+        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
+    } else {
+        m_ykConfig->setNewAccessCodeTxt(ui->newAccessCodeTxt->text());
+    }
+
+    if(ui->updateDormantCheck->isChecked()) {
+        m_ykConfig->setDormant(true);
+    }
+
+    //Write
+    connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(updateConfigWritten(bool, const QString &)));
+
+    YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
+}
+
+void SettingPage::updateConfigWritten(bool written, const QString &msg) {
+    disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+        this, SLOT(updateConfigWritten(bool, const QString &)));
+
+    if(written) {
+        qDebug() << "Configuration updated." << msg;
+        emit showStatusMessage(tr("Configuration successfully updated.", 0));
+    } else {
+        qDebug() << "Failed update.";
+        emit showStatusMessage(msg, 1);;
+    }
+
+}
+
+void SettingPage::on_swapBtn_clicked() {
+    if(m_ykConfig != NULL) {
+        delete m_ykConfig;
+    }
+    m_ykConfig = new YubiKeyConfig();
+
+    m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Swap);
+
+    // access code
+    m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());
+    if(ui->configProtectionCombo->currentIndex() ==
+        CONFIG_PROTECTION_DISABLE) {
+        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
+    } else {
+        m_ykConfig->setNewAccessCodeTxt(ui->newAccessCodeTxt->text());
+    }
+
+    //Write
+    connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(swapWritten(bool, const QString &)));
+
+    YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
+}
+
+void SettingPage::swapWritten(bool written, const QString &msg) {
+    disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+        this, SLOT(swapWritten(bool, const QString &)));
+
+    if(written) {
+        qDebug() << "Configurations swapped." << msg;
+        emit showStatusMessage(tr("Configuration successfully swapped.", 0));
+    } else {
+        qDebug() << "Failed swapping." << msg;
+        emit showStatusMessage(msg, 1);;
+    }
+}
+
+
+void SettingPage::on_configProtectionCombo_currentIndexChanged(int index) {
+    switch(index) {
+    case CONFIG_PROTECTION_DISABLED:
+        ui->currentAccessCodeTxt->clear();
+        ui->currentAccessCodeTxt->setEnabled(false);
+
+        ui->newAccessCodeTxt->clear();
+        ui->newAccessCodeTxt->setEnabled(false);
+        break;
+    case CONFIG_PROTECTION_ENABLE:
+        ui->currentAccessCodeTxt->clear();
+        ui->currentAccessCodeTxt->setEnabled(false);
+
+        on_newAccessCodeTxt_editingFinished();
+        ui->newAccessCodeTxt->setEnabled(true);
+        break;
+    case CONFIG_PROTECTION_DISABLE:
+    case CONFIG_PROTECTION_ENABLED:
+        on_currentAccessCodeTxt_editingFinished();
+        ui->currentAccessCodeTxt->setEnabled(true);
+
+        ui->newAccessCodeTxt->clear();
+        ui->newAccessCodeTxt->setEnabled(false);
+        break;
+    case CONFIG_PROTECTION_CHANGE:
+        on_currentAccessCodeTxt_editingFinished();
+        ui->currentAccessCodeTxt->setEnabled(true);
+
+        on_newAccessCodeTxt_editingFinished();
+        ui->newAccessCodeTxt->setEnabled(true);
+        break;
+    }
+}
+
+void SettingPage::on_currentAccessCodeTxt_editingFinished() {
+    QString txt = ui->currentAccessCodeTxt->text();
+    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
+    ui->currentAccessCodeTxt->setText(txt);
+}
+
+void SettingPage::on_newAccessCodeTxt_editingFinished() {
+    QString txt = ui->newAccessCodeTxt->text();
+    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
+    ui->newAccessCodeTxt->setText(txt);
+}
+
+void SettingPage::keyFound(bool found, bool* featuresMatrix) {
+    if(found) {
+        if(featuresMatrix[YubiKeyFinder::Feature_Updatable]) {
+            ui->updateBtn->setEnabled(true);
+        }
+    } else {
+        ui->updateBtn->setEnabled(false);
+    }
+}
+
+void SettingPage::custPrefixChanged(int type, QString src) {
+    unsigned char buf[16];
+    memset(buf, 0, sizeof(buf));
+    size_t bufLen = 0;
+
+    switch(type) {
+        // decimal
+        case DECIMAL:
+            {
+                QString tmp = QString::number(src.toULongLong(), 16);
+                size_t len = tmp.length();
+                if(len % 2 != 0) {
+                    len++;
+                }
+                YubiKeyUtil::qstrClean(&tmp, (size_t)len, true);
+                YubiKeyUtil::qstrHexDecode(buf, &bufLen, tmp);
+                break;
+            }
+        // modhex
+        case MODHEX:
+            YubiKeyUtil::qstrModhexDecode(buf, &bufLen, src);
+            break;
+        // hex
+        case HEX:
+            YubiKeyUtil::qstrHexDecode(buf, &bufLen, src);
+            break;
+    }
+    QString hex = YubiKeyUtil::qstrHexEncode(buf, bufLen);
+    QString modhex = YubiKeyUtil::qstrModhexEncode(buf, bufLen);
+    bool ok = false;
+    qulonglong dec = hex.toULongLong(&ok, 16);
+    if(dec > 0) {
+        ui->custPrefixDecTxt->setText(QString::number(dec));
+        ui->custPrefixModhexTxt->setText(modhex);
+        ui->custPrefixHexTxt->setText(hex);
     }
 }

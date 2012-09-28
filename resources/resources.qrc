@@ -5,10 +5,15 @@
         <file>images/recommend.png</file>
         <file>images/right.png</file>
         <file>images/tick.png</file>
-        <file>images/yk.png</file>
         <file>win/Yubico.ico</file>
         <file>images/clipboard.png</file>
         <file>images/blank.png</file>
         <file>images/logo.png</file>
+        <file>images/v1-3-not-animated.png</file>
+        <file>images/V2-0-2-1-animated.gif</file>
+        <file>images/v2-2-animated.gif</file>
+        <file>images/v2-3-animated.gif</file>
+        <file>images/neo_transparent.png</file>
+        <file>images/yubikey_devel.png</file>
     </qresource>
 </RCC>

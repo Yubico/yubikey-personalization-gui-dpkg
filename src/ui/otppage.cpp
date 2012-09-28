@@ -235,10 +235,9 @@ void OtpPage::loadSettings() {
         QByteArray prefix;
 
         // As per old tool
-        prefix.resize(3);
-        prefix[0] = YUBICO_OTP_CUSTOMER_PREFIX_CODE;
-        prefix[1] = (unsigned char) (m_customerPrefix >> 8U);
-        prefix[2] = (unsigned char) m_customerPrefix;
+        prefix.resize(2);
+        prefix[0] = (unsigned char) (m_customerPrefix >> 8U);
+        prefix[1] = (unsigned char) m_customerPrefix;
 
         char pubIdPrefix[prefix.size() * 2 + 1];
         size_t pubIdPrefixLen = 0;
@@ -360,7 +359,6 @@ void OtpPage::writeQuickConfig() {
     //Write configuration
     ui->quickWriteConfigBtn->setEnabled(false);
     ui->quickUploadBtn->setEnabled(false);
-    ui->quickResetBtn->setEnabled(false);
     ui->quickBackBtn->setEnabled(false);
 
     if(m_ykConfig != 0) {
@@ -409,7 +407,6 @@ void OtpPage::quickConfigWritten(bool written, const QString &msg) {
                this, SLOT(quickConfigWritten(bool, const QString &)));
 
     ui->quickWriteConfigBtn->setEnabled(true);
-    ui->quickResetBtn->setEnabled(true);
     ui->quickBackBtn->setEnabled(true);
 
     if(written && m_ykConfig != 0) {
@@ -438,7 +435,7 @@ void OtpPage::resetAdvPage() {
         ui->advConfigSlot2Radio->setChecked(true);
     }
 
-    ui->advConfigParamsCombo->setCurrentIndex(0);
+    ui->advConfigParamsCombo->setCurrentIndex(2);
     ui->advAutoProgramKeysCheck->setChecked(false);
     ui->advProgramMulKeysBox->setChecked(false);
 
@@ -446,6 +443,7 @@ void OtpPage::resetAdvPage() {
 
     ui->advPubIdCheck->setChecked(true);
     ui->advPubIdTxt->clear();
+    set_advPubId_default();
     on_advPubIdTxt_editingFinished();
     ui->advPubIdLenBox->setValue(PUBLIC_ID_DEFAULT_SIZE);
     if(m_customerPrefix > 0) {
@@ -462,7 +460,6 @@ void OtpPage::resetAdvPage() {
     on_advSecretKeyTxt_editingFinished();
 
     ui->advStopBtn->setEnabled(false);
-    ui->advResetBtn->setEnabled(false);
 }
 
 void OtpPage::freezeAdvPage(bool freeze) {
@@ -474,7 +471,6 @@ void OtpPage::freezeAdvPage(bool freeze) {
 
     ui->advWriteConfigBtn->setEnabled(disable);
     ui->advStopBtn->setEnabled(!disable);
-    ui->advResetBtn->setEnabled(disable);
     ui->advBackBtn->setEnabled(disable);
 }
 
@@ -543,13 +539,34 @@ void OtpPage::on_advPubIdCheck_stateChanged(int state) {
     }
 }
 
+void OtpPage::set_advPubId_default() {
+    QString txt = "cccccc";
+    unsigned int serial = YubiKeyFinder::getInstance()->serial();
+
+    //Convert serial number to modhex
+    unsigned char buf[16];
+    memset(buf, 0, sizeof(buf));
+    size_t bufLen = 0;
+
+    QString tmp = QString::number(serial, 16);
+    size_t len = tmp.length();
+    if(len % 2 != 0) {
+      len++;
+    }
+    YubiKeyUtil::qstrClean(&tmp, (size_t)len, true);
+    YubiKeyUtil::qstrHexDecode(buf, &bufLen, tmp);
+
+    txt.append(YubiKeyUtil::qstrModhexEncode(buf, bufLen));
+    ui->advPubIdTxt->setText(txt);
+}
+
 void OtpPage::on_advPubIdTxt_editingFinished() {
     QString txt = ui->advPubIdTxt->text();
     int len = ui->advPubIdLenBox->value() * 2;
     YubiKeyUtil::qstrModhexClean(&txt, (size_t)len);
 
     if(m_customerPrefix > 0) {
-        txt.replace(0, 6, m_pubIdPrefix);
+        txt.replace(0, 4, m_pubIdPrefix);
     }
     ui->advPubIdTxt->setText(txt);
     len = txt.length();
@@ -637,7 +654,7 @@ void OtpPage::on_advStopBtn_clicked() {
 }
 
 void OtpPage::stopAdvConfigWritting() {
-    qDebug() << "Stopping adv confgiuration writing...";
+    qDebug() << "Stopping adv configuration writing...";
 
     if(m_state >= State_Programming_Multiple) {
         ui->advStopBtn->setEnabled(true);
@@ -648,11 +665,10 @@ void OtpPage::stopAdvConfigWritting() {
     clearState();
 
     freezeAdvPage(false);
-    ui->advResetBtn->setEnabled(true);
 }
 
 void OtpPage::changeAdvConfigParams() {
-    qDebug() << "Changing adv confgiuration prams...";
+    qDebug() << "Changing adv configuration params...";
 
     int index = ui->advConfigParamsCombo->currentIndex();
     int idScheme = GEN_SCHEME_FIXED;
@@ -671,23 +687,32 @@ void OtpPage::changeAdvConfigParams() {
         idScheme = GEN_SCHEME_RAND;
         secretScheme = GEN_SCHEME_RAND;
         break;
+
+    case SCHEME_ID_FROM_SERIAL_RAND_SECRET:
+        idScheme = GEN_SCHEME_SERIAL;
+        secretScheme = GEN_SCHEME_RAND;
+        break;
     }
 
     //Public ID...
     if(ui->advPubIdCheck->isChecked()) {
-        QString pubIdTxt = YubiKeyUtil::getNextModhex(
+        if(idScheme == GEN_SCHEME_SERIAL) {
+            set_advPubId_default();
+        } else {
+            QString pubIdTxt = YubiKeyUtil::getNextModhex(
                 ui->advPubIdLenBox->value() * 2,
                 ui->advPubIdTxt->text(), idScheme);
 
-        ui->advPubIdTxt->setText(pubIdTxt);
-        on_advPubIdTxt_editingFinished();
+            ui->advPubIdTxt->setText(pubIdTxt);
+            on_advPubIdTxt_editingFinished();
+        }
     }
 
     //Private ID...
     if(ui->advPvtIdCheck->isChecked()) {
         QString pvtIdTxt = YubiKeyUtil::getNextHex(
                 UID_SIZE * 2,
-                ui->advPvtIdTxt->text(), idScheme);
+                ui->advPvtIdTxt->text(), secretScheme);
         ui->advPvtIdTxt->setText(pvtIdTxt);
     }
 

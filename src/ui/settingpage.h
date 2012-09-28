@@ -29,13 +29,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SETTINGPAGE_H
 #define SETTINGPAGE_H
 
-#include <QWidget>
+#include <QStackedWidget>
+#include "yubikeyconfig.h"
 
 namespace Ui {
     class SettingPage;
 }
 
-class SettingPage : public QWidget {
+class SettingPage : public QStackedWidget {
     Q_OBJECT
 
 public:
@@ -46,8 +47,17 @@ public:
 private:
     Ui::SettingPage *ui;
 
+    enum Page {
+        Page_Base,
+        Page_Update,
+    };
+    int m_currentPage;
+
+    YubiKeyConfig *m_ykConfig;
+
 private slots:
     void connectHelpButtons();
+    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void restoreDefaults();
     void load();
@@ -55,10 +65,24 @@ private slots:
     void restore();
 
     void on_custPrefixCheck_stateChanged(int state);
-    void on_custPrefixTxt_editingFinished();
+    void on_custPrefixDecTxt_editingFinished();
+    void on_custPrefixModhexTxt_editingFinished();
+    void on_custPrefixHexTxt_editingFinished();
     void on_logOutputCheck_stateChanged(int state);
     void on_browseBtn_clicked();
 
+    void on_doUpdateBtn_clicked();
+    void on_swapBtn_clicked();
+    void updateConfigWritten(bool written, const QString &msg);
+    void swapWritten(bool written, const QString &msg);
+
+    void on_configProtectionCombo_currentIndexChanged(int index);
+    void on_currentAccessCodeTxt_editingFinished();
+    void on_newAccessCodeTxt_editingFinished();
+
+    void keyFound(bool found, bool* featuresMatrix);
+
+    void custPrefixChanged(int type, QString src);
 signals:
     void settingsChanged();
     void showStatusMessage(const QString &text, int status = 0);

@@ -260,6 +260,10 @@ void MainWindow::resetDeviceInfo() {
     ui->scanCodeSupportLbl->setText(NA);
     ui->chalRespSupportLbl->setPixmap(NULL);
     ui->chalRespSupportLbl->setText(NA);
+    ui->updatableSupportLbl->setPixmap(NULL);
+    ui->updatableSupportLbl->setText(NA);
+    ui->ndefSupportLbl->setPixmap(NULL);
+    ui->ndefSupportLbl->setText(NA);
 }
 
 void MainWindow::keyFound(bool found, bool* featuresMatrix) {
@@ -272,10 +276,38 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix) {
     resetDeviceInfo();
 
     if(found) {
+        YubiKeyFinder *finder = YubiKeyFinder::getInstance();
+        unsigned int version = finder->version();
         ui->statusLbl->setText(KEY_FOUND);
         ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_SUCCESS));
 
-        ui->versionLbl->setText(YubiKeyFinder::getInstance()->versionStr());
+        ui->versionLbl->setText(finder->versionStr());
+        qDebug() << "version is" << finder->versionStr();
+
+        QPixmap pixmap;
+        QMovie *movie = new QMovie();
+        if(version < YK_VERSION(2,0,0)) {
+            pixmap.load(":/res/images/v1-3-not-animated.png");
+        } else if(version < YK_VERSION(2,1,4)) {
+            movie->setFileName(":/res/images/V2-0-2-1-animated.gif");
+        } else if(version < YK_VERSION(2,2,0)) {
+            // YubiKey NEO
+            pixmap.load(":/res/images/neo_transparent.png");
+        } else if(version % 10 == 9){
+            pixmap.load(":/res/images/yubikey_devel.png");
+        } else if(version < YK_VERSION(2,3,0)){
+            movie->setFileName(":/res/images/v2-2-animated.gif");
+        } else {
+            movie->setFileName(":/res/images/v2-3-animated.gif");
+        }
+        if(pixmap.isNull()) {
+            ui->deviceImage->setMovie(movie);
+            movie->start();
+        } else {
+            delete movie;
+            ui->deviceImage->setPixmap(pixmap);
+        }
+        ui->deviceImage->setHidden(false);
 
         unsigned int serial = 0;
         if(featuresMatrix[YubiKeyFinder::Feature_SerialNumber]) {
@@ -370,7 +402,27 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix) {
             ui->chalRespMenuBtn->setStyleSheet(disabledMenuBtnSS);
             ui->chalRespMenuBtn->setEnabled(false);
         }
+
+        if(featuresMatrix[YubiKeyFinder::Feature_Updatable]) {
+            ui->updatableSupportLbl->setPixmap(TICKMAP);
+        } else {
+            ui->updatableSupportLbl->setPixmap(CROSSMAP);
+        }
+
+        if(featuresMatrix[YubiKeyFinder::Feature_Ndef]) {
+            ui->ndefSupportLbl->setPixmap(TICKMAP);
+        } else {
+            ui->ndefSupportLbl->setPixmap(CROSSMAP);
+        }
     } else {
+        ui->deviceImage->setHidden(true);
+        if(ui->deviceImage->movie()) {
+            delete(ui->deviceImage->movie());
+            ui->deviceImage->setMovie(NULL);
+        }
+        if(ui->deviceImage->pixmap()) {
+            ui->deviceImage->setPixmap(NULL);
+        }
         ui->statusLbl->setText(NO_KEY_FOUND);
         ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_ERROR));
 

@@ -111,6 +111,18 @@ void HelpBox::setHelpIndex(Help helpIndex) {
         title = tr("Challenge-Response Options");
         helpMsg = HELP_CHALRESP_OPTION;
         break;
+    case Help_AllowUpdate:
+        title = tr("Allow Update");
+        helpMsg = HELP_ALLOW_UPDATE_OPTION;
+        break;
+    case Help_Swap:
+        title = tr("Swap");
+        helpMsg = HELP_SWAP_OPTION;
+        break;
+    case Help_ManUpdate:
+        title = tr("Manual Update");
+        helpMsg = HELP_MAN_UPDATE_OPTION;
+        break;
 
     default:
         helpMsg = tr("");

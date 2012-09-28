@@ -31,7 +31,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
 
-#include <QDesktopServices>
 #include "common.h"
 
 ChalRespPage::ChalRespPage(QWidget *parent) :
@@ -188,6 +187,12 @@ void ChalRespPage::keyFound(bool found, bool* featuresMatrix) {
                 ui->quickConfigSlot2Radio->setEnabled(true);
                 ui->advConfigSlot2Radio->setEnabled(true);
             }
+            if(!featuresMatrix[YubiKeyFinder::Feature_ChallengeResponseFixed]) {
+                ui->advHmacFixedInputRadio->setEnabled(false);
+                ui->advHmacVarInputRadio->setChecked(true);
+            } else {
+                ui->advHmacFixedInputRadio->setEnabled(true);
+            }
 
             if(!featuresMatrix[YubiKeyFinder::Feature_ChallengeResponse]) {
                 this->setEnabled(false);
@@ -211,6 +216,7 @@ void ChalRespPage::keyFound(bool found, bool* featuresMatrix) {
     } else {
         ui->quickWriteConfigBtn->setEnabled(false);
         ui->advWriteConfigBtn->setEnabled(false);
+        ui->advHmacFixedInputRadio->setEnabled(true);
 
         if(m_state == State_Initial) {
             ui->quickConfigSlot2Radio->setEnabled(true);
@@ -406,7 +412,7 @@ void ChalRespPage::on_quickStopBtn_clicked() {
 }
 
 void ChalRespPage::stopQuickConfigWritting() {
-    qDebug() << "Stopping quick confgiuration writing...";
+    qDebug() << "Stopping quick configuration writing...";
 
     if(m_state >= State_Programming_Multiple) {
         ui->quickStopBtn->setEnabled(true);
@@ -771,7 +777,7 @@ void ChalRespPage::on_advStopBtn_clicked() {
 }
 
 void ChalRespPage::stopAdvConfigWritting() {
-    qDebug() << "Stopping adv confgiuration writing...";
+    qDebug() << "Stopping adv configuration writing...";
 
     if(m_state >= State_Programming_Multiple) {
         ui->advStopBtn->setEnabled(true);
@@ -786,11 +792,15 @@ void ChalRespPage::stopAdvConfigWritting() {
 }
 
 void ChalRespPage::changeAdvConfigParams() {
-    //Secret Key...
-    QString secretKeyTxt = YubiKeyUtil::getNextHex(
+    int index = ui->advConfigParamsCombo->currentIndex();
+    // else we use a static secret.
+    if(index == SCHEME_INCR_ID_RAND_SECRET) {
+        //Secret Key...
+        QString secretKeyTxt = YubiKeyUtil::getNextHex(
             KEY_SIZE_OATH * 2,
             ui->advSecretKeyTxt->text(), GEN_SCHEME_RAND);
-    ui->advSecretKeyTxt->setText(secretKeyTxt);
+        ui->advSecretKeyTxt->setText(secretKeyTxt);
+    }
     on_advSecretKeyTxt_editingFinished();
     m_ready = true;
 }
