@@ -1,3 +1,11 @@
+yubikey-personalization-gui (3.1.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+  * Dependency on libykpers version 1.8.0 or later
+
+ -- Klas Lindfors <klas@yubico.com>  Fri, 28 Sep 2012 15:20:50 +0200
+
 yubikey-personalization-gui (3.0.6-1) unstable; urgency=low
 
   * Initial release (Closes: #676212)
