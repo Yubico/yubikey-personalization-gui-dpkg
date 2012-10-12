@@ -1,5 +1,5 @@
 build/release/yubikey-personalization-gui usr/bin
 resources/lin/yubikey-personalization-gui.1 usr/share/man/man1
-debian/yubikey-personalization-gui.xpm usr/share/pixmaps
-debian/yubikey-personalization-gui.png usr/share/pixmaps
-debian/yubikey-personalization-gui.desktop usr/share/applications
+resources/lin/yubikey-personalization-gui.xpm usr/share/pixmaps
+resources/lin/yubikey-personalization-gui.png usr/share/pixmaps
+resources/lin/yubikey-personalization-gui.desktop usr/share/applications
