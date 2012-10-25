@@ -65,6 +65,9 @@ const unsigned int YubiKeyFinder::FEATURE_MATRIX_EXCLUDE[][2] = {
 };
 
 YubiKeyFinder::YubiKeyFinder() {
+    // init the ykpers library
+    yk_init();
+
     //Initialize fields
     init();
 
@@ -75,7 +78,7 @@ YubiKeyFinder::YubiKeyFinder() {
 }
 
 YubiKeyFinder::~YubiKeyFinder() {
-    closeKey();
+    yk_release();
 
     if(m_timer != 0) {
         delete m_timer;
@@ -153,7 +156,6 @@ void YubiKeyFinder::start() {
     if(m_timer && !m_timer->isActive()) {
         m_timer->start(TIMEOUT_FINDER);
     }
-    yk_init();
 }
 
 void YubiKeyFinder::stop() {
@@ -161,15 +163,10 @@ void YubiKeyFinder::stop() {
     if(m_timer && m_timer->isActive()) {
         m_timer->stop();
     }
-    closeKey();
-    yk_release();
 }
 
 bool YubiKeyFinder::openKey() {
     bool flag = true;
-    if(m_yk != 0) {
-        closeKey();
-    }
     if (!(m_yk = yk_open_first_key())) {
         flag = false;
     }
@@ -183,9 +180,9 @@ bool YubiKeyFinder::closeKey() {
         if (!yk_close_key(m_yk)) {
             flag = false;
         }
+        m_yk = 0;
     }
 
-    init();
     return flag;
 }
 
@@ -221,6 +218,8 @@ void YubiKeyFinder::findKey() {
                                    m_versionMinor,
                                    m_versionBuild);
 
+            m_touchLevel = ykds_touch_level(ykst);
+
             //Get serial number
             if(checkFeatureSupport(Feature_SerialNumber)) {
                 if (!yk_get_serial(m_yk, 0, 0, &m_serial)) {
@@ -248,9 +247,11 @@ void YubiKeyFinder::findKey() {
         ykds_free(ykst);
     }
 
+    closeKey();
+
     if(error) {
+        init();
         m_state = State_Absent;
-        closeKey();
         reportError();
         emit keyFound(false, NULL);
     }

@@ -61,6 +61,9 @@ StaticPage::StaticPage(QWidget *parent) :
 
     ui->quickResultsWidget->resizeColumnsToContents();
     ui->advResultsWidget->resizeColumnsToContents();
+
+    QRegExp rx("^[a-f0-9]{0,72}$");
+    ui->quickScanCodesTxt->setValidator(new QRegExpValidator(rx, this));
 }
 
 StaticPage::~StaticPage() {
@@ -282,8 +285,9 @@ void StaticPage::resetQuickPage() {
 
     ui->quickStaticLenTxt->setText("0");
     ui->quickStaticTxt->clear();
+    ui->quickScanCodesTxt->clear();
     ui->quickInsertTabBtn->setEnabled(true);
-    ui->quickClearBtn->setEnabled(false);
+    ui->quickClearBtn->setEnabled(true);
 
     ui->quickStopBtn->setEnabled(false);
     ui->quickResetBtn->setEnabled(false);
@@ -351,33 +355,44 @@ void StaticPage::on_quickNewAccessCodeTxt_editingFinished() {
 void StaticPage::on_quickHideParams_clicked(bool checked) {
     if(checked) {
         ui->quickStaticTxt->setEchoMode(QLineEdit::Password);
+        ui->quickScanCodesTxt->setEchoMode(QLineEdit::Password);
     } else {
         ui->quickStaticTxt->setEchoMode(QLineEdit::Normal);
+        ui->quickScanCodesTxt->setEchoMode(QLineEdit::Normal);
     }
 }
 
-void StaticPage::on_quickStaticTxt_textChanged(const QString &txt) {
-    int len = ui->quickStaticTxt->len();
+void StaticPage::on_quickStaticTxt_textEdited(const QString &txt) {
+    QString scanCodes = ScanEdit::textToScanCodes(txt);
+    ui->quickScanCodesTxt->setText(scanCodes);
 
+    int len = scanCodes.length() / 2;
     ui->quickStaticLenTxt->setText(QString::number(len));
     if(len >= MAX_SCAN_EDIT_SIZE) {
         ui->quickInsertTabBtn->setEnabled(false);
     } else {
         ui->quickInsertTabBtn->setEnabled(true);
     }
+}
 
-    ui->quickClearBtn->setEnabled(len > 0);
+void StaticPage::on_quickStaticTxt_returnPressed() {
+    QString text = ui->quickStaticTxt->text() + "\\n";
+    ui->quickStaticTxt->setText(text);
+    on_quickStaticTxt_textEdited(text);
 }
 
 void StaticPage::on_quickInsertTabBtn_clicked() {
-    ui->quickStaticTxt->injectScanCode(0x2b);
+    QString text = ui->quickStaticTxt->text() + "\\t";
+    ui->quickStaticTxt->setText(text);
     ui->quickStaticTxt->setFocus();
+    on_quickStaticTxt_textEdited(text);
 }
 
 void StaticPage::on_quickClearBtn_clicked() {
-    ui->quickStaticTxt->clearScanCodeText();
+    ui->quickScanCodesTxt->clear();
     ui->quickStaticTxt->clear();
-    ui->quickStaticTxt->setFocus();
+    ui->quickStaticLenTxt->setText("0");
+    ui->quickInsertTabBtn->setEnabled(true);
 }
 
 void StaticPage::on_quickWriteConfigBtn_clicked() {
@@ -506,6 +521,9 @@ void StaticPage::writeQuickConfig() {
     //Programming mode...
     m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Static);
 
+    // set serial
+    m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
+
     //Configuration slot...
     int configSlot = 1;
     if(ui->quickConfigSlot2Radio->isChecked()) {
@@ -514,8 +532,10 @@ void StaticPage::writeQuickConfig() {
     m_ykConfig->setConfigSlot(configSlot);
 
     //Parameters...
-    QString staticTxt = ui->quickStaticTxt->scanCodeText();
+    QString staticTxt = ui->quickScanCodesTxt->text();
+
     YubiKeyUtil::qstrClean(&staticTxt, 0);
+    qDebug() << "static txt is: " << staticTxt;
 
     QString pubIdTxt("");
     QString pvtIdTxt("");
@@ -1017,6 +1037,9 @@ void StaticPage::writeAdvConfig() {
     //Programming mode...
     m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Static);
 
+    // set serial
+    m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
+
     //Configuration slot...
     int configSlot = 1;
     if(ui->advConfigSlot2Radio->isChecked()) {
@@ -1175,4 +1198,18 @@ void StaticPage::advUpdateResults(bool written, const QString &msg) {
 
     ui->advResultsWidget->resizeColumnsToContents();
     ui->advResultsWidget->resizeRowsToContents();
+}
+
+void StaticPage::on_quickScanCodesTxt_textEdited(const QString &scanCodes) {
+    QString text = ScanEdit::scanCodesToText(scanCodes);
+    ui->quickStaticTxt->setText(text);
+
+    int len = scanCodes.length() / 2;
+    ui->quickStaticLenTxt->setText(QString::number(len));
+
+    if(len >= MAX_SCAN_EDIT_SIZE) {
+        ui->quickInsertTabBtn->setEnabled(false);
+    } else {
+        ui->quickInsertTabBtn->setEnabled(true);
+    }
 }

@@ -83,7 +83,8 @@ private slots:
     void on_quickNewAccessCodeTxt_editingFinished();
 
     void on_quickHideParams_clicked(bool checked);
-    void on_quickStaticTxt_textChanged(const QString &txt);
+    void on_quickStaticTxt_textEdited(const QString &txt);
+    void on_quickStaticTxt_returnPressed();
     void on_quickInsertTabBtn_clicked();
     void on_quickClearBtn_clicked();
 
@@ -137,6 +138,8 @@ private slots:
     void advConfigWritten(bool written, const QString &msg);
 
     void advUpdateResults(bool written, const QString &msg);
+
+    void on_quickScanCodesTxt_textEdited(const QString &text);
 
 signals:
     void showStatusMessage(const QString &text, int status = 0);

@@ -1,3 +1,228 @@
+2012-10-17  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: add NEWS and release date for 3.1.1
+
+2012-10-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/scanedit.cpp: don't try to access the usb2key arrays if the
+	scancode is to high
+
+2012-10-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp: take the scancodes directly from the
+	scancode field, it's always populated
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: do else:fedora to avoid debian branch
+	falling into later else
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp: set scancodes to password mode when hidden
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp: set len to zero when clearing
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp, src/ui/staticpage.h: capture a pressed
+	return when editing text
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: don't show the components at all as
+	we only have one
+
+2012-10-12  Klas Lindfors <klas@yubico.com>
+
+	* : commit 791a91cfffaded71855c788ae1932e5881f9da5c Author: Klas
+	Lindfors <klas@yubico.com> Date:   Fri Oct 12 08:36:48 2012 +0200
+
+2012-10-11  Maxim Burgerhout <maxim@wzzrd.com>
+
+	* resources/lin/yubikey-personalization-gui.desktop,
+	resources/lin/yubikey-personalization-gui.xpm: Add .desktop, .xpm
+	and .png files These are from the yubikey-personalization-gui-dpkg repo on github.
+	Putting them here will enable us to grab them from the tarball in
+	the future, instead of directly from github.
+
+2012-10-11  Maxim Burgerhout <maxim@wzzrd.com>
+
+	* YKPersonalization.pro: Linux build -> Generic Linux build
+
+2012-10-11  Maxim Burgerhout <maxim@wzzrd.com>
+
+	* YKPersonalization.pro: Create a separate 'fedora' build target Copying this from the 'debian' target to make sure changes there
+	will not bite us, and vice versa.
+
+2012-10-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.ui, src/ui/oathpage.ui, src/ui/otppage.ui,
+	src/ui/settingpage.ui, src/ui/staticpage.ui, src/ui/toolpage.ui: 
+	change height of radio buttons so whole button can be seen
+
+2012-10-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.ui: use validators
+	instead of inputmask for all customer prefix fields
+
+2012-10-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/scanedit.cpp, src/ui/scanedit.h, src/ui/staticpage.cpp,
+	src/ui/staticpage.h, src/ui/staticpage.ui: rework the scancode
+	input.  allow editing and pasting, allow going back and forth between scan
+	codes and text.
+
+2012-10-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/staticpage.ui: 
+	add field for scan code input allowing either direct input as scan codes also showing the
+	scancodes that will be programmed for standard text
+
+2012-10-10  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: clear the struct when no key found, not
+	when closing. when closing, clear m_yk
+
+2012-10-10  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: always closeKey() when we're done with it
+	in yubikeyfinder
+
+2012-10-10  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeywriter.cpp: only do yk_init() /
+	yk_release() in constructor/destructor of yubikeyfinder
+
+2012-10-08  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: change name of linux installer
+
+2012-10-08  Klas Lindfors <klas@yubico.com>
+
+	* : commit a5339e308fc784cf6a996c8050a81bcf9e6abda9 Merge: 27b8dac
+	88ba617 Author: Klas Lindfors <klas@yubico.com> Date:   Mon Oct 8
+	11:00:57 2012 +0200
+
+2012-10-08  Klas Lindfors <klas@yubico.com>
+
+	* resources/lin/YubiKey Personalization Tool.sh: fix binary name
+
+2012-10-08  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: fix search paths for linux "installer"
+
+2012-10-08  Klas Lindfors <klas@yubico.com>
+
+	* : commit a79a710011ebddc22fbab5477cc6b4b4a452cc54 Author: Klas
+	Lindfors <klas@yubico.com> Date:   Mon Oct 8 09:30:45 2012 +0100
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: other libdir for natively installed qt..
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, resources/mac/installer.plist: installer
+	fixups
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: remove the headers from qt frameworks
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: add .DS_Store to .gitignore
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: run install_name_tool for native builds
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: use codesign and pkgbuild to build a signed
+	installer
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: fix installer name for native mac build
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: native mac build fixes
+
+2012-10-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: declare that we need qgif
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignore build artifacts and .swp files
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* : commit c373d05f7fb586c4810941eaa8cee32af2e30841 Author: Klas
+	Lindfors <klas@yubico.com> Date:   Wed Oct 3 10:05:31 2012 +0200
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: spelling timstamp -> timestamp
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: do start logging in traditional format
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/settingpage.ui: add
+	controls for the logging format
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: implement the yubico logging format
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: spelling timstamp -> timestamp
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: do start logging in traditional format
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: set logging format on load
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/settingpage.ui: add
+	controls for the logging format
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: add support for
+	different formats to logger
+
+2012-10-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/settingpage.cpp, src/ui/staticpage.cpp,
+	src/yubikeyconfig.cpp, src/yubikeyconfig.h: add serial to
+	yubikeyconfig class
+
+2012-10-01  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.ui,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: use touchLevel to find
+	out what slots on inserted YubiKey is programmed
+
+2012-10-01  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions after
+	release
+
 2012-09-28  Klas Lindfors <klas@yubico.com>
 
 	* NEWS, YKPersonalization.pro, src/version.h: bump versions for
