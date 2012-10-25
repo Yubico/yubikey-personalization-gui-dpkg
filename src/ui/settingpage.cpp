@@ -79,12 +79,18 @@ SettingPage::SettingPage(QWidget *parent) :
     connect(ui->updateCheck, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->fastTrigCheck, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->useNumericKeypadCheck, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->logTraditionalRadio, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->logYubicoRadio, SIGNAL(clicked()), this, SLOT(save()));
 
     connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
             this, SLOT(keyFound(bool, bool*)));
 
-    QRegExp rx("^[cbdefghijklnrtuv]{0,4}$");
-    ui->custPrefixModhexTxt->setValidator(new QRegExpValidator(rx, this));
+    QRegExp modHexRx("^[cbdefghijklnrtuv]{0,4}$");
+    ui->custPrefixModhexTxt->setValidator(new QRegExpValidator(modHexRx, this));
+    QRegExp decRx("^[0-9]{0,5}$");
+    ui->custPrefixDecTxt->setValidator(new QRegExpValidator(decRx, this));
+    QRegExp hexRx("^[0-9a-f]{0,4}$");
+    ui->custPrefixHexTxt->setValidator(new QRegExpValidator(hexRx, this));
 }
 
 SettingPage::~SettingPage() {
@@ -146,6 +152,7 @@ void SettingPage::restoreDefaults() {
 
     settings.setValue(SG_LOG_DISABLED,          false);
     settings.setValue(SG_LOG_FILENAME,          YubiKeyLogger::defaultLogFilename());
+    settings.setValue(SG_LOG_FORMAT,            YubiKeyLogger::Format_Traditional);
 
     settings.setValue(SG_TAB_FIRST,             false);
     settings.setValue(SG_APPEND_TAB1,           false);
@@ -172,6 +179,7 @@ void SettingPage::load() {
 
     QString logFilename = settings.value(SG_LOG_FILENAME).toString();
     bool logDisabled = settings.value(SG_LOG_DISABLED).toBool();
+    int logFormat = settings.value(SG_LOG_FORMAT).toInt();
     if(logFilename.isEmpty()) {
         //This is the first time... set defaults
         restoreDefaults();
@@ -252,12 +260,23 @@ void SettingPage::load() {
         ui->logOutputCheck->setChecked(false);
         ui->logFileTxt->setEnabled(false);
         ui->browseBtn->setEnabled(false);
+        ui->logTraditionalRadio->setEnabled(false);
+        ui->logYubicoRadio->setEnabled(false);
     } else {
         YubiKeyLogger::enableLogging();
 
         ui->logOutputCheck->setChecked(true);
         ui->logFileTxt->setEnabled(true);
         ui->browseBtn->setEnabled(true);
+        ui->logTraditionalRadio->setEnabled(true);
+        ui->logYubicoRadio->setEnabled(true);
+        if(logFormat == YubiKeyLogger::Format_Yubico) {
+            ui->logYubicoRadio->setChecked(true);
+            YubiKeyLogger::setLogFormat(YubiKeyLogger::Format_Yubico);
+        } else {
+            ui->logTraditionalRadio->setChecked(true);
+            YubiKeyLogger::setLogFormat(YubiKeyLogger::Format_Traditional);
+        }
     }
 
     if(!logFilename.isEmpty()) {
@@ -337,6 +356,12 @@ void SettingPage::save() {
 
         QString logFilename = ui->logFileTxt->text().trimmed();
         settings.setValue(SG_LOG_FILENAME,  logFilename);
+
+        if(ui->logYubicoRadio->isChecked()) {
+            settings.setValue(SG_LOG_FORMAT, YubiKeyLogger::Format_Yubico);
+        } else {
+            settings.setValue(SG_LOG_FORMAT, YubiKeyLogger::Format_Traditional);
+        }
     } else {
         settings.setValue(SG_LOG_DISABLED,  true);
     }
@@ -437,6 +462,9 @@ void SettingPage::on_doUpdateBtn_clicked() {
     m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Update);
     m_ykConfig->setConfigSlot(slot);
 
+    // set serial
+    m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
+
     // access code
     m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());
     if(ui->configProtectionCombo->currentIndex() ==
@@ -478,6 +506,9 @@ void SettingPage::on_swapBtn_clicked() {
     m_ykConfig = new YubiKeyConfig();
 
     m_ykConfig->setProgrammingMode(YubiKeyConfig::Mode_Swap);
+
+    // set serial
+    m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
 
     // access code
     m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());

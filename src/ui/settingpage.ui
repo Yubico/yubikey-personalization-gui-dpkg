@@ -120,9 +120,6 @@ color: rgb(140, 192, 65);</string>
      <property name="styleSheet">
       <string notr="true">font-weight: normal;</string>
      </property>
-     <property name="inputMask">
-      <string>00000; </string>
-     </property>
      <property name="text">
       <string/>
      </property>
@@ -130,7 +127,7 @@ color: rgb(140, 192, 65);</string>
       <number>5</number>
      </property>
      <property name="cursorPosition">
-      <number>5</number>
+      <number>0</number>
      </property>
     </widget>
     <widget class="QLabel" name="custPrefixDecLabel">
@@ -236,9 +233,6 @@ color: rgb(140, 192, 65);</string>
      <property name="styleSheet">
       <string notr="true">font-weight: normal;</string>
      </property>
-     <property name="inputMask">
-      <string>hhhh; </string>
-     </property>
      <property name="text">
       <string/>
      </property>
@@ -246,7 +240,7 @@ color: rgb(140, 192, 65);</string>
       <number>4</number>
      </property>
      <property name="cursorPosition">
-      <number>4</number>
+      <number>0</number>
      </property>
     </widget>
    </widget>
@@ -271,7 +265,7 @@ color: rgb(140, 192, 65);</string>
       <rect>
        <x>10</x>
        <y>25</y>
-       <width>221</width>
+       <width>171</width>
        <height>17</height>
       </rect>
      </property>
@@ -353,6 +347,38 @@ font-weight: bold;</string>
      </property>
      <property name="flat">
       <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="logTraditionalRadio">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>25</y>
+       <width>131</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: normal;</string>
+     </property>
+     <property name="text">
+      <string>Traditional format</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="logYubicoRadio">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>25</y>
+       <width>120</width>
+       <height>17</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: normal;</string>
+     </property>
+     <property name="text">
+      <string>Yubico format</string>
      </property>
     </widget>
    </widget>
@@ -1362,7 +1388,7 @@ color: rgb(118, 116, 108);</string>
        <x>10</x>
        <y>40</y>
        <width>151</width>
-       <height>17</height>
+       <height>19</height>
       </rect>
      </property>
      <property name="styleSheet">
@@ -1384,7 +1410,7 @@ color: rgb(118, 116, 108);</string>
        <x>200</x>
        <y>40</y>
        <width>151</width>
-       <height>17</height>
+       <height>19</height>
       </rect>
      </property>
      <property name="styleSheet">

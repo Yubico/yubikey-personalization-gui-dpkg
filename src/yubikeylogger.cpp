@@ -29,7 +29,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "yubikeylogger.h"
 #include <QFile>
 #include <QDir>
-#include <QTextStream>
 #include <QDebug>
 #include <QDateTime>
 
@@ -39,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 QString YubiKeyLogger::m_filename   = defaultLogFilename();
 bool YubiKeyLogger::m_enabled       = true;
 bool YubiKeyLogger::m_started       = true;
+YubiKeyLogger::Format YubiKeyLogger::m_format = Format_Traditional;
 
 YubiKeyLogger::~YubiKeyLogger() {
 }
@@ -60,6 +60,17 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
 
     QTextStream out(&file);
 
+
+    if(m_format == Format_Traditional) {
+        logConfigTraditional(ykConfig, out);
+    } else {
+        logConfigYubico(ykConfig, out);
+    }
+    file.flush();
+    file.close();
+}
+
+void YubiKeyLogger::logConfigTraditional(YubiKeyConfig *ykConfig, QTextStream &out) {
     if(m_started) {
         QDateTime ts = QDateTime::currentDateTime();
         out << tr("LOGGING START")
@@ -113,8 +124,8 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
     out << eventType;
 
     //Timestamp...
-    QDateTime timstamp = QDateTime::currentDateTime();
-    out << LOG_SEPARATOR << timstamp.toString(Qt::SystemLocaleDate);
+    QDateTime timestamp = QDateTime::currentDateTime();
+    out << LOG_SEPARATOR << timestamp.toString(Qt::SystemLocaleDate);
 
     //Configuration slot...
     out << LOG_SEPARATOR << ykConfig->configSlot();
@@ -159,9 +170,35 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
     }
 
     out << endl;
+}
 
-    file.flush();
-    file.close();
+void YubiKeyLogger::logConfigYubico(YubiKeyConfig *ykConfig, QTextStream &out) {
+    if(ykConfig->serial() != "0") {
+        out << ykConfig->serial();
+    }
+    out << LOG_SEPARATOR;
+    switch(ykConfig->programmingMode()) {
+    case YubiKeyConfig::Mode_YubicoOtp:
+        out << ykConfig->pubIdTxt() << LOG_SEPARATOR;
+        out << ykConfig->pvtIdTxt() << LOG_SEPARATOR;
+        break;
+    case YubiKeyConfig::Mode_OathHotp:
+        out << ykConfig->pubIdTxt() << LOG_SEPARATOR;
+        out << ykConfig->oathMovingFactorSeed() << LOG_SEPARATOR;
+        break;
+    case YubiKeyConfig::Mode_ChalRespHmac:
+        out << LOG_SEPARATOR;
+        out << "0" << LOG_SEPARATOR;
+        break;
+    default:
+        qDebug() << "Yubico format has no support for programmingMode " << ykConfig->programmingMode();
+        break;
+    }
+    out << ykConfig->secretKeyTxt() << LOG_SEPARATOR;
+    out << ykConfig->newAccessCodeTxt() << LOG_SEPARATOR;
+    QDateTime timestamp = QDateTime::currentDateTime();
+    out << timestamp.toString("yyyy-MM-ddThh:mm:ss");
+    out << LOG_SEPARATOR << endl;
 }
 
 void YubiKeyLogger::enableLogging() {
@@ -187,3 +224,8 @@ QString YubiKeyLogger::logFilename() {
 QString YubiKeyLogger::defaultLogFilename() {
     return QDir::homePath() + "/" + LOG_FILENAME_DEF;
 }
+
+void YubiKeyLogger::setLogFormat(Format format) {
+    m_format = format;
+}
+
