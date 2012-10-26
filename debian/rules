@@ -11,5 +11,7 @@ LDFLAGS := "$(shell dpkg-buildflags --get LDFLAGS)"
 override_dh_auto_build:
 	CXXFLAGS=$(CXXFLAGS) LDFLAGS=$(LDFLAGS) qmake "CONFIG+=debian" && make
 
+override_dh_auto_configure:
+
 %:
 	dh $@
