@@ -1,0 +1,6 @@
+files
+yubikey-personalization-gui.debhelper.log
+yubikey-personalization-gui.postinst.debhelper
+yubikey-personalization-gui.postrm.debhelper
+yubikey-personalization-gui.substvars
+yubikey-personalization-gui/
