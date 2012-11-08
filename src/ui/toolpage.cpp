@@ -60,6 +60,9 @@ ToolPage::ToolPage(QWidget *parent) :
 
     connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
             this, SLOT(keyFound(bool, bool*)));
+
+    ui->zapAccCodeEdit->setEnabled(false);
+    ui->ndefAccCodeEdit->setEnabled(false);
 }
 
 ToolPage::~ToolPage() {
@@ -87,6 +90,9 @@ void ToolPage::connectPages() {
     connect(ui->ndefBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->ndefBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
+    connect(ui->zapBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->zapBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+
     //Set a value for each button
     mapper->setMapping(ui->converterBtn, Page_Converter);
     mapper->setMapping(ui->converterBackBtn, Page_Base);
@@ -96,6 +102,9 @@ void ToolPage::connectPages() {
 
     mapper->setMapping(ui->ndefBtn, Page_Ndef);
     mapper->setMapping(ui->ndefBackBtn, Page_Base);
+
+    mapper->setMapping(ui->zapBtn, Page_Zap);
+    mapper->setMapping(ui->zapBackBtn, Page_Base);
 
     //Connect the mapper to the widget
     //The mapper will set a value to each button and
@@ -324,7 +333,7 @@ void ToolPage::programNdef() {
 
     connect(writer, SIGNAL(configWritten(bool, const QString &)),
             this, SLOT(ndefWritten(bool, const QString &)));
-    writer->writeNdef(uri, language, payload);
+    writer->writeNdef(uri, language, payload, ui->ndefAccCodeEdit->text().remove(" "));
 }
 
 void ToolPage::ndefWritten(bool written, const QString &msg) {
@@ -344,6 +353,41 @@ void ToolPage::on_ndefTextRadio_toggled(bool checked) {
     }
 }
 
+void ToolPage::on_ndefAccCodeCheckbox_toggled(bool checked) {
+    ui->ndefAccCodeEdit->setText("00 00 00 00 00 00");
+    ui->ndefAccCodeEdit->setEnabled(checked);
+}
+
+void ToolPage::on_zapPerformBtn_clicked() {
+    int slot;
+    if(ui->zapSlot1Radio->isChecked()) {
+        slot = 1;
+    } else if(ui->zapSlot2Radio->isChecked()) {
+        slot = 2;
+    } else {
+      emit showStatusMessage(ERR_CONF_SLOT_NOT_SELECTED, 1);
+      return;
+    }
+
+    YubiKeyWriter *writer = YubiKeyWriter::getInstance();
+    connect(writer, SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(zapDone(bool, const QString &)));
+    writer->deleteConfig(slot, ui->zapAccCodeEdit->text().remove(" "));
+}
+
+void ToolPage::zapDone(bool written, const QString &msg) {
+    disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+            this, SLOT(zapDone(bool, const QString &)));
+    if(written) {
+        showStatusMessage(tr("Configuration successfully deleted."));
+    }
+}
+
+void ToolPage::on_zapAccCodeCheckbox_toggled(bool checked) {
+    ui->zapAccCodeEdit->setText("00 00 00 00 00 00");
+    ui->zapAccCodeEdit->setEnabled(checked);
+}
+
 void ToolPage::keyFound(bool found, bool* featuresMatrix) {
     if(found && featuresMatrix[YubiKeyFinder::Feature_ChallengeResponse]) {
         ui->chalRespPerformBtn->setEnabled(true);
@@ -355,4 +399,5 @@ void ToolPage::keyFound(bool found, bool* featuresMatrix) {
     } else {
         ui->ndefProgramBtn->setEnabled(false);
     }
+    ui->zapPerformBtn->setEnabled(found);
 }

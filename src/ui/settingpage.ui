@@ -77,9 +77,9 @@ color: rgb(140, 192, 65);</string>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>35</y>
       <width>711</width>
-      <height>55</height>
+      <height>60</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -397,38 +397,12 @@ font-weight: bold;</string>
     <property name="title">
      <string>Actions</string>
     </property>
-    <widget class="QPushButton" name="saveBtn">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>45</y>
-       <width>85</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">font: 12px;
-font-weight: bold;</string>
-     </property>
-     <property name="text">
-      <string>Save</string>
-     </property>
-     <property name="autoExclusive">
-      <bool>false</bool>
-     </property>
-     <property name="default">
-      <bool>false</bool>
-     </property>
-     <property name="flat">
-      <bool>false</bool>
-     </property>
-    </widget>
     <widget class="QLabel" name="actionsDescLbl">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>25</y>
-       <width>691</width>
+       <width>200</width>
        <height>16</height>
       </rect>
      </property>
@@ -438,7 +412,7 @@ color: rgb(118, 116, 108)
 </string>
      </property>
      <property name="text">
-      <string>Press Save to save your settings</string>
+      <string>Settings are saved automatically</string>
      </property>
     </widget>
     <widget class="QPushButton" name="restoreBtn">
@@ -447,7 +421,7 @@ color: rgb(118, 116, 108)
      </property>
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>10</x>
        <y>45</y>
        <width>171</width>
        <height>25</height>
@@ -486,7 +460,25 @@ font-weight: bold;</string>
       </rect>
      </property>
      <property name="text">
-      <string>Update</string>
+      <string>Update...</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="updateDescLbl">
+     <property name="geometry">
+      <rect>
+       <x>405</x>
+       <y>25</y>
+       <width>250</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-weight: normal;
+color: rgb(118, 116, 108)
+</string>
+     </property>
+     <property name="text">
+      <string>Update is available for YubiKey 2.3 and later</string>
      </property>
     </widget>
    </widget>
@@ -882,7 +874,7 @@ border-radius: 10px;
 </string>
     </property>
     <property name="title">
-     <string>Serial # Visibility Settings (YubiKey 2.2)</string>
+     <string>Serial # Visibility Settings (YubiKey 2.2+)</string>
     </property>
     <widget class="QCheckBox" name="srBtnVisibleCheck">
      <property name="geometry">
@@ -1066,7 +1058,7 @@ border-radius: 10px;
 </string>
     </property>
     <property name="title">
-     <string>Update Settings (YubiKey 2.3)</string>
+     <string>Update Settings (YubiKey 2.3+)</string>
     </property>
     <widget class="QCheckBox" name="updateCheck">
      <property name="geometry">
@@ -1142,7 +1134,7 @@ border-radius: 10px;
 </string>
     </property>
     <property name="title">
-     <string>Extended Settings (YubiKey 2.3)</string>
+     <string>Extended Settings (YubiKey 2.3+)</string>
     </property>
     <widget class="QCheckBox" name="useNumericKeypadCheck">
      <property name="geometry">
@@ -1677,7 +1669,6 @@ border-radius: 10px;
   <tabstop>logOutputCheck</tabstop>
   <tabstop>logFileTxt</tabstop>
   <tabstop>browseBtn</tabstop>
-  <tabstop>saveBtn</tabstop>
   <tabstop>restoreBtn</tabstop>
   <tabstop>outFormatHelpBtn</tabstop>
   <tabstop>outSpeedHelpBtn</tabstop>

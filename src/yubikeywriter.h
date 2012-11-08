@@ -54,13 +54,14 @@ private:
     static YubiKeyWriter* _instance;
 
     QString reportError();
+    int encodeAccessCode(const QString accCode, unsigned char *accessCode, size_t *accessCodeLen);
 
 public slots:
     void writeConfig(YubiKeyConfig *ykConfig);
     void doChallengeResponse(const QString challenge,
         QString &response, int slot, bool hmac);
-    void writeNdef(bool uri, const QString language, const QString payload);
-
+    void writeNdef(bool uri, const QString language, const QString payload, const QString accCode);
+    void deleteConfig(int slot, const QString accCode);
 
 signals:
     void configWritten(bool written, const QString &msg);
