@@ -1,3 +1,101 @@
+2012-11-07  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.2
+
+2012-11-06  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: put ... to show that update leads to a new
+	page
+
+2012-10-31  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: some wording on versions and box sizes.
+
+2012-10-31  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.ui: remove save button
+	and write out that we autosave
+
+2012-10-26  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: news for 3.1.2
+
+2012-10-26  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: create all start menu items in the
+	same place and make sure they're removed when uninstalled
+
+2012-10-26  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi: set a default startmenu folder
+	under Yubico
+
+2012-10-23  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp: set new parameters on key insertion, not
+	removal
+
+2012-10-23  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp: remove the movie field if it's set before
+	setting a new one
+
+2012-10-23  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/oathpage.cpp, src/ui/oathpage.h, src/ui/otppage.cpp,
+	src/ui/otppage.h, src/ui/staticpage.cpp, src/ui/staticpage.h: keep
+	track of the keys state when writing multiple keys otherwise we'll trigger on the keyFound event after it's written
+
+2012-10-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/yubikeywriter.cpp: add
+	message on successful config deletion
+
+2012-10-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui,
+	src/yubikeywriter.cpp, src/yubikeywriter.h: add access code entry
+	for ndef programming
+
+2012-10-19  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui: add
+	access code entry for delete
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp: call deleteConfig()
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp, src/yubikeywriter.h: deleteConfig() slot
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: clear the finder object when starting, so
+	it re-reads key
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp, src/yubikeywriter.h: break out accesscode
+	formatting into it's own function
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui: start
+	with ui for deleting configuration
+
+2012-10-18  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.ui: make the serial numbers selectable and
+	copyable
+
+2012-10-17  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions after
+	release
+
 2012-10-17  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: add NEWS and release date for 3.1.1
