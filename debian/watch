@@ -1,2 +1,2 @@
 version=3
-http://code.google.com/p/yubikey-personalization/downloads/list?can=1 .*/yubikey-personalization-gui-(\d[\d.]*)\.(?:zip|tgz|tbz2|txz|tar\.gz|tar\.bz2|tar\.xz)
+http://yubico.github.com/yubikey-personalization-gui/releases.html .*/yubikey-personalization-gui-(\d[\d.]*)\.(?:zip|tgz|tbz2|txz|tar\.gz|tar\.bz2|tar\.xz)

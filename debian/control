@@ -10,7 +10,7 @@ Build-Depends: debhelper (>= 7.0.50~),
   libyubikey-dev,
   libykpers-1-dev (>= 1.9.0)
 Standards-Version: 3.9.3
-Homepage: https://github.com/Yubico/yubikey-personalization-gui
+Homepage: http://yubico.github.com/yubikey-personalization-gui/
 DM-Upload-Allowed: yes
 Vcs-Git: git://github.com/Yubico/yubikey-personalization-gui-dpkg.git
 Vcs-Browser: https://github.com/Yubico/yubikey-personalization-gui-dpkg
