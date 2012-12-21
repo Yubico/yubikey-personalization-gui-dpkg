@@ -44,7 +44,7 @@ const unsigned int YubiKeyFinder::FEATURE_MATRIX[][2] = {
     { YK_VERSION(2,1,7), 0 },   //Feature_MovingFactor
     { YK_VERSION(2,3,0), 0 },   //Feature_ChallengeResponseFixed
     { YK_VERSION(2,3,0), 0 },   //Feature_Updatable
-    { YK_VERSION(2,1,4), YK_VERSION(2,2,0)}, //Feature_Ndef
+    { YK_VERSION(2,1,4), 0 },   //Feature_Ndef
 };
 
 // when a featureset should be excluded from versions (NEO, I'm looking at you.)
@@ -61,7 +61,7 @@ const unsigned int YubiKeyFinder::FEATURE_MATRIX_EXCLUDE[][2] = {
     { 0, 0 },                                 //Feature_MovingFactor
     { 0, 0 },                                 //Feature_ChallengeResponseFixed
     { 0, 0 },                                 //Feature_Updatable
-    { 0, 0 },                                 //Feature_Ndef
+    { YK_VERSION(2,2,0), YK_VERSION(3,0,0) }, //Feature_Ndef
 };
 
 YubiKeyFinder::YubiKeyFinder() {
@@ -163,6 +163,10 @@ void YubiKeyFinder::stop() {
     //Stop timer
     if(m_timer && m_timer->isActive()) {
         m_timer->stop();
+        // doing closeKey() here might look out of place and may cause findKey()
+        // to fail unexpectedly, but it's needed to not leak file descriptors
+        // when writing the key.
+        closeKey();
     }
 }
 

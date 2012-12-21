@@ -63,7 +63,7 @@ YubiKeyWriter* YubiKeyWriter::getInstance() {
     return _instance;
 }
 
-QString YubiKeyWriter::reportError() {
+QString YubiKeyWriter::reportError(bool chalresp = false) {
     QString errMsg;
 
     if (ykp_errno) {
@@ -94,7 +94,11 @@ QString YubiKeyWriter::reportError() {
             errMsg = ERR_FIRMWARE_NOT_SUPPORTED;
             break;
         default:
-            errMsg = ERR_PROCESSING;
+            if(chalresp) {
+                errMsg = ERR_PROCESSING_CHALRESP;
+            } else {
+                errMsg = ERR_PROCESSING;
+            }
             break;
         }
         yk_errno = 0;
@@ -140,7 +144,7 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             throw 0;
         }
 
-        if (!(yk_check_firmware_version(yk))) {
+        if (!(yk_check_firmware_version2(ykst))) {
             throw 0;
         }
 
@@ -468,11 +472,12 @@ void YubiKeyWriter::doChallengeResponse(const QString challenge, QString  &respo
 
     if(error) {
         qDebug() << "Challenge response failed.";
-        QString errMsg = reportError();
+        QString errMsg = reportError(true);
     }
 }
 
-void YubiKeyWriter::writeNdef(bool uri, const QString language, const QString payload, const QString accCode) {
+void YubiKeyWriter::writeNdef(bool uri, const QString language,
+    const QString payload, const QString accCode, int slot) {
     YubiKeyFinder::getInstance()->stop();
 
     YK_KEY *yk = 0;
@@ -520,7 +525,7 @@ void YubiKeyWriter::writeNdef(bool uri, const QString language, const QString pa
         }
 
         qDebug() << "writing the ndef.";
-        if(! yk_write_ndef(yk, ndef)) {
+        if(! yk_write_ndef2(yk, ndef, slot)) {
             throw 0;
         }
         emit configWritten(true, NULL);
@@ -550,7 +555,6 @@ void YubiKeyWriter::deleteConfig(int slot, const QString accCode) {
     bool error = false;
     YK_KEY *yk;
     YKP_CONFIG *cfg = ykp_alloc();
-    YK_STATUS *ykst = ykds_alloc();
 
     YubiKeyFinder::getInstance()->stop();
 
@@ -589,10 +593,6 @@ void YubiKeyWriter::deleteConfig(int slot, const QString accCode) {
 
     if (cfg) {
         ykp_free_config(cfg);
-    }
-
-    if(ykst) {
-        ykds_free(ykst);
     }
 
     if (yk && !yk_close_key(yk)) {
