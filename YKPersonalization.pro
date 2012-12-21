@@ -1,24 +1,30 @@
 #
 # global definitions
 #
-VERSION         = "3.1.2"
+VERSION         = "3.1.3"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
 # common configuration
 #
 QT             += core gui
-DEPLOYMENT_PLUGIN += qgif
+DEPLOYMENT_PLUGIN += qmng
 TEMPLATE        = app
 TARGET          = yubikey-personalization-gui
 
 DEFINES        += VERSION=\\\"$${VERSION}\\\"
 
+CONFIG         += silent
+
 CONFIG(debug, debug|release) {
-    TARGET_DIR  = build/debug
+    message("Debug build")
+    TARGET_DIR  = build$${DIR_SEPARATOR}debug
+
+    QT += testlib
 
     CONFIG     += console no_lflags_merge
 } else {
+    message("Release build")
     TARGET_DIR  = build$${DIR_SEPARATOR}release
 
     DEFINES    += QT_NO_DEBUG_OUTPUT
@@ -97,15 +103,11 @@ OTHER_FILES += \
 !debian:!fedora {
   HEADERS += \
       deps/libykpers/ykpers.h \
-      deps/libykpers/ykpbkdf2.h \
       deps/libykpers/ykcore/yktsd.h \
       deps/libykpers/ykcore/ykstatus.h \
       deps/libykpers/ykcore/ykdef.h \
-      deps/libykpers/ykcore/ykcore_lcl.h \
       deps/libykpers/ykcore/ykcore_backend.h \
       deps/libykpers/ykcore/ykcore.h \
-      deps/libykpers/rfc4634/sha.h \
-      deps/libykpers/rfc4634/sha-private.h \
       deps/libyubikey/yubikey.h
 
   INCLUDEPATH    += . src src/ui deps/libusb-1.0 deps/libykpers deps/libykpers/ykcore deps/libyubikey
@@ -179,22 +181,56 @@ win32 {
         LIBS += $$quote(-L./libs/win64) -llibyubikey-0 -llibykpers-1-1
     }
 
-     LIB_FILES += \
-         $$_QT_BINDIR$${DIR_SEPARATOR}QtCore4.dll \
-         $$_QT_BINDIR$${DIR_SEPARATOR}QtGui4.dll \
-         $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qgif4.dll \
-         $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
-         $$_QT_BINDIR$${DIR_SEPARATOR}mingwm10.dll \
-         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libyubikey-0.dll \
-         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libykpers-1-1.dll
+    CONFIG(debug, debug|release) {
+        LIB_FILES += \
+             $$_QT_BINDIR$${DIR_SEPARATOR}QtCored4.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}QtGuid4.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}QtTestd4.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmngd4.dll
+    } else {
+        LIB_FILES += \
+             $$_QT_BINDIR$${DIR_SEPARATOR}QtCore4.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}QtGui4.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmng4.dll
+    }
+
+    LIB_FILES += \
+        $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}mingwm10.dll \
+        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libyubikey-0.dll \
+        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libykpers-1-1.dll
+
+    isEmpty(TIMESTAMP_URL):TIMESTAMP_URL = 'http://timestamp.verisign.com/scripts/timstamp.dll'
 
     LIB_FILES_WIN = $${LIB_FILES}
     TARGET_DIR_WIN = $${DESTDIR}
     for(FILE, LIB_FILES_WIN) {
         QMAKE_POST_LINK +=$$quote($$QMAKE_COPY $${FILE} $${TARGET_DIR_WIN}$$escape_expand(\\n\\t))
     }
+    sign_binaries {
+        _PVK_FILE = $$(PVK_FILE)
+        _SPC_FILE = $$(SPC_FILE)
+        isEmpty(_PVK_FILE) {
+            error("Must have a pvk file to sign (PVK_FILE env variable).")
+        }
+        isEmpty(_SPC_FILE) {
+            error("Must have a spc file to sign (SPC_FILE env variable).")
+        }
+
+        # sign all Yubico binaries
+        SIGN_FILES = $${TARGET}.exe \
+            libyubikey-0.dll \
+            libykpers-1-1.dll
+
+        for(FILE, SIGN_FILES) {
+            QMAKE_POST_LINK += $$quote("signcode -spc $$(SPC_FILE) -v $$(PVK_FILE) -a sha1 -$ commercial -n '$${APP_NAME}' -i 'http://www.yubico.com' -t $${TIMESTAMP_URL} $${TARGET_DIR_WIN}$${DIR_SEPARATOR}$${FILE}"$$escape_expand(\\n\\t))
+        }
+    }
     build_installer {
-        QMAKE_POST_LINK += $$quote("makensis -DYKPERS_VERSION=$${VERSION} installer/win-nsis/ykpers.nsi")
+        QMAKE_POST_LINK += $$quote("makensis -DYKPERS_VERSION=$${VERSION} installer/win-nsis/ykpers.nsi"$$escape_expand(\\n\\t))
+        sign_binaries {
+            QMAKE_POST_LINK += $$quote("signcode -spc $$(SPC_FILE) -v $$(PVK_FILE) -a sha1 -$ commercial -n '$${APP_NAME} Installer' -i 'http://www.yubico.com' -t '$${TIMESTAMP_URL}' $${TARGET_DIR_WIN}$${DIR_SEPARATOR}$${TARGET}-$${VERSION}.exe"$$escape_expand(\\n\\t))
+        }
     }
 }
 
@@ -261,7 +297,7 @@ unix:!macx {
     LIB_FILES += \
         $$[QT_INSTALL_LIBS]/libQtGui.so.4 \
         $$[QT_INSTALL_LIBS]/libQtCore.so.4 \
-        $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.so \
+        $$[QT_INSTALL_PLUGINS]/imageformats/libqmng.so \
         libs/lin/libusb-1.0.so.0 \
         resources/lin/$${TARGET_LIN}.sh
 
@@ -350,13 +386,13 @@ macx {
         mv $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources/qt_menu.nib $$_BASEDIR/Resources/qt_menu.nib && \
         rmdir $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources && \
         mkdir -p $$_PLUGINDIR/imageformats && \
-        cp -R $$_QT_PLUGINDIR/imageformats/libqgif.dylib $$_PLUGINDIR/imageformats)
+        cp -R $$_QT_PLUGINDIR/imageformats/libqmng.dylib $$_PLUGINDIR/imageformats)
 
     # fixup all library paths..
     _BASE = $$quote(@executable_path/../Frameworks)
     _QTCORE = $$quote(QtCore.framework/Versions/4/QtCore)
     _QTGUI = $$quote(QtGui.framework/Versions/4/QtGui)
-    isEmpty($$_TARGET_ARCH) {
+    isEmpty(_TARGET_ARCH) {
         _INSTALL_NAME_TOOL = install_name_tool
     } else {
         _INSTALL_NAME_TOOL = $$(TARGET_ARCH)-install_name_tool
@@ -364,8 +400,8 @@ macx {
     QMAKE_POST_LINK += $$quote( && $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_BASEDIR/MacOS/$$TARGET_MAC && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_BASEDIR/MacOS/$$TARGET_MAC && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_FRAMEWORKDIR/$$_QTGUI && \
-        $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_PLUGINDIR/imageformats/libqgif.dylib && \
-        $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqgif.dylib)
+        $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_PLUGINDIR/imageformats/libqmng.dylib && \
+        $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqmng.dylib)
         
     cross {
         build_installer {
@@ -438,7 +474,8 @@ win32 {
     TARGET_DIR_WIN = $${DESTDIR}
 
     QMAKE_CLEAN += $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.exe \
-                   $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.dll
+                   $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.dll \
+                   $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.exe.bak
 } else:macx {
     QMAKE_CLEAN += -r $${DESTDIR}/*.app $${DESTDIR}/*.pkg $${DESTDIR}/*.dmg $${DESTDIR}/temp
 } else {

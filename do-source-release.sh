@@ -3,12 +3,11 @@
 set -e
 
 VERSION=$1
-USER=$2
-PGP_KEYID=$3
+PGP_KEYID=$2
 
 if [ "x$PGP_KEYID" = "x" ]; then
-  echo "try with $0 VERSION GOOGLECODE_USER PGP_KEYID"
-  echo "example: $0 3.0.4 klas@yubico.com 9D1C0E79"
+  echo "try with $0 VERSION PGP_KEYID"
+  echo "example: $0 3.0.4 9D1C0E79"
   exit
 fi
 
@@ -39,6 +38,18 @@ git archive $releasename --format=tar | tar -xC $releasedir
 git2cl > $releasedir/ChangeLog
 tar -cz --directory=$tmpdir --file=${releasename}.tar.gz $releasename
 gpg --detach-sign --default-key $PGP_KEYID ${releasename}.tar.gz
-googlecode_upload.py -s "OpenPGP signature for ${releasename}." -p yubikey-personalization -u $USER ${releasename}.tar.gz.sig
-googlecode_upload.py -s "$releasename" -p yubikey-personalization -u $USER ${releasename}.tar.gz
-rm -rf $releasedir
+stagedir=`mktemp -d`
+mv ${releasename}.tar.gz.sig $stagedir
+mv ${releasename}.tar.gz $stagedir
+git checkout gh-pages
+mv $stagedir/${releasename}.tar.gz.sig releases/
+mv $stagedir/${releasename}.tar.gz releases/
+git add releases/${releasename}.tar.gz.sig
+git add releases/${releasename}.tar.gz
+x=`ls -1 releases/*.tar.gz | awk -F\- '{print $4}' | sed 's/.tar.gz/,/' | paste -sd ' ' -`; sed -i -e "2s|\[.*\]|[$x]|" releases.html
+git add releases.html
+git commit -m "Added release $VERSION"
+git checkout master
+git push origin gh-pages
+rm -rf $tmpdir
+rm -rf $stagedir

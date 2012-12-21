@@ -1,3 +1,156 @@
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: update do-source-release properly.
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: news and release for 3.1.3
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: remove USER
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: switch to gh-pages for releases
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh: script to build the homepage in the gh-pages
+	branch
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* README: change some formatting to match asciidoc better
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* README: README updates
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro.user.lin, YKPersonalization.pro.user.mac,
+	YKPersonalization.pro.user.win: drop files that we generate anyways
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* README.binary_dists: some useful qmake invocations
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add code for signing windows binaries as
+	part of the build
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: no $$ when checking isEmpty()
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: cleanup libraries and remove unused header
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.h: mui should be unsigned
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp: make sure we zero-out mui on reset
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: fix release build for windows, cleanup.
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.h: don't do fancy bcd tricks
+	with MUI, just keep it in an int
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: config for creating windows debug builds
+
+2012-12-20  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: fix a file descriptor leak that caused
+	windows to fail after 44 writes
+
+2012-12-18  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/common.h, src/yubikeywriter.cpp, src/yubikeywriter.h: 
+	don't reuse the general error message for challenge-response
+
+2012-12-18  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: make compiling silent
+
+2012-12-18  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: add NEWS for 3.1.3
+
+2012-12-18  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/mainwindow.cpp, src/ui/mainwindow.h,
+	src/ui/mainwindow.ui: add support for stopping animation (and saving
+	that in settings)
+
+2012-12-17  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi,
+	resources/images/README.mng, resources/resources.qrc,
+	src/ui/mainwindow.cpp: switch from gifs to mng
+
+2012-12-17  Klas Lindfors <klas@yubico.com>
+
+	* : new pictures
+
+2012-12-11  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: new picture for
+	production neo
+
+2012-11-20  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: change wording for update to update
+	settings
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: add forgotten save on selecting pacing
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: fixup last commit that was broken, remove
+	correct ykst
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: remove unnecessary status struct and call
+	yk_check_firmware2() when we have it
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui, src/yubikeywriter.cpp,
+	src/yubikeywriter.h: support for writing SLOT_NDEF2 for production
+	neo
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp: correct picture for production neo
+
+2012-11-12  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: features for yubikey 3.0 (neo)
+
+2012-11-09  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp: run the editingFinished hook on public id
+	after setting it to serial
+
+2012-11-07  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions to 3.1.3
+
 2012-11-07  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: release 3.1.2
