@@ -1,3 +1,17 @@
+2013-01-10  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.5
+
+2013-01-10  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add ykpers-version.c for inline build of
+	ykpers
+
+2013-01-09  Klas Lindfors <klas@yubico.com>
+
+	* COPYING, NEWS, YKPersonalization.pro, do-source-release.sh,
+	src/version.h: bump versions and copyrights
+
 2013-01-09  Klas Lindfors <klas@yubico.com>
 
 	* YKPersonalization.pro: set version to 3.1.4
