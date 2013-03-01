@@ -192,6 +192,11 @@ bool YubiKeyFinder::closeKey() {
 }
 
 void YubiKeyFinder::findKey() {
+    if(QApplication::activeWindow() == 0) {
+        //No focus, avoid locking the YubiKey.
+        return;
+    }
+
     YK_STATUS *ykst = ykds_alloc();
     bool error = false;
 

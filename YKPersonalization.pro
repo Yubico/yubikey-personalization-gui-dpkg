@@ -1,7 +1,7 @@
 #
 # global definitions
 #
-VERSION         = "3.1.5"
+VERSION         = "3.1.6"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
@@ -13,6 +13,8 @@ TEMPLATE        = app
 TARGET          = yubikey-personalization-gui
 
 DEFINES        += VERSION=\\\"$${VERSION}\\\"
+
+CONFIG         += exceptions
 
 CONFIG         += silent
 
@@ -137,6 +139,7 @@ cross {
         QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
         QMAKE_UIC = $$[QT_INSTALL_BINS]/uic
         QMAKE_IDC = $$[QT_INSTALL_BINS]/idc
+        QMAKE_RCC = $$[QT_INSTALL_BINS]/rcc
 
         QMAKE_LFLAGS += -static-libstdc++ -static-libgcc
     }
