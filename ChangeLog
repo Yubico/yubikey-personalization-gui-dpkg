@@ -1,3 +1,43 @@
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: news for override box
+
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/confirmbox.cpp, src/ui/toolpage.cpp: make the
+	override box on ndef without http work
+
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: point to rcc for win32 build
+
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: declare that we use exceptions
+
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.6
+
+2013-02-18  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: only set imf if the key is capable of it
+
+2013-02-18  Dain Nilsson <dain@yubico.com>
+
+	* src/yubikeyfinder.cpp: Fixed memory leak introduced in last
+	commit.
+
+2013-02-08  Dain Nilsson <dain@yubico.com>
+
+	* src/yubikeyfinder.cpp: Only lock the YubiKey when we have window
+	focus.
+
+2013-01-10  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions after
+	release
+
 2013-01-10  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: release 3.1.5
