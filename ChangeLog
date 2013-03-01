@@ -1,3 +1,34 @@
+2013-01-09  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: set version to 3.1.4
+
+2013-01-09  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: news for 3.1.4
+
+2013-01-09  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/confirmbox.cpp, src/ui/confirmbox.h,
+	src/ui/toolpage.cpp: add a confirm if the entered uri does not start
+	with http
+
+2013-01-07  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh: add NEWS to homepage
+
+2012-12-28  Klas Lindfors <klas@yubico.com>
+
+	* README, YKPersonalization.pro, src/ui/aboutpage.cpp,
+	src/ui/aboutpage.ui: display library version on about page
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/version.h: bump versions after release
+
+2012-12-21  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: remove trailing comma
+
 2012-12-21  Klas Lindfors <klas@yubico.com>
 
 	* do-source-release.sh: update do-source-release properly.
