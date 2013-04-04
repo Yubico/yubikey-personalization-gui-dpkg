@@ -4,7 +4,7 @@ Upstream-Contact: Yubico Open Source Maintainers <ossmaint@yubico.com>
 Source: https://github.com/Yubico/yubikey-personalization-gui
 
 Files: *
-Copyright: 2011-2012, Yubico AB
+Copyright: Copyright (C) 2011-2013 Yubico AB.
 License: BSD-2-clause
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are
