@@ -116,7 +116,6 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     // Check features support
     bool flagSrNoSupport = false;
     bool flagUpdateSupport = false;
-    bool flagImfSupport = false;
     if(YubiKeyFinder::getInstance()->checkFeatureSupport(
             YubiKeyFinder::Feature_SerialNumber)) {
         flagSrNoSupport = true;
@@ -124,10 +123,6 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     if(YubiKeyFinder::getInstance()->checkFeatureSupport(
           YubiKeyFinder::Feature_Updatable)) {
         flagUpdateSupport = true;
-    }
-    if(YubiKeyFinder::getInstance()->checkFeatureSupport(
-          YubiKeyFinder::Feature_MovingFactor)) {
-        flagImfSupport = true;
     }
 
     YubiKeyFinder::getInstance()->stop();
@@ -195,7 +190,7 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             CFGFLAG(OATH_FIXED_MODHEX,  ykConfig->oathFixedModhex());
 
             //Moving Factor Seed...
-            if(flagImfSupport && !ykp_set_oath_imf(cfg, ykConfig->oathMovingFactorSeed())) {
+            if(!ykp_set_oath_imf(cfg, ykConfig->oathMovingFactorSeed())) {
               throw 0;
             }
 
