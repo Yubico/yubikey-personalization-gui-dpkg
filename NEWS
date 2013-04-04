@@ -1,5 +1,32 @@
 yubikey-personalization-gui NEWS -- History of user-visible changes.     -*- outline -*-
 
+* Version 3.1.8 (released 2013-03-18)
+
+** Fix programming of OATH MUI
+Identifier was never added to the token, broken since release 3.1.3.
+
+* Version 3.1.7 (released 2013-03-14)
+
+** Try to make some version dependencies in the GUI clearer.
+
+** Change around the "Upload to Yubico" feature:
+It used to spawn a web browser with a standard URL with all fields, instead
+write down a html page with a self-submitting POST form to a temp directory
+and point the web browser at that.
+
+** Fixup entering of OATH MUI.
+
+** Add support for new YubiKey feature: Inversed LED, appearing in firmware
+2.4 and 3.1.
+
+* Version 3.1.6 (released 2013-02-21)
+
+** Only lock the key when window has focus.
+
+** Fix OATH configuration for 2.1 keys.
+
+** Make the override box on the http warning for NDEF work.
+
 * Version 3.1.5 (released 2013-01-10)
 
 ** Fixup building on osx.

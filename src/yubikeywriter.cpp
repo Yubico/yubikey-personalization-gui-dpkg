@@ -116,13 +116,25 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     // Check features support
     bool flagSrNoSupport = false;
     bool flagUpdateSupport = false;
-    if(YubiKeyFinder::getInstance()->checkFeatureSupport(
+    bool flagImfSupport = false;
+    bool flagLedInvSupport = false;
+
+    YubiKeyFinder *finder = YubiKeyFinder::getInstance();
+    if(finder->checkFeatureSupport(
             YubiKeyFinder::Feature_SerialNumber)) {
         flagSrNoSupport = true;
     }
-    if(YubiKeyFinder::getInstance()->checkFeatureSupport(
+    if(finder->checkFeatureSupport(
           YubiKeyFinder::Feature_Updatable)) {
         flagUpdateSupport = true;
+    }
+    if(finder->checkFeatureSupport(
+          YubiKeyFinder::Feature_MovingFactor)) {
+        flagImfSupport = true;
+    }
+    if(finder->checkFeatureSupport(
+          YubiKeyFinder::Feature_LedInvert)) {
+        flagLedInvSupport = true;
     }
 
     YubiKeyFinder::getInstance()->stop();
@@ -190,7 +202,7 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             CFGFLAG(OATH_FIXED_MODHEX,  ykConfig->oathFixedModhex());
 
             //Moving Factor Seed...
-            if(!ykp_set_oath_imf(cfg, ykConfig->oathMovingFactorSeed())) {
+            if(flagImfSupport && !ykp_set_oath_imf(cfg, ykConfig->oathMovingFactorSeed())) {
               throw 0;
             }
 
@@ -363,6 +375,10 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             EXTFLAG(DORMANT, ykConfig->dormant());
             EXTFLAG(FAST_TRIG, ykConfig->fastTrig());
             EXTFLAG(USE_NUMERIC_KEYPAD, ykConfig->useNumericKeypad());
+        }
+
+        if(flagLedInvSupport) {
+            EXTFLAG(LED_INV, ykConfig->ledInvert());
         }
 
         //Log configuration...

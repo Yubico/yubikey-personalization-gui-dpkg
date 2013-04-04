@@ -49,7 +49,6 @@ OathPage::OathPage(QWidget *parent) :
     m_customerPrefix = -1;
     memset(&m_pubId, 0, sizeof(m_pubId));
     m_pubIdMUI = 0;
-    m_pubIdFormat = 0;
     m_ykConfig = 0;
     m_keyPresent = false;
     clearState();
@@ -318,7 +317,12 @@ void OathPage::updatePrefix() {
             break;
 
         case OATH_FIXED_MODHEX:
-            muiTxt = YubiKeyUtil::qstrModhexEncode((unsigned char*)&m_pubIdMUI, 4);
+            unsigned char tempMUI[4];
+            tempMUI[0] = (m_pubIdMUI >> 24) & 0xff;
+            tempMUI[1] = (m_pubIdMUI >> 16) & 0xff;
+            tempMUI[2] = (m_pubIdMUI >> 8) & 0xff;
+            tempMUI[3] = m_pubIdMUI & 0xff;
+            muiTxt = YubiKeyUtil::qstrModhexEncode(tempMUI, 4);
             ui->advOMPTxt->setText(pubIdModhexTxt.left(2));
             ui->advTTTxt->setText(pubIdModhexTxt.mid(2, 2));
             ui->advMUITxt->setText(muiTxt);
@@ -495,8 +499,7 @@ void OathPage::writeQuickConfig() {
 
     //Public ID...
     if(ui->quickPubIdCheck->isChecked()) {
-        QString pubIdTxt = YubiKeyUtil::qstrModhexEncode(m_pubId, 2);
-        m_ykConfig->setPubIdTxt(pubIdTxt);
+        m_ykConfig->setPubIdTxt(getPublicId(true));
 
         //OATH Public ID Type...
         m_ykConfig->setOathFixedModhex2(true);
@@ -668,48 +671,7 @@ void OathPage::on_advPubIdCheck_stateChanged(int state) {
 }
 
 void OathPage::on_advPubIdFormatCombo_currentIndexChanged(int index) {
-    updateAdvOMP(m_pubIdFormat);
-    updateAdvTT(m_pubIdFormat);
-    updateAdvMUI(m_pubIdFormat);
-
-    //        QRegExp modhex2("([b-lnrt-v ]){2}");
-    //        QRegExp modhex8("([b-lnrt-v ]){8}");
-
-    //        switch(index) {
-    //        case OATH_FIXED_MODHEX1:
-    //            ui->advOMPTxt->setInputMask("");
-    //            ui->advOMPTxt->setValidator(new QRegExpValidator(modhex2, this));
-    //            ui->advTTTxt->setInputMask(tr("00;"));
-    //            ui->advMUITxt->setInputMask(tr("00 00 00 00;"));
-    //            break;
-
-    //        case OATH_FIXED_MODHEX2:
-    //            ui->advOMPTxt->setInputMask("");
-    //            ui->advOMPTxt->setValidator(new QRegExpValidator(modhex2, this));
-    //            ui->advTTTxt->setInputMask("");
-    //            ui->advTTTxt->setValidator(new QRegExpValidator(modhex2, this));
-    //            ui->advMUITxt->setInputMask(tr("00 00 00 00;"));
-    //            break;
-
-    //        case OATH_FIXED_MODHEX:
-    //            ui->advOMPTxt->setInputMask("");
-    //            ui->advOMPTxt->setValidator(new QRegExpValidator(modhex2, this));
-    //            ui->advTTTxt->setInputMask("");
-    //            ui->advTTTxt->setValidator(new QRegExpValidator(modhex2, this));
-    //            ui->advMUITxt->setInputMask("");
-    //            ui->advMUITxt->setValidator(new QRegExpValidator(modhex8, this));
-    //            break;
-
-    //        default:
-    //            ui->advOMPTxt->setInputMask(tr("00;"));
-    //            ui->advTTTxt->setInputMask(tr("00;"));
-    //            ui->advMUITxt->setInputMask(tr("00 00 00 00;"));
-    //            break;
-    //        }
-
     updatePrefix();
-
-    m_pubIdFormat = index;
 }
 
 void OathPage::updateAdvOMP(int index) {
@@ -762,20 +724,18 @@ void OathPage::on_advTTTxt_editingFinished() {
 void OathPage::updateAdvMUI(int index) {
     QString txt = ui->advMUITxt->text();
 
-    unsigned char buf[MAX_SIZE];
-    memset(buf, 0, sizeof(buf));
-    size_t bufLen = 0;
-
     if (index != OATH_FIXED_MODHEX) {
         YubiKeyUtil::qstrClean(&txt, OATH_HOTP_MUI_SIZE * 2, true);
-        YubiKeyUtil::qstrDecDecode(buf, &bufLen, txt);
+        m_pubIdMUI = txt.toInt();
     } else {
+        unsigned char buf[MAX_SIZE];
+        memset(buf, 0, sizeof(buf));
+        size_t bufLen = 0;
+
         YubiKeyUtil::qstrModhexClean(&txt, OATH_HOTP_MUI_SIZE * 2);
         YubiKeyUtil::qstrModhexDecode(buf, &bufLen, txt);
+        m_pubIdMUI = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + (buf[3]);
     }
-
-    ui->advMUITxt->setText(txt);
-    memcpy(m_pubId + 2, buf, OATH_HOTP_MUI_SIZE);
 }
 
 void OathPage::on_advMUITxt_editingFinished() {
@@ -982,6 +942,29 @@ bool OathPage::validateAdvSettings() {
     return true;
 }
 
+QString OathPage::getPublicId(bool bcd) {
+  unsigned char pubId[6];
+  memcpy(pubId, m_pubId, 2);
+
+  if(bcd) {
+    int part = m_pubIdMUI / 1000000;
+    pubId[2] = ((part / 10) << 4) + part % 10;
+    part = m_pubIdMUI / 10000 % 100;
+    pubId[3] = ((part / 10) << 4) + part % 10;
+    part = m_pubIdMUI / 100 % 100;
+    pubId[4] = ((part / 10) << 4) + part % 10;
+    part = m_pubIdMUI % 100;
+    pubId[5] = ((part / 10) << 4) + part % 10;
+  } else {
+    pubId[2] = (m_pubIdMUI >> 24) & 0xff;
+    pubId[3] = (m_pubIdMUI >> 16) & 0xff;
+    pubId[4] = (m_pubIdMUI >> 8) & 0xff;
+    pubId[5] = m_pubIdMUI & 0xff;
+  }
+  QString pubIdTxt = YubiKeyUtil::qstrModhexEncode(pubId, 6);
+  return pubIdTxt;
+}
+
 void OathPage::writeAdvConfig() {
     qDebug() << "Writing configuration...";
 
@@ -1012,8 +995,8 @@ void OathPage::writeAdvConfig() {
 
     //Public ID...
     if(ui->advPubIdCheck->isChecked()) {
-        QString pubIdTxt = YubiKeyUtil::qstrModhexEncode(m_pubId, 2);
-        m_ykConfig->setPubIdTxt(pubIdTxt);
+        bool bcd = ui->advPubIdFormatCombo->currentIndex() < 3 ? true : false;
+        m_ykConfig->setPubIdTxt(getPublicId(bcd));
 
         //OATH Public ID Type...
         switch(ui->advPubIdFormatCombo->currentIndex()) {

@@ -64,7 +64,7 @@ typedef std::vector<int>::size_type size_t;
 #define OUT_CHAR_RATE_SLOWDOWN_60   3
 
 #define SUPPORT_EMAIL               tr("mailto:support@yubico.com")
-#define UPLOAD_URL                  tr("https://upload.yubico.com/?serial=%1&prefix=%2&uid=%3&aeskey=%4")
+#define UPLOAD_URL                  tr("<!doctype html><html><title>upload</title></head><body><form action='https://upload.yubico.com/' method='post' id='upload'>serial:<input name='serial' value='%1'/><br/>prefix:<input name='prefix' value='%2'/><br/>uid:<input name='uid' value='%3'/><br/>aeskey:<input name='aeskey' value='%4'/><br/><input type='submit'/><br/></form><script type='text/javascript'>window.onload=function(){document.getElementById('upload').submit();}</script></body></html>")
 
 
 //Timeouts
@@ -163,10 +163,12 @@ typedef std::vector<int>::size_type size_t;
 #define SG_ALLOW_UPDATE             "Flag/AllowUpdate"
 #define SG_FAST_TRIG                "Flag/FastTrig"
 #define SG_USE_NUMERIC_KEYPAD       "Flag/UseNumericKeypad"
+#define SG_LED_INVERT               "Flag/LedInvert"
 
 #define SG_OVERWRITE_CONF_SLOT1     "DontAsk/Slot1Overwriting"
 #define SG_DIFF_PUBLIC_ID_LEN       "DontAsk/PublicIdLen"
 #define SG_ENABLE_CONF_PROTECTION   "DontAsk/ConfProtection"
+#define SG_NDEF_WITHOUT_HTTP        "DontAsk/NdefWithoutHttp"
 
 #define SG_ANIMATIONS_PREFERENCE    "Preference/Animations"
 
