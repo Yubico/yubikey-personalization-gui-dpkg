@@ -1,3 +1,76 @@
+2013-03-18  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.8
+
+2013-03-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.h: correctly add the MUI part
+	to public id for oath fixes #12 broken in 5fa2fb7 and released in 3.1.3..
+
+2013-03-14  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions
+	post-release
+
+2013-03-14  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh: no -e for homepage build
+
+2013-03-14  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.7
+
+2013-03-14  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp: switch to using fromLocalFile() to construct
+	instead of specing file://
+
+2013-03-14  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.7
+
+2013-03-13  Klas Lindfors <klas@yubico.com>
+
+	* README: LED_INV didn't appear until version 1.12
+
+2013-03-13  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/settingpage.ui,
+	src/yubikeyconfig.cpp, src/yubikeyconfig.h, src/yubikeyfinder.cpp,
+	src/yubikeyfinder.h, src/yubikeywriter.cpp: move around and add
+	LED_INV support
+
+2013-03-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.h: cleanup, remove unused
+	stuff m_pubIdFormat was never read, calls to update...() didn't have any
+	effect.
+
+2013-03-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp: drop commented code
+
+2013-03-11  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp: fixup entering of MUI contained code that overwrote the bounds of m_pubid and did other
+	unnecessary things.  Fixes #11
+
+2013-02-28  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/otppage.cpp, src/ui/otppage.h: change around
+	so we don't send the uploaded key as a GET instead write a temp file with an auto-submitting form that does a
+	POST to upload.yubico.com
+
+2013-02-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.ui: add a + to indicate that it's version 2.2
+	and later
+
+2013-02-21  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions
+	post-release
+
 2013-02-21  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: news for override box
