@@ -1,7 +1,7 @@
 yubikey-personalization-gui (3.1.8-1) unstable; urgency=low
 
   * New upstream release.
-
+  * Remove obsolete 'DM-Upload-Allowed'.
   * Dependency on libykpers 1.12.0 or later
 
  -- Klas Lindfors <klas@yubico.com>  Thu, 04 Apr 2013 13:15:10 +0200
