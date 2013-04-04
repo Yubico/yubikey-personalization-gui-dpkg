@@ -1,6 +1,6 @@
 Source: yubikey-personalization-gui
 Maintainer: Yubico Open Source Maintainers <ossmaint@yubico.com>
-Uploaders: Simon Josefsson <simon@josefsson.org>, Klas Lindfors <klas@yubico.com>
+Uploaders: Simon Josefsson <simon@yubico.com>, Klas Lindfors <klas@yubico.com>, Dain Nilsson <dain@yubico.com>
 Section: utils
 Priority: extra
 Build-Depends: debhelper (>= 7.0.50~),
