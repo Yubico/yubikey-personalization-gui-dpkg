@@ -1,21 +1,32 @@
-This is the recommended way to get and work with the package sources.
+We describe here one way to work with the package sources.
 
-To load a new upstream release:
+Initialize cowbuilder:
 
-git-import-orig --pristine-tar $tarball
+sudo cowbuilder --create --distribution sid --mirror ftp://ftp.se.debian.org/debian/ --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg" --basepath /var/cache/pbuilder/base-debian-sid.cow
 
-To build the package:
+Optionally update cowbuilder:
 
-git-buildpackage --git-pristine-tar
-OR
+sudo cowbuilder --update --basepath /var/cache/pbuilder/base-debian-sid.cow
+
+Clone the repository:
+
+git clone git@github.com:Yubico/yubikey-personalization-gui-dpkg.git
+
+Build the package:
+
+git-buildpackage --git-pristine-tar --git-builder="pdebuild --auto-debsign --pbuilder cowbuilder -- --basepath /var/cache/pbuilder/base-debian-sid.cow"
+
+Or using gitpkg:
+
+git config gitpkg.deb-export-hook /usr/share/gitpkg/hooks/quilt-patches-deb-export-hook
+git config gitpkg.pre-export-hook /usr/share/gitpkg/hooks/pristine-tar-pre-export-hook
+git config gitpkg.create-fake-orig false
+git config gitpkg.force-overwrite-orig false
 gitpkg master
 
-if using gitpkg you need the following in .git/config for it to work with
-  pristine-tar:
+If all goes well, you should have newly built packages in
+/var/cache/pbuilder/result/.
 
-[gitpkg]
-  deb-export-hook = /usr/share/gitpkg/hooks/quilt-patches-deb-export-hook
-  pre-export-hook = /usr/share/gitpkg/hooks/pristine-tar-pre-export-hook
-  create-fake-orig = false
-  force-overwrite-orig = false
+Update the package to a new upstream release (don't forget debian/changelog):
 
+git-import-orig --pristine-tar /path/to/new-release.tar.gz
