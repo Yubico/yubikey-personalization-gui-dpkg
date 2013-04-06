@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: yubikey-personalization-gui
 Upstream-Contact: Yubico Open Source Maintainers <ossmaint@yubico.com>
-Source: https://github.com/Yubico/yubikey-personalization-gui
+Source: http://yubico.github.com/yubikey-personalization-gui/
 
 Files: *
 Copyright: Copyright (C) 2011-2013 Yubico AB.
