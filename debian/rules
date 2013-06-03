@@ -2,15 +2,8 @@
 
 #export DH_VERBOSE=1
 
-CPPFLAGS := "$(shell dpkg-buildflags --get CPPFLAGS)"
-CXXFLAGS := "$(shell dpkg-buildflags --get CXXFLAGS) $(CPPFLAGS)"
-LDFLAGS := "$(shell dpkg-buildflags --get LDFLAGS)"
-
-# use qmake + make to build this package
-override_dh_auto_build:
-	CXXFLAGS=$(CXXFLAGS) LDFLAGS=$(LDFLAGS) qmake "CONFIG+=debian" && make
+%:
+	dh $@ --buildsystem=qmake --parallel
 
 override_dh_auto_configure:
-
-%:
-	dh $@ --parallel
+	dh_auto_configure -- CONFIG+=nosilent
