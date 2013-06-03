@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <QDebug>
 #include <QDateTime>
+#include <QFileDialog>
+#include <QSettings>
 
 #define LOG_FILENAME_DEF   "configuration_log.csv"
 #define LOG_SEPARATOR      ","
@@ -39,8 +41,23 @@ QString YubiKeyLogger::m_filename   = defaultLogFilename();
 bool YubiKeyLogger::m_enabled       = true;
 bool YubiKeyLogger::m_started       = true;
 YubiKeyLogger::Format YubiKeyLogger::m_format = Format_Traditional;
+QFile* YubiKeyLogger::m_logFile     = NULL;
 
 YubiKeyLogger::~YubiKeyLogger() {
+}
+
+QFile *YubiKeyLogger::getLogFile() {
+    if(m_logFile == NULL) {
+        m_filename = QFileDialog::getSaveFileName(NULL, tr("Select Log File"), m_filename, "Comma-sepparated values (*.csv)", NULL, QFileDialog::DontConfirmOverwrite);
+        m_logFile = new QFile(m_filename);
+        if(!m_logFile->open(QIODevice::WriteOnly | QIODevice::Append)) {
+            qDebug() << "File could not be opened for writing";
+            return NULL;
+        }
+        QSettings settings;
+        settings.setValue(SG_LOG_FILENAME, m_filename);
+    }
+    return m_logFile;
 }
 
 void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
@@ -49,25 +66,19 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
         return;
     }
 
-    QFile file(m_filename);
-
-    qDebug() << "Log file name:" << m_filename;
-
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
-        qDebug() << "File could not be opened for writing";
+    QFile *file = getLogFile();
+    if(file == NULL) {
         return;
     }
 
-    QTextStream out(&file);
-
+    QTextStream out(file);
 
     if(m_format == Format_Traditional) {
         logConfigTraditional(ykConfig, out);
     } else {
         logConfigYubico(ykConfig, out);
     }
-    file.flush();
-    file.close();
+    file->flush();
 }
 
 void YubiKeyLogger::logConfigTraditional(YubiKeyConfig *ykConfig, QTextStream &out) {

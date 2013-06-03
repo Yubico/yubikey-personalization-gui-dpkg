@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -75,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
             m_otpPage, SLOT(loadSettings()));
     connect(m_settingPage, SIGNAL(settingsChanged()),
             m_oathPage, SLOT(loadSettings()));
+    connect(m_settingPage, SIGNAL(settingsChanged()),
+            m_chalRespPage, SLOT(loadSettings()));
 
     //Intialize settings
     m_settingPage->init();

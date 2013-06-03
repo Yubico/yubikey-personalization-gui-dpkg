@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -81,6 +81,7 @@ SettingPage::SettingPage(QWidget *parent) :
     connect(ui->logTraditionalRadio, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->logYubicoRadio, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->outCharRateCombo, SIGNAL(activated(int)), this, SLOT(save()));
+    connect(ui->exportCheck, SIGNAL(clicked()), this, SLOT(save()));
 
     connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
             this, SLOT(keyFound(bool, bool*)));
@@ -151,8 +152,11 @@ void SettingPage::restoreDefaults() {
     settings.setValue(SG_CUSTOMER_PREFIX,       0);
 
     settings.setValue(SG_LOG_DISABLED,          false);
+    // we continue loading LOG_FILENAME since we use that to check if settings are loaded
     settings.setValue(SG_LOG_FILENAME,          YubiKeyLogger::defaultLogFilename());
     settings.setValue(SG_LOG_FORMAT,            YubiKeyLogger::Format_Traditional);
+
+    settings.setValue(SG_EXPORT_FILENAME,       YubiKeyWriter::defaultExportFilename());
 
     settings.setValue(SG_TAB_FIRST,             false);
     settings.setValue(SG_APPEND_TAB1,           false);
@@ -172,6 +176,8 @@ void SettingPage::restoreDefaults() {
     settings.setValue(SG_ALLOW_UPDATE,          true);
     settings.setValue(SG_FAST_TRIG,             false);
     settings.setValue(SG_USE_NUMERIC_KEYPAD,    false);
+
+    settings.setValue(SG_EXPORT_PREFERENCE,     false);
 }
 
 void SettingPage::load() {
@@ -183,6 +189,13 @@ void SettingPage::load() {
     if(logFilename.isEmpty()) {
         //This is the first time... set defaults
         restoreDefaults();
+    }
+
+    YubiKeyLogger::setLogFilename(logFilename);
+
+    QString exportFilename = settings.value(SG_EXPORT_FILENAME).toString();
+    if(!exportFilename.isEmpty()) {
+        YubiKeyWriter::setExportFilename(exportFilename);
     }
 
     //General settings...
@@ -259,16 +272,12 @@ void SettingPage::load() {
         YubiKeyLogger::disableLogging();
 
         ui->logOutputCheck->setChecked(false);
-        ui->logFileTxt->setEnabled(false);
-        ui->browseBtn->setEnabled(false);
         ui->logTraditionalRadio->setEnabled(false);
         ui->logYubicoRadio->setEnabled(false);
     } else {
         YubiKeyLogger::enableLogging();
 
         ui->logOutputCheck->setChecked(true);
-        ui->logFileTxt->setEnabled(true);
-        ui->browseBtn->setEnabled(true);
         ui->logTraditionalRadio->setEnabled(true);
         ui->logYubicoRadio->setEnabled(true);
         if(logFormat == YubiKeyLogger::Format_Yubico) {
@@ -280,14 +289,7 @@ void SettingPage::load() {
         }
     }
 
-    if(!logFilename.isEmpty()) {
-        YubiKeyLogger::setLogFilename(logFilename);
-    } else {
-        logFilename = YubiKeyLogger::logFilename();
-    }
-
-    ui->logFileTxt->setText(logFilename);
-    ui->logFileTxt->setCursorPosition(0);
+    ui->exportCheck->setChecked(settings.value(SG_EXPORT_PREFERENCE).toBool());
 
     //Signal everyone
     emit settingsChanged();
@@ -356,9 +358,6 @@ void SettingPage::save() {
     if(ui->logOutputCheck->isChecked()) {
         settings.setValue(SG_LOG_DISABLED,  false);
 
-        QString logFilename = ui->logFileTxt->text().trimmed();
-        settings.setValue(SG_LOG_FILENAME,  logFilename);
-
         if(ui->logYubicoRadio->isChecked()) {
             settings.setValue(SG_LOG_FORMAT, YubiKeyLogger::Format_Yubico);
         } else {
@@ -367,6 +366,8 @@ void SettingPage::save() {
     } else {
         settings.setValue(SG_LOG_DISABLED,  true);
     }
+
+    settings.setValue(SG_EXPORT_PREFERENCE, ui->exportCheck->isChecked());
 
     //Reload settings
     load();
@@ -420,28 +421,6 @@ void SettingPage::on_custPrefixModhexTxt_editingFinished() {
 void SettingPage::on_custPrefixHexTxt_editingFinished() {
     custPrefixChanged(HEX, ui->custPrefixHexTxt->text());
     save();
-}
-
-void SettingPage::on_logOutputCheck_stateChanged(int state) {
-    if(state == 0) {
-        ui->logFileTxt->setEnabled(false);
-        ui->browseBtn->setEnabled(false);
-    } else {
-        ui->logFileTxt->setEnabled(true);
-        ui->browseBtn->setEnabled(true);
-    }
-}
-
-void SettingPage::on_browseBtn_clicked() {
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                                    tr("Open"),
-                                                    QDir(ui->logFileTxt->text()).absolutePath(),
-                                                    tr("Comma-separated text file (*.txt *.csv)"));
-
-    if(!fileName.isEmpty()) {
-        ui->logFileTxt->setText(fileName);
-        save();
-    }
 }
 
 void SettingPage::on_doUpdateBtn_clicked() {

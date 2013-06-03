@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -182,6 +182,7 @@ void OtpPage::keyFound(bool found, bool* featuresMatrix) {
         if(m_state == State_Initial) {
             ui->quickWriteConfigBtn->setEnabled(true);
             ui->advWriteConfigBtn->setEnabled(true);
+            ui->advExportConfigBtn->setEnabled(true);
 
             if(!featuresMatrix[YubiKeyFinder::Feature_MultipleConfigurations]) {
                 ui->quickConfigSlot2Radio->setEnabled(false);
@@ -198,14 +199,16 @@ void OtpPage::keyFound(bool found, bool* featuresMatrix) {
             }
             if(m_state == State_Programming_Multiple) {
                 ui->advWriteConfigBtn->setEnabled(true);
+                ui->advExportConfigBtn->setEnabled(true);
             } else {
-                writeAdvConfig();
+                writeAdvConfig(WRITE_CONFIG);
             }
         }
         m_keyPresent = true;
     } else {
         ui->quickWriteConfigBtn->setEnabled(false);
         ui->advWriteConfigBtn->setEnabled(false);
+        ui->advExportConfigBtn->setEnabled(false);
 
         m_keyPresent = false;
 
@@ -260,8 +263,9 @@ void OtpPage::loadSettings() {
 
         m_pubIdPrefix = QString("");
     }
-}
 
+    ui->advExportConfigBtn->setVisible(settings.value(SG_EXPORT_PREFERENCE).toBool());
+}
 
 /*
  Quick Page handling
@@ -481,6 +485,7 @@ void OtpPage::freezeAdvPage(bool freeze) {
     ui->advKeyParamsBox->setEnabled(disable);
 
     ui->advWriteConfigBtn->setEnabled(disable);
+    ui->advExportConfigBtn->setEnabled(disable);
     ui->advStopBtn->setEnabled(!disable);
     ui->advBackBtn->setEnabled(disable);
 }
@@ -627,6 +632,20 @@ void OtpPage::on_advSecretKeyGenerateBtn_clicked() {
             YubiKeyUtil::generateRandomHex((size_t)KEY_SIZE * 2));
 }
 
+void OtpPage::on_advExportConfigBtn_clicked() {
+    qDebug() << "foo";
+    //Validate settings
+    if(!validateAdvSettings()) {
+        return;
+    }
+
+    clearState();
+
+    freezeAdvPage(true);
+
+    writeAdvConfig(EXPORT_CONFIG);
+}
+
 void OtpPage::on_advWriteConfigBtn_clicked() {
     emit showStatusMessage(NULL, -1);
 
@@ -656,7 +675,7 @@ void OtpPage::on_advWriteConfigBtn_clicked() {
         m_state = State_Programming;
     }
 
-    writeAdvConfig();
+    writeAdvConfig(WRITE_CONFIG);
 }
 
 void OtpPage::on_advStopBtn_clicked() {
@@ -801,7 +820,7 @@ bool OtpPage::validateAdvSettings() {
     return true;
 }
 
-void OtpPage::writeAdvConfig() {
+void OtpPage::writeAdvConfig(int mode) {
     qDebug() << "Writing configuration...";
 
     //Disable stop button while configuration is being written
@@ -853,11 +872,19 @@ void OtpPage::writeAdvConfig() {
         m_ykConfig->setNewAccessCodeTxt(ui->advNewAccessCodeTxt->text());
     }
 
-    //Write
-    connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
-            this, SLOT(advConfigWritten(bool, const QString &)));
 
-    YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
+    if(mode == WRITE_CONFIG) {
+        //Write
+        connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+                this, SLOT(advConfigWritten(bool, const QString &)));
+
+        YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
+    } else if(mode == EXPORT_CONFIG) {
+        connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+                this, SLOT(advConfigExported(bool, const QString &)));
+
+        YubiKeyWriter::getInstance()->exportConfig(m_ykConfig);
+    }
 }
 
 void OtpPage::advConfigWritten(bool written, const QString &msg) {
@@ -892,6 +919,33 @@ void OtpPage::advConfigWritten(bool written, const QString &msg) {
     }
 
     advUpdateResults(written, message);
+
+    m_ready = false;
+    stopAdvConfigWritting();
+}
+
+void OtpPage::advConfigExported(bool written, const QString &msg) {
+    disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
+               this, SLOT(advConfigExported(bool, const QString &)));
+
+    QString message;
+
+    if(written && m_ykConfig != 0) {
+        qDebug() << "Configuration exported....";
+
+        QString keyDetail("");
+        if(ui->advPubIdCheck->isChecked()) {
+            keyDetail = tr(" (Public ID: %1)").arg(m_ykConfig->pubIdTxt());
+        }
+
+        message = KEY_EXPORTED;
+
+        showStatusMessage(message, 0);
+    } else {
+        qDebug() << "Configuration could not be exported....";
+
+        message = msg;
+    }
 
     m_ready = false;
     stopAdvConfigWritting();

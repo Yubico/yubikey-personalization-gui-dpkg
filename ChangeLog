@@ -1,3 +1,174 @@
+2013-04-22  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS
+
+2013-04-22  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/yubikeylogger.cpp,
+	src/yubikeylogger.h, src/yubikeywriter.cpp, src/yubikeywriter.h: 
+	remember selected locations for log and export and reuse resolves #16
+
+2013-04-19  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeywriter.cpp: better default paths
+	for file dialogs
+
+2013-04-19  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/mainwindow.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/settingpage.cpp, src/ui/settingpage.ui: add a setting for
+	enable/disable export config
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: YKP_FORMAT_JSON changed to YKP_FORMAT_YCFG
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: deal with moving qt_menu.nib if it's
+	already moved
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: move around logging settings
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* : commit 2dab637d23070be7a6e146a1d5e4b2e60673ba0d Author: Klas
+	Lindfors <klas@yubico.com> Date:   Thu Apr 18 13:57:52 2013 +0100
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add for_store build flags
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* resources/mac/Info.plist.in: add application category
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: for mac use config for_store to select
+	appropriate certificates
+
+2013-04-18  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: run productbuild instead of pkgbuild
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add license files for osx
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: include
+	licenses in windows installer
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: merge two win32 blocks
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, resources/mac/Entitlements.plist: use app
+	sandbox on osX
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* README: update instructions
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: simplify mac build
+
+2013-04-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: rework macx build to work with binary
+	package of libykpers
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: change around so the dll files come from
+	the packed up zip
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeywriter.cpp: set filters for
+	selected files
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui, src/yubikeylogger.cpp, src/yubikeylogger.h: 
+	change around for logging to go by QFileDialog With this the user has to select which file to log to when the first
+	write occurs.  solves #3
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: add json dll
+	for windows build
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* installer/win32/Installer.sln,
+	installer/win32/Installer/Installer.vdproj: drop old windows
+	installer
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/chalresppage.ui, src/ui/oathpage.cpp, src/ui/oathpage.h,
+	src/ui/oathpage.ui, src/ui/otppage.cpp: implement export for oath
+	and chalresp
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp: same rules for export as write
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: little bit more error-checking
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/otppage.cpp, src/ui/otppage.h,
+	src/ui/otppage.ui: add exporting of otp
+
+2013-04-15  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp, src/yubikeywriter.h: add exportConfig
+	method and split out assembling the configuration
+
+2013-04-11  Dain Nilsson <dain@yubico.com>
+
+	* do-source-release.sh: Use publish script in YUBICO_GITHUB_REPO
+
+2013-04-05  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh, do-source-release.sh: change release scripts
+	around to work with yubico.github.com
+
+2013-04-04  Simon Josefsson <simon@josefsson.org>
+
+	* resources/lin/yubikey-personalization-gui.1, src/common.h,
+	src/crandom.cpp, src/crandom.h, src/main.cpp, src/otpdef.h,
+	src/ui/aboutpage.cpp, src/ui/aboutpage.h, src/ui/chalresppage.cpp,
+	src/ui/chalresppage.h, src/ui/confirmbox.cpp, src/ui/confirmbox.h,
+	src/ui/helpbox.cpp, src/ui/helpbox.h, src/ui/mainwindow.cpp,
+	src/ui/mainwindow.h, src/ui/oathpage.cpp, src/ui/oathpage.h,
+	src/ui/otppage.cpp, src/ui/otppage.h, src/ui/scanedit.cpp,
+	src/ui/scanedit.h, src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp,
+	src/ui/toolpage.h, src/yubikeyconfig.cpp, src/yubikeyconfig.h,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h, src/yubikeylogger.cpp,
+	src/yubikeylogger.h, src/yubikeyutil.cpp, src/yubikeyutil.h,
+	src/yubikeywriter.cpp, src/yubikeywriter.h: Bump copyright years.
+
+2013-03-18  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions
+	post-release
+
 2013-03-18  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: release 3.1.8

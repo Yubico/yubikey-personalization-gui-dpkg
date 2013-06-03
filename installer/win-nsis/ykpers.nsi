@@ -38,7 +38,6 @@ FunctionEnd
 
 ; Pages
   !insertmacro MUI_PAGE_WELCOME
-  !insertmacro MUI_PAGE_LICENSE "../../COPYING"
   !insertmacro MUI_PAGE_DIRECTORY
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Yubico\YubiKey Personalization Tool"
@@ -61,12 +60,15 @@ Section "YubiKey Personalization Tool"
   SectionIn RO
   SetOutPath $INSTDIR
   FILE ../../build/release/yubikey-personalization-gui.exe
+  FILE ../../build/release/libjson-c-2.dll
   FILE ../../build/release/libyubikey-0.dll
   FILE ../../build/release/libykpers-1-1.dll
   FILE ../../build/release/QtCore4.dll
   FILE ../../build/release/QtGui4.dll
   FILE ../../build/release/libgcc_s_dw2-1.dll
   FILE ../../build/release/mingwm10.dll
+  SetOutPath $INSTDIR\licenses
+  FILE /r ../../build/release/licenses/
   SetOutPath $INSTDIR\imageformats
   FILE ../../build/release/qmng4.dll
 SectionEnd
@@ -113,6 +115,7 @@ Section "Uninstall"
   DeleteRegKey HKLM "Software\Yubico\yubikey-personalization-gui"
 
   DELETE "$INSTDIR\yubikey-personalization-gui.exe"
+  DELETE "$INSTDIR\libjson-c-2.dll"
   DELETE "$INSTDIR\libyubikey-0.dll"
   DELETE "$INSTDIR\libykpers-1-1.dll"
   DELETE "$INSTDIR\QtCore4.dll"
@@ -121,8 +124,10 @@ Section "Uninstall"
   DELETE "$INSTDIR\libgcc_s_sjlj-1.dll"
   DELETE "$INSTDIR\libstdc++-6.dll"
   DELETE "$INSTDIR\mingwm10.dll"
+  DELETE "$INSTDIR\licenses\*"
   DELETE "$INSTDIR\imageformats\qmng4.dll"
 
+  RMDir "$INSTDIR\licenses"
   RMDir "$INSTDIR\imageformats"
 
   ; Remove uninstaller
