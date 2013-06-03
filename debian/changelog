@@ -1,3 +1,10 @@
+yubikey-personalization-gui (3.1.9-1) unstable; urgency=low
+
+  * New upstream release.
+  * Simplified build and make sure we get full output from compilation.
+
+ -- Klas Lindfors <klas@yubico.com>  Mon, 03 Jun 2013 08:58:41 +0200
+
 yubikey-personalization-gui (3.1.8-1) unstable; urgency=low
 
   * New upstream release.
