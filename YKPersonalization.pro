@@ -1,7 +1,7 @@
 #
 # global definitions
 #
-VERSION         = "3.1.8"
+VERSION         = "3.1.9"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
@@ -40,6 +40,10 @@ DESTDIR         = "$$TARGET_DIR"
 
 DEPENDPATH     += . src src/ui
 INCLUDEPATH    += . src src/ui
+
+LICENSEFILES    = json-c.txt \
+                  libyubikey.txt \
+                  yubikey-personalization.txt
 
 FORMS += \
     src/ui/toolpage.ui \
@@ -102,20 +106,6 @@ OTHER_FILES += \
     resources/mac/Info.plist.in \
     resources/mac/qt.conf
 
-!debian:!fedora {
-  HEADERS += \
-      deps/libykpers/ykpers.h \
-      deps/libykpers/ykpers-version.h \
-      deps/libykpers/ykcore/yktsd.h \
-      deps/libykpers/ykcore/ykstatus.h \
-      deps/libykpers/ykcore/ykdef.h \
-      deps/libykpers/ykcore/ykcore_backend.h \
-      deps/libykpers/ykcore/ykcore.h \
-      deps/libyubikey/yubikey.h
-
-  INCLUDEPATH    += . src src/ui deps/libusb-1.0 deps/libykpers deps/libykpers/ykcore deps/libyubikey
-}
-
 cross {
     message("Doing a cross platform build..")
     QMAKE_CXXFLAGS += $$(CXXFLAGS)
@@ -168,6 +158,7 @@ cross {
 # Windows specific configuration
 #
 win32 {
+    INCLUDEPATH += libs/win32/include libs/win32/include/ykpers-1
     HEADERS += src/crandom.h
     SOURCES += src/crandom.cpp
 
@@ -178,11 +169,11 @@ win32 {
     !contains(QMAKE_TARGET.arch, x86_64) {
         message("Windows x86 build")
 
-        LIBS += $$quote(-L./libs/win32) -llibyubikey-0 -llibykpers-1-1
+        LIBS += $$quote(-L./libs/win32/bin) -llibyubikey-0 -llibykpers-1-1
     } else {
         message("Windows x86_64 build")
 
-        LIBS += $$quote(-L./libs/win64) -llibyubikey-0 -llibykpers-1-1
+        LIBS += $$quote(-L./libs/win64/bin) -llibyubikey-0 -llibykpers-1-1
     }
 
     CONFIG(debug, debug|release) {
@@ -201,8 +192,9 @@ win32 {
     LIB_FILES += \
         $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
         $$_QT_BINDIR$${DIR_SEPARATOR}mingwm10.dll \
-        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libyubikey-0.dll \
-        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}libykpers-1-1.dll
+        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libjson-c-2.dll \
+        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libyubikey-0.dll \
+        libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libykpers-1-1.dll
 
     isEmpty(TIMESTAMP_URL):TIMESTAMP_URL = 'http://timestamp.verisign.com/scripts/timstamp.dll'
 
@@ -211,6 +203,13 @@ win32 {
     for(FILE, LIB_FILES_WIN) {
         QMAKE_POST_LINK +=$$quote($$QMAKE_COPY $${FILE} $${TARGET_DIR_WIN}$$escape_expand(\\n\\t))
     }
+    LICENSE_DIR = $${TARGET_DIR_WIN}$${DIR_SEPARATOR}licenses
+    QMAKE_POST_LINK += $$quote($$QMAKE_MKDIR $${LICENSE_DIR}$$escape_expand(\\n\\t))
+    BASEDIR = libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}licenses$${DIR_SEPARATOR}
+    for(FILE, LICENSEFILES) {
+        QMAKE_POST_LINK += $$quote($$QMAKE_COPY $${BASEDIR}$${FILE} $${LICENSE_DIR}$$escape_expand(\\n\\t))
+    }
+    QMAKE_POST_LINK += $$quote($$QMAKE_COPY COPYING $${LICENSE_DIR}$${DIR_SEPARATOR}yubikey-personalization-gui.txt$$escape_expand(\\n\\t))
     sign_binaries {
         _PVK_FILE = $$(PVK_FILE)
         _SPC_FILE = $$(SPC_FILE)
@@ -239,33 +238,10 @@ win32 {
 }
 
 #
-# Non-windows specific configuration
-#
-!win32:!debian:!fedora {
-    SOURCES += \
-        deps/libykpers/ykpers.c \
-        deps/libykpers/ykpers-version.c \
-        deps/libykpers/ykpbkdf2.c \
-        deps/libykpers/ykcore/ykstatus.c \
-        deps/libykpers/ykcore/ykcore.c \
-        deps/libykpers/rfc4634/usha.c \
-        deps/libykpers/rfc4634/sha384-512.c \
-        deps/libykpers/rfc4634/sha224-256.c \
-        deps/libykpers/rfc4634/sha1.c \
-        deps/libykpers/rfc4634/hmac.c \
-        deps/libyubikey/yktoken.c \
-        deps/libyubikey/ykmodhex.c \
-        deps/libyubikey/ykhex.c \
-        deps/libyubikey/ykcrc.c \
-        deps/libyubikey/ykaes.c
-}
-
-#
 # *nix specific configuration
 #
 unix:!macx {
-  debian {
-    message("Debian build")
+    message("Unix build")
 
     LIBS += -lyubikey
 
@@ -274,57 +250,6 @@ unix:!macx {
 
     QMAKE_CXXFLAGS += $$(CXXFLAGS)
     QMAKE_LFLAGS += $$(LDFLAGS)
-
-  } else:fedora {
-    message("Fedora build")
-
-    LIBS += -lyubikey
-
-    CONFIG += link_pkgconfig
-    PKGCONFIG += ykpers-1
-
-    QMAKE_CXXFLAGS += $$(CXXFLAGS)
-    QMAKE_LFLAGS += $$(LDFLAGS)
-
-  } else {
-    message("Generic Linux build")
-
-    HEADERS += deps/libusb-1.0/libusb.h
-    SOURCES += deps/libykpers/ykcore/ykcore_libusb-1.0.c
-
-    # The application dependencies
-    LIBS += $$quote(-L./libs/lin) -lusb-1.0
-
-    TARGET_LIN = $${APP_NAME}
-    TARGET_LIN ~= s, ,\\ ,g
-
-    # Copy dependencies and other resources
-    LIB_FILES += \
-        $$[QT_INSTALL_LIBS]/libQtGui.so.4 \
-        $$[QT_INSTALL_LIBS]/libQtCore.so.4 \
-        $$[QT_INSTALL_PLUGINS]/imageformats/libqmng.so \
-        libs/lin/libusb-1.0.so.0 \
-        resources/lin/$${TARGET_LIN}.sh
-
-    for(FILE, LIB_FILES){
-        QMAKE_POST_LINK += $$quote(cp $${FILE} $${DESTDIR}$$escape_expand(\\n\\t))
-    }
-
-    # Create application tarball
-    TARROOT = "$${TARGET_LIN}-linux-$${VERSION}"
-    TARFILE = "$${TARGET_LIN}-linux-$${VERSION}.tgz"
-
-    tarball.target   = tarball
-    tarball.commands = \
-        rm -rf "$${DESTDIR}/$${TARROOT}"; \
-        mkdir "$${DESTDIR}/$${TARROOT}"; \
-        (cd $${DESTDIR} && cp -R $${TARGET} *.sh *.so* "$${TARROOT}"); \
-        rm -f "$${DESTDIR}/$${TARFILE}"; \
-        (cd $${DESTDIR} && tar -czf "$${TARFILE}" $${TARROOT}); \
-        rm -rf "$${DESTDIR}/$${TARROOT}";
-
-    QMAKE_EXTRA_TARGETS += tarball
-  }
 }
 
 #
@@ -333,27 +258,23 @@ unix:!macx {
 macx {
     message("Mac build")
 
-    CONFIG += x86_64
+    INCLUDEPATH += libs/macx/include libs/macx/include/ykpers-1
+    LIBS += libs/macx/lib/libykpers-1.dylib libs/macx/lib/libyubikey.dylib
 
-    SOURCES += deps/libykpers/ykcore/ykcore_osx.c
+    CONFIG += x86_64
 
     DEFINES += QT_MAC_USE_COCOA
 
-    cross {
-        CONFIG += qt_framework
-        _SDK = $$(OSX_SDK)
-        !isEmpty (_SDK) {
-            # FIXME: this is prone to breaking with version numbers
-            INCLUDEPATH += $$(OSX_SDK)/usr/include/c++/4.2.1
-        }
-        QMAKE_CFLAGS_X86_64 -= -arch
-        QMAKE_CFLAGS_X86_64 -= x86_64
-        QMAKE_CXXFLAGS_X86_64 -= -arch
-        QMAKE_CXXFLAGS_X86_64 -= x86_64
-    } else {
-        _QT_LIBDIR = $$QMAKE_LIBDIR_QT
-        _QT_PLUGINDIR = $$[QT_INSTALL_PLUGINS]
+    _QT_LIBDIR = $$QMAKE_LIBDIR_QT
+    _QT_PLUGINDIR = $$[QT_INSTALL_PLUGINS]
 
+    for_store {
+        QMAKE_CFLAGS += -gdwarf-2
+        QMAKE_CXXFLAGS += -gdwarf-2
+
+        isEmpty(PACKAGE_SIGN_IDENTITY):PACKAGE_SIGN_IDENTITY = '3rd Party Mac Developer Application'
+        isEmpty(INSTALLER_SIGN_IDENTITY):INSTALLER_SIGN_IDENTITY = '3rd Party Mac Developer Installer'
+    } else {
         isEmpty(PACKAGE_SIGN_IDENTITY):PACKAGE_SIGN_IDENTITY = 'Developer ID Application'
         isEmpty(INSTALLER_SIGN_IDENTITY):INSTALLER_SIGN_IDENTITY = 'Developer ID Installer'
     }
@@ -388,10 +309,27 @@ macx {
         cp -R $$_QT_LIBDIR/QtGui.framework $$_FRAMEWORKDIR/QtGui.framework && \
         rm -rf $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Headers && \
         find $$_FRAMEWORKDIR -type l -print0 | xargs -0 rm -f  && \
+        test -d $$_BASEDIR/Resources/qt_menu.nib || \
         mv $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources/qt_menu.nib $$_BASEDIR/Resources/qt_menu.nib && \
+        test ! -d $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources || \
         rmdir $$_FRAMEWORKDIR/QtGui.framework/Versions/4/Resources && \
         mkdir -p $$_PLUGINDIR/imageformats && \
         cp -R $$_QT_PLUGINDIR/imageformats/libqmng.dylib $$_PLUGINDIR/imageformats)
+
+    # copy libykpers and friends
+    _LIBDIR = $${_BASEDIR}/lib
+    QMAKE_POST_LINK += $$quote( && mkdir -p $$_LIBDIR && \
+        cp libs/macx/lib/libyubikey.0.dylib $$_LIBDIR && \
+        cp libs/macx/lib/libykpers-1.1.dylib $$_LIBDIR && \
+        cp libs/macx/lib/libjson-c.2.dylib $$_LIBDIR)
+
+    _LICENSEDIR = $${_BASEDIR}/licenses
+    QMAKE_POST_LINK += $$quote(&& mkdir -p $$_LICENSEDIR && \
+        cp COPYING $$_LICENSEDIR/yubikey-personalization-gui.txt)
+    for(FILE, LICENSEFILES) {
+        QMAKE_POST_LINK += $$quote(&& cp libs/macx/licenses/$${FILE} $$_LICENSEDIR)
+    }
+
 
     # fixup all library paths..
     _BASE = $$quote(@executable_path/../Frameworks)
@@ -407,68 +345,11 @@ macx {
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_FRAMEWORKDIR/$$_QTGUI && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_PLUGINDIR/imageformats/libqmng.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqmng.dylib)
-        
-    cross {
-        build_installer {
-            QMAKE_POST_LINK += $$quote( && mkdir -p $${DESTDIR}/temp/ && \
-                cp -R $${DESTDIR}/$${TARGET_MAC}.app $${DESTDIR}/temp/ && \
-                ln -s /Applications $${DESTDIR}/temp/Applications && \
-                mkdir $${DESTDIR}/temp/.background/ && \
-                cp resources/mac/yubico-logo.png $${DESTDIR}/temp/.background/background.png && \
-                genisoimage -V "$$TARGET_MAC" -r -apple --hfs-bless "/$${TARGET_MAC}.app" -o $${DESTDIR}/ykpers-pre.dmg  $${DESTDIR}/temp && \
-                rm -rf $${DESTDIR}/temp && \
-                dmg dmg $${DESTDIR}/ykpers-pre.dmg $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.dmg)
-        }
-    } else {
-        build_installer {
-            QMAKE_POST_LINK += $$quote( && codesign -s \'$$PACKAGE_SIGN_IDENTITY\' $${DESTDIR}/$${TARGET_MAC}.app && \
-                rm -rf $${DESTDIR}/temp && \
-                mkdir -p $${DESTDIR}/temp/ && \
-                cp -R $${DESTDIR}/$${TARGET_MAC}.app $${DESTDIR}/temp/ && \
-                pkgbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --version $${VERSION} --root $${DESTDIR}/temp/ --component-plist resources/mac/installer.plist --install-location '/Applications/' $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg)
-        }
 
-        # Create application dmg
-        shutup = ">/dev/null 2>&1"
-
-        isEmpty(MACDEPLOYQT):MACDEPLOYQT = macdeployqt
-        !system($$MACDEPLOYQT $$shutup) {
-            warning("macdeployqt utility '$$MACDEPLOYQT' not found \
-                     will not create target for application bundling")
-        } else {
-            macdeploy.depends  = $${DESTDIR}/$${TARGET_MAC}.app/Contents/MacOS/$${TARGET_MAC}
-            macdeploy.target   = macdeploy
-            macdeploy.commands = \
-                [ -f $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/qt.conf ] || \
-                    $$MACDEPLOYQT $${DESTDIR}/$${TARGET_MAC}.app -no-strip;
-
-            QMAKE_EXTRA_TARGETS += macdeploy
-        }
-
-        isEmpty(HDIUTIL):HDIUTIL = "hdiutil"
-        !system($$HDIUTIL help $$shutup) {
-            warning("hdiutil utility '$$HDIUTIL' not found \
-                     will not create target for disk image creation")
-        } else {
-            contains(QMAKE_EXTRA_TARGETS, macdeploy) {
-                IMAGEROOT = $${DESTDIR}/disk-image-root
-                IMAGEFILE = $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.dmg
-
-                #Note: Volume name for disk image should be passed without escaping quotes
-                macdisk.depends  = macdeploy
-                macdisk.target   = macdisk
-                macdisk.commands = \
-                    rm -rf $${IMAGEROOT}; \
-                    mkdir $${IMAGEROOT}; \
-                    cp -R $${DESTDIR}/$${TARGET_MAC}.app $${IMAGEROOT}; \
-                    rm -f $${IMAGEFILE}; \
-                    $${HDIUTIL} create -srcfolder $${IMAGEROOT} -format UDBZ \
-                        -volname \'$${TARGET} $${VERSION}\' $${IMAGEFILE}; \
-                    rm -rf $${IMAGEROOT}
-
-                QMAKE_EXTRA_TARGETS += macdisk
-            }
-        }
+    build_installer {
+        QMAKE_POST_LINK += $$quote( && codesign -s \'$$PACKAGE_SIGN_IDENTITY\' $${DESTDIR}/$${TARGET_MAC}.app \
+            --entitlements resources/mac/Entitlements.plist && \
+            productbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --component $${DESTDIR}/$${TARGET_MAC}.app /Applications $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg)
     }
 }
 
@@ -482,7 +363,7 @@ win32 {
                    $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.dll \
                    $${TARGET_DIR_WIN}$${DIR_SEPARATOR}*.exe.bak
 } else:macx {
-    QMAKE_CLEAN += -r $${DESTDIR}/*.app $${DESTDIR}/*.pkg $${DESTDIR}/*.dmg $${DESTDIR}/temp
+    QMAKE_CLEAN += -r $${DESTDIR}/*.app $${DESTDIR}/*.pkg $${DESTDIR}/*.dmg
 } else {
     QMAKE_CLEAN += -r $${DESTDIR}/*
 }

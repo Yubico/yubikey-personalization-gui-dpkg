@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -68,8 +68,6 @@ private slots:
     void on_custPrefixDecTxt_editingFinished();
     void on_custPrefixModhexTxt_editingFinished();
     void on_custPrefixHexTxt_editingFinished();
-    void on_logOutputCheck_stateChanged(int state);
-    void on_browseBtn_clicked();
 
     void on_doUpdateBtn_clicked();
     void on_swapBtn_clicked();

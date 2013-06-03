@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -32,7 +32,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 #include <QtCore/QString>
 #include <QTextStream>
+#include <QFile>
 
+#include "common.h"
 #include "yubikeyconfig.h"
 
 class YubiKeyLogger : public QObject {
@@ -63,6 +65,9 @@ private:
 
     static void logConfigTraditional(YubiKeyConfig *ykConfig, QTextStream &out);
     static void logConfigYubico(YubiKeyConfig *ykConfig, QTextStream &out);
+
+    static QFile *m_logFile;
+    static QFile *getLogFile(void);
 };
 
 #endif // YUBIKEYLOGGER_H

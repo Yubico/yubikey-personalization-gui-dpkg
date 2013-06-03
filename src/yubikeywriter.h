@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -48,16 +48,23 @@ class YubiKeyWriter : public QObject {
 public:
     static YubiKeyWriter* getInstance();
     ~YubiKeyWriter();
+    static void setExportFilename(QString filename);
+    static QString defaultExportFilename(void);
 
 private:
+    static QString m_filename;
+
     YubiKeyWriter();
     static YubiKeyWriter* _instance;
 
     QString reportError(bool chalresp);
     int encodeAccessCode(const QString accCode, unsigned char *accessCode, size_t *accessCodeLen);
 
+    int assembleConfig(YubiKeyConfig *ykConfig, YKP_CONFIG *ykp, bool *useAccessCode, unsigned char *accessCode);
+
 public slots:
     void writeConfig(YubiKeyConfig *ykConfig);
+    void exportConfig(YubiKeyConfig *ykConfig);
     void doChallengeResponse(const QString challenge,
         QString &response, int slot, bool hmac);
     void writeNdef(bool uri, const QString language,

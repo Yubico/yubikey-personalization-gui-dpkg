@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -63,6 +63,9 @@ typedef std::vector<int>::size_type size_t;
 #define OUT_CHAR_RATE_SLOWDOWN_40   2
 #define OUT_CHAR_RATE_SLOWDOWN_60   3
 
+#define WRITE_CONFIG                0
+#define EXPORT_CONFIG               1
+
 #define SUPPORT_EMAIL               tr("mailto:support@yubico.com")
 #define UPLOAD_URL                  tr("<!doctype html><html><title>upload</title></head><body><form action='https://upload.yubico.com/' method='post' id='upload'>serial:<input name='serial' value='%1'/><br/>prefix:<input name='prefix' value='%2'/><br/>uid:<input name='uid' value='%3'/><br/>aeskey:<input name='aeskey' value='%4'/><br/><input type='submit'/><br/></form><script type='text/javascript'>window.onload=function(){document.getElementById('upload').submit();}</script></body></html>")
 
@@ -103,6 +106,7 @@ typedef std::vector<int>::size_type size_t;
 #define NO_KEY_FOUND                tr("No YubiKey inserted")
 
 #define KEY_CONFIGURED              tr("YubiKey%1 has been successfully configured")
+#define KEY_EXPORTED                tr("YubiKey configuration has been successfully exported")
 #define REMOVE_KEY                  tr("Please remove this YubiKey")
 #define SETTINGS_SAVED              tr("Settings have been successfully saved")
 #define SETTINGS_RESTORED           tr("Default settings have been restored")
@@ -144,6 +148,8 @@ typedef std::vector<int>::size_type size_t;
 #define SG_LOG_FILENAME             "Log/Filename"
 #define SG_LOG_FORMAT               "Log/Format"
 
+#define SG_EXPORT_FILENAME          "Export/Filename"
+
 #define SG_TAB_FIRST                "Flag/TabTirst"
 #define SG_APPEND_TAB1              "Flag/AppendTab1"
 #define SG_APPEND_TAB2              "Flag/AppendTab2"
@@ -171,6 +177,7 @@ typedef std::vector<int>::size_type size_t;
 #define SG_NDEF_WITHOUT_HTTP        "DontAsk/NdefWithoutHttp"
 
 #define SG_ANIMATIONS_PREFERENCE    "Preference/Animations"
+#define SG_EXPORT_PREFERENCE        "Preference/Export"
 
 //Help messages
 
