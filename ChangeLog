@@ -1,3 +1,284 @@
+2013-07-04  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.10
+
+2013-07-02  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: don't try to open file if we don't have a
+	filename
+
+2013-07-02  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: drop the write_config way and only write it
+	out with qDebug()
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: make sure all text is shown
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: set acces code mode to the library
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/chalresppage.cpp, src/ui/oathpage.cpp,
+	src/ui/otppage.cpp, src/ui/settingpage.cpp, src/ui/staticpage.cpp,
+	src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.h, src/yubikeyconfig.cpp,
+	src/yubikeyconfig.h: code to set the mode of acccode in the
+	yubikeyconfig object
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/main.cpp, src/ui/aboutpage.cpp,
+	src/ui/chalresppage.cpp, src/ui/mainwindow.cpp,
+	src/ui/oathpage.cpp, src/ui/otppage.cpp, src/ui/scanedit.cpp,
+	src/ui/settingpage.cpp, src/ui/staticpage.cpp, src/ui/toolpage.cpp,
+	src/ui/yubiaccbox.cpp, src/yubikeyconfig.h, src/yubikeyfinder.cpp,
+	src/yubikeyfinder.h, src/yubikeylogger.h, src/yubikeyutil.cpp,
+	src/yubikeywriter.cpp, src/yubikeywriter.h: include cleanup.
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/yubiaccbox.cpp: if we want to keep accCode, return the old
+	one as new
+
+2013-07-01  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.h: move around inclusions
+	of "other" forms to avoid unnecessary re-compilations
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui: disable import when no
+	key is inserted
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.h, src/ui/toolpage.ui: add
+	serial checkbox for ndef and zap acc code
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: move around
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/staticpage.cpp, src/ui/toolpage.cpp, src/ui/yubiaccbox.cpp: 
+	mark unused parameters as unused
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/scanedit.cpp: use toUInt() to get an unsigned variable for
+	comparison
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: fix warning
+
+2013-06-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyutil.cpp: fix warnings
+
+2013-06-25  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: add build config flag force_pkgconfig
+
+2013-06-25  Klas Lindfors <klas@yubico.com>
+
+	* README: we now depend on 1.14.0 of yubikey-personalization
+
+2013-06-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui: try to make uri example
+	clearer with a placeholder on ndefEdit
+
+2013-06-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/yubiaccbox.cpp: remove unecessary check if m_serial is set
+
+2013-06-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.h: implement serial
+	functionality
+
+2013-06-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.ui: add serial checkboxes
+
+2013-06-06  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/yubiaccbox.ui: set stylesheet for the accbox
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/settingpage.ui: refactor settingpage usage of access code to
+	use new box
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/chalresppage.ui: refactor chalresppage to use new access code
+	box
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/staticpage.ui: 
+	refactor staticpage to use new access box
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/oathpage.cpp, src/ui/oathpage.h, src/ui/oathpage.ui: 
+	refactor the oath page to use new access code box
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/otppage.cpp, src/ui/otppage.h, src/ui/otppage.ui: refactor
+	to use the broken-out config protection box
+
+2013-06-05  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/ui/yubiaccbox.cpp,
+	src/ui/yubiaccbox.h, src/ui/yubiaccbox.ui: break out the config
+	protection box into it's own widget
+
+2013-06-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp: make sure the buffer for decoding hex/modhex
+	into is large enough it has to be number of bytes * 2 for decoding.  fixes #18
+
+2013-05-03  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: only enable silent if nosilent isn't set
+
+2013-05-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/scanedit.cpp: old bug make sure we don't access after end
+	of array code was changed earlier to xor with SHIFT before and store it
+
+2013-05-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: move box around to fix ui issues
+
+2013-05-02  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/mainwindow.cpp, src/ui/settingpage.cpp,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp: 
+	handle strong_pw stuff as settings
+
+2013-05-02  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/mainwindow.cpp, src/ui/mainwindow.h, src/ui/oathpage.cpp,
+	src/ui/oathpage.h, src/ui/otppage.cpp, src/ui/otppage.h,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp,
+	src/ui/toolpage.h: let the import feature select slots
+
+2013-05-02  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: only use productbuild for app store builds
+
+2013-04-30  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/settingpage.cpp, src/ui/toolpage.cpp: handle hmac_lt64 as a
+	setting
+
+2013-04-30  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/settingpage.cpp, src/ui/toolpage.cpp: treat btn_trig as a
+	setting
+
+2013-04-30  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/oathpage.cpp, src/ui/oathpage.h,
+	src/ui/settingpage.cpp, src/ui/toolpage.cpp: handle oath digits by
+	remembering the setting
+
+2013-04-29  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, do-source-release.sh, src/version.h: only
+	keep version in YKPersonalization.pro
+
+2013-04-29  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: export and import
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp: save filename if import was ok
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp: import alot of settings
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/toolpage.cpp, src/ui/toolpage.h: 
+	switch page according to inmported cfg
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.h: add code to switch to
+	specific tab on page
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.h, src/ui/oathpage.h, src/ui/otppage.h,
+	src/ui/settingpage.h, src/ui/staticpage.h, src/ui/toolpage.h: make
+	setCurrentPage a public slot
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/settingpage.cpp,
+	src/ui/settingpage.h, src/ui/toolpage.h: add a reloadSettings
+	slot/signal
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.h, src/ui/oathpage.h, src/ui/otppage.h,
+	src/ui/settingpage.h, src/ui/staticpage.h, src/ui/toolpage.h: move
+	all Page elements to public
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: use YK_STATUS object from yubikeyfinder
+	instead
+
+2013-04-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeyfinder.h: move the ykstatus
+	object to class level and make it fetchable for others
+
+2013-04-25  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp: start on importing configuration
+
+2013-04-25  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/toolpage.cpp,
+	src/ui/toolpage.h: filenames for import
+
+2013-04-25  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/toolpage.cpp, src/ui/toolpage.h,
+	src/ui/toolpage.ui: add basis of import tab to toolpage
+
+2013-04-22  Klas Lindfors <klas@yubico.com>
+
+	* : re-generate .icns file for mac
+
+2013-04-22  Klas Lindfors <klas@yubico.com>
+
+	* resources/mac/Info.plist.in: add CFBundleShortVersionString
+
+2013-04-22  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro, src/version.h: bump versions
+
 2013-04-22  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS

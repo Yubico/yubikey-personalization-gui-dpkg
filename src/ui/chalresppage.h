@@ -43,17 +43,20 @@ public:
     explicit ChalRespPage(QWidget *parent = 0);
     ~ChalRespPage();
 
-public slots:
-    void loadSettings();
-
-private:
-    Ui::ChalRespPage *ui;
-
     enum Page {
         Page_Base,
         Page_Quick,     //Yubico OTP
         Page_Advanced   //HMAC-SHA1
     };
+
+public slots:
+    void loadSettings();
+    void setCurrentPage(int pageIndex);
+    void setCurrentSlot(int slot);
+
+private:
+    Ui::ChalRespPage *ui;
+
     int m_currentPage;
 
     enum State {
@@ -72,7 +75,6 @@ private:
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void keyFound(bool found, bool* featuresMatrix);
 
@@ -84,10 +86,6 @@ private slots:
 
     void on_quickProgramMulKeysBox_clicked(bool checked);
     void on_quickConfigParamsCombo_currentIndexChanged(int index);
-
-    void on_quickConfigProtectionCombo_currentIndexChanged(int index);
-    void on_quickCurrentAccessCodeTxt_editingFinished();
-    void on_quickNewAccessCodeTxt_editingFinished();
 
     void on_quickPvtIdCheck_stateChanged(int state);
     void on_quickPvtIdTxt_editingFinished();
@@ -116,10 +114,6 @@ private slots:
     void on_advProgramMulKeysBox_clicked(bool checked);
     void on_advConfigParamsCombo_currentIndexChanged(int index);
 
-    void on_advConfigProtectionCombo_currentIndexChanged(int index);
-    void on_advCurrentAccessCodeTxt_editingFinished();
-    void on_advNewAccessCodeTxt_editingFinished();
-
     void on_advSecretKeyTxt_editingFinished();
     void on_advSecretKeyGenerateBtn_clicked();
 
@@ -135,6 +129,9 @@ private slots:
     void advConfigExported(bool written, const QString &msg);
 
     void advUpdateResults(bool written, const QString &msg);
+
+    void requireInput_clicked(bool checked);
+    void hmac_lt64_clicked();
 
 signals:
     void showStatusMessage(const QString &text, int status = 0);

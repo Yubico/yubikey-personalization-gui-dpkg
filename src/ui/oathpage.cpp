@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "oathpage.h"
+#include "yubikeyutil.h"
+#include "yubikeyfinder.h"
+#include "yubikeywriter.h"
 #include "ui_oathpage.h"
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
@@ -70,6 +73,15 @@ OathPage::OathPage(QWidget *parent) :
 
     connect(ui->advMovingFactorSeedTxt, SIGNAL(editingFinished()),
             this, SLOT(on_advMovingFactorSeedTxt_editingFinished()));
+
+    connect(ui->advHotpLen6Radio, SIGNAL(clicked()),
+            this, SLOT(hotpLen_clicked()));
+    connect(ui->advHotpLen8Radio, SIGNAL(clicked()),
+            this, SLOT(hotpLen_clicked()));
+    connect(ui->quickHotpLen6Radio, SIGNAL(clicked()),
+            this, SLOT(hotpLen_clicked()));
+    connect(ui->quickHotpLen8Radio, SIGNAL(clicked()),
+            this, SLOT(hotpLen_clicked()));
 
     //Load settings
     loadSettings();
@@ -156,7 +168,6 @@ void OathPage::connectHelpButtons() {
 
     connect(ui->advConfigHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advParamGenSchemeHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    connect(ui->advConfigProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advPubIdHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advHotpLenHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advHotpParamsHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
@@ -170,7 +181,6 @@ void OathPage::connectHelpButtons() {
 
     mapper->setMapping(ui->advConfigHelpBtn, HelpBox::Help_ConfigurationSlot);
     mapper->setMapping(ui->advParamGenSchemeHelpBtn, HelpBox::Help_ParameterGeneration);
-    mapper->setMapping(ui->advConfigProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     mapper->setMapping(ui->advPubIdHelpBtn, HelpBox::Help_OathPublicID);
     mapper->setMapping(ui->advHotpLenHelpBtn, HelpBox::Help_HotpLen);
     mapper->setMapping(ui->advHotpParamsHelpBtn, HelpBox::Help_HotpParam);
@@ -358,6 +368,12 @@ void OathPage::loadSettings() {
     ui->advTTTxt->setEnabled(customerPrefixFlag);
 
     ui->advExportConfigBtn->setVisible(settings.value(SG_EXPORT_PREFERENCE).toBool());
+
+    bool hotp8 = settings.value(SG_OATH_HOTP8).toBool();
+    ui->advHotpLen6Radio->setChecked(!hotp8);
+    ui->quickHotpLen6Radio->setChecked(!hotp8);
+    ui->advHotpLen8Radio->setChecked(hotp8);
+    ui->quickHotpLen8Radio->setChecked(hotp8);
 }
 
 /*
@@ -371,7 +387,6 @@ void OathPage::resetQuickPage() {
     }
 
     ui->quickPubIdCheck->setChecked(true);
-    ui->quickHotpLen6Radio->setChecked(true);
 
     on_quickResetBtn_clicked();
 }
@@ -526,7 +541,7 @@ void OathPage::writeQuickConfig() {
     YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
 }
 
-void OathPage::quickConfigWritten(bool written, const QString &msg) {
+void OathPage::quickConfigWritten(bool written, __attribute__((unused)) const QString &msg) {
 
     disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
                this, SLOT(quickConfigWritten(bool, const QString &)));
@@ -567,7 +582,7 @@ void OathPage::resetAdvPage() {
     ui->advAutoProgramKeysCheck->setChecked(false);
     ui->advProgramMulKeysBox->setChecked(false);
 
-    ui->advConfigProtectionCombo->setCurrentIndex(0);
+    ui->advConfigProtectionBox->reset();
 
     ui->advPubIdCheck->setChecked(true);
     if(customerPrefixFlag) {
@@ -582,7 +597,6 @@ void OathPage::resetAdvPage() {
     ui->advTTTxt->setEnabled(customerPrefixFlag);
     on_advMUITxt_editingFinished();
 
-    ui->advHotpLen6Radio->setChecked(true);
     ui->advMovingFactorSeedCombo->setCurrentIndex(0);
     ui->advMovingFactorSeedTxt->setText(tr("0"));
     ui->advMovingFactorSeedTxt->setEnabled(false);
@@ -613,54 +627,8 @@ void OathPage::on_advProgramMulKeysBox_clicked(bool checked) {
     }
 }
 
-void OathPage::on_advConfigParamsCombo_currentIndexChanged(int index) {
+void OathPage::on_advConfigParamsCombo_currentIndexChanged(__attribute__((unused)) int index) {
     changeAdvConfigParams();
-}
-
-void OathPage::on_advConfigProtectionCombo_currentIndexChanged(int index) {
-    switch(index) {
-    case CONFIG_PROTECTION_DISABLED:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_ENABLE:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    case CONFIG_PROTECTION_DISABLE:
-    case CONFIG_PROTECTION_ENABLED:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_CHANGE:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    }
-}
-
-void OathPage::on_advCurrentAccessCodeTxt_editingFinished() {
-    QString txt = ui->advCurrentAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advCurrentAccessCodeTxt->setText(txt);
-}
-
-void OathPage::on_advNewAccessCodeTxt_editingFinished() {
-    QString txt = ui->advNewAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advNewAccessCodeTxt->setText(txt);
 }
 
 void OathPage::on_advPubIdCheck_stateChanged(int state) {
@@ -676,7 +644,7 @@ void OathPage::on_advPubIdCheck_stateChanged(int state) {
     ui->advMUIGenerateBtn->setEnabled(disable);
 }
 
-void OathPage::on_advPubIdFormatCombo_currentIndexChanged(int index) {
+void OathPage::on_advPubIdFormatCombo_currentIndexChanged(__attribute__((unused)) int index) {
     updatePrefix();
 }
 
@@ -942,22 +910,8 @@ bool OathPage::validateAdvSettings() {
         }
     }
 
-    //Check if logging is disabled and
-    //configuration protection is being enabled
-    if(!settings.value(SG_ENABLE_CONF_PROTECTION).toBool() &&
-       !YubiKeyLogger::isLogging() &&
-       ui->advConfigProtectionCombo->currentIndex() == CONFIG_PROTECTION_ENABLE) {
-        //Confirm from client
-        ConfirmBox confirm(this);
-        confirm.setConfirmIndex(ConfirmBox::Confirm_ConfigurationProtection);
-        int ret = confirm.exec();
-
-        switch (ret) {
-        case 1:     //Yes
-            break;
-        default:    //No
-            return false;
-        }
+    if(!ui->advConfigProtectionBox->checkConfirm()) {
+        return false;
     }
 
     return true;
@@ -1048,16 +1002,11 @@ void OathPage::writeAdvConfig(int mode) {
     m_ykConfig->setSecretKeyTxt(ui->advSecretKeyTxt->text());
 
     //Configuration protection...
-    //Current Access Code...
-    m_ykConfig->setCurrentAccessCodeTxt(ui->advCurrentAccessCodeTxt->text());
-
-    //New Access Code...
-    if(ui->advConfigProtectionCombo->currentIndex()
-        == CONFIG_PROTECTION_DISABLE){
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->advNewAccessCodeTxt->text());
-    }
+    m_ykConfig->setCurrentAccessCodeTxt(
+        ui->advConfigProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+        ui->advConfigProtectionBox->newAccessCode(),
+        ui->advConfigProtectionBox->newAccMode());
 
     if(mode == WRITE_CONFIG) {
         //Write
@@ -1186,4 +1135,30 @@ void OathPage::advUpdateResults(bool written, const QString &msg) {
 
     ui->advResultsWidget->resizeColumnsToContents();
     ui->advResultsWidget->resizeRowsToContents();
+}
+
+void OathPage::hotpLen_clicked() {
+    QSettings settings;
+    QRadioButton *button = ui->advHotpLen8Radio;
+    QRadioButton *button2 = ui->quickHotpLen8Radio;
+    if(m_currentPage == Page_Quick) {
+        button = ui->quickHotpLen8Radio;
+        button2 = ui->advHotpLen8Radio;
+    }
+    if(button->isChecked()) {
+        settings.setValue(SG_OATH_HOTP8, true);
+    } else {
+        settings.setValue(SG_OATH_HOTP8, false);
+    }
+    button2->toggle();
+}
+
+void OathPage::setCurrentSlot(int slot) {
+    if(m_currentPage == Page_Advanced) {
+        ui->advConfigSlot1Radio->setChecked(slot == 1);
+        ui->advConfigSlot2Radio->setChecked(slot == 2);
+    } else if(m_currentPage == Page_Quick) {
+        ui->quickConfigSlot1Radio->setChecked(slot == 1);
+        ui->quickConfigSlot2Radio->setChecked(slot == 2);
+    }
 }

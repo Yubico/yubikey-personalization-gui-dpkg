@@ -28,6 +28,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ui/mainwindow.h"
 #include "ui/ui_mainwindow.h"
+#include "yubikeyfinder.h"
+#include "yubikeywriter.h"
+#include "yubikeyutil.h"
+#include "ui/otppage.h"
+#include "ui/oathpage.h"
+#include "ui/staticpage.h"
+#include "ui/chalresppage.h"
+#include "ui/toolpage.h"
+#include "ui/settingpage.h"
+#include "ui/aboutpage.h"
 
 #include "common.h"
 #include "version.h"
@@ -77,6 +87,16 @@ MainWindow::MainWindow(QWidget *parent) :
             m_oathPage, SLOT(loadSettings()));
     connect(m_settingPage, SIGNAL(settingsChanged()),
             m_chalRespPage, SLOT(loadSettings()));
+    connect(m_settingPage, SIGNAL(settingsChanged()),
+            m_staticPage, SLOT(loadSettings()));
+    connect(m_settingPage, SIGNAL(settingsChanged()),
+            m_toolPage, SLOT(loadSettings()));
+
+    connect(m_toolPage, SIGNAL(reloadSettings()),
+            m_settingPage, SLOT(reloadSettings()));
+
+    connect(m_toolPage, SIGNAL(switchPage(int, int, int)),
+            this, SLOT(setCurrentPage(int, int, int)));
 
     //Intialize settings
     m_settingPage->init();
@@ -174,7 +194,7 @@ void MainWindow::createPages() {
     setCurrentPage(Page_About);
 }
 
-void MainWindow::setCurrentPage(int pageIndex) {
+void MainWindow::setCurrentPage(int pageIndex, int tab, int slot) {
     // Page changed...
 
     // Clear status message
@@ -224,21 +244,31 @@ void MainWindow::setCurrentPage(int pageIndex) {
     switch(pageIndex){
     case Page_Otp:
         ui->otpMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_otpPage->setCurrentPage(tab);
+        if(slot) m_otpPage->setCurrentSlot(slot);
         break;
     case Page_Oath:
         ui->oathHotpMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_oathPage->setCurrentPage(tab);
+        if(slot) m_oathPage->setCurrentSlot(slot);
         break;
     case Page_Static:
         ui->staticMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_staticPage->setCurrentPage(tab);
+        if(slot) m_staticPage->setCurrentSlot(slot);
         break;
     case Page_ChalResp:
         ui->chalRespMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_chalRespPage->setCurrentPage(tab);
+        if(slot) m_chalRespPage->setCurrentSlot(slot);
         break;
     case Page_Settings:
         ui->settingsMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_settingPage->setCurrentPage(tab);
         break;
     case Page_Tools:
         ui->toolsMenuBtn->setStyleSheet(checkedMenuBtnSS);
+        if(tab) m_toolPage->setCurrentPage(tab);
         break;
     case Page_About:
         ui->aboutMenuBtn->setStyleSheet(checkedMenuBtnSS);

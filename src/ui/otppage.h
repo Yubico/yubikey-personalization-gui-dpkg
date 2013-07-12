@@ -44,15 +44,16 @@ public:
     explicit OtpPage(QWidget *parent = 0);
     ~OtpPage();
 
-private:
-    Ui::OtpPage *ui;
-
     enum Page {
         Page_Base,
         Page_Quick,
         Page_Advanced,
         Page_Upload
     };
+
+private:
+    Ui::OtpPage *ui;
+
     int m_currentPage;
 
     int m_customerPrefix;
@@ -78,11 +79,12 @@ private:
 
 public slots:
     void loadSettings();
+    void setCurrentPage(int pageIndex);
+    void setCurrentSlot(int slot);
 
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void keyFound(bool found, bool* featuresMatrix);
 
@@ -107,11 +109,6 @@ private slots:
     void freezeAdvPage(bool freeze);
 
     void on_advProgramMulKeysBox_clicked(bool checked);
-    void on_advConfigParamsCombo_currentIndexChanged(int index);
-
-    void on_advConfigProtectionCombo_currentIndexChanged(int index);
-    void on_advCurrentAccessCodeTxt_editingFinished();
-    void on_advNewAccessCodeTxt_editingFinished();
 
     void set_advPubId_default();
     void on_advPubIdCheck_stateChanged(int state);

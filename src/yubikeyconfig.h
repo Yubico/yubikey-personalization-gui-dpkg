@@ -29,7 +29,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef YUBIKEYCONFIG_H
 #define YUBIKEYCONFIG_H
 
-#include <QtCore/QString>
+#include <QString>
+#include "common.h"
 
 class YubiKeyConfig
 {
@@ -50,6 +51,9 @@ public:
     {m_mode = mode;}
     Mode programmingMode() const
     {return m_mode;}
+
+    AccMode accMode() const
+    {return m_accMode;}
 
     void setConfigSlot(int configSlot)
     {m_configSlot = configSlot;}
@@ -77,7 +81,7 @@ public:
     QString currentAccessCodeTxt() const
     {return m_currentAccessCodeTxt;}
 
-    void setNewAccessCodeTxt(const QString &newAccessCodeTxt);
+    void setNewAccessCodeTxt(const QString &newAccessCodeTxt, AccMode accMode);
     QString newAccessCodeTxt() const
     {return m_newAccessCodeTxt;}
 
@@ -258,6 +262,7 @@ public:
 
 private:
     Mode m_mode;
+    AccMode m_accMode;
     int m_configSlot;
     bool m_pubIdInHex;
     QString m_pubIdTxt;

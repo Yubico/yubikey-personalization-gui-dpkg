@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "staticpage.h"
+#include "yubikeyfinder.h"
+#include "yubikeyutil.h"
+#include "yubikeywriter.h"
 #include "ui_staticpage.h"
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
@@ -142,30 +145,33 @@ void StaticPage::connectHelpButtons() {
 
     //Connect the clicked signal with the QSignalMapper
     connect(ui->quickConfigHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    connect(ui->quickConfigProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->quickStaticScanCodeHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
     connect(ui->advConfigHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advParamGenSchemeHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    connect(ui->advConfigProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advPubIdHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advPvtIdHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advSecretKeyHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
     //Set a value for each button
     mapper->setMapping(ui->quickConfigHelpBtn, HelpBox::Help_ConfigurationSlot);
-    mapper->setMapping(ui->quickConfigProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     mapper->setMapping(ui->quickStaticScanCodeHelpBtn, HelpBox::Help_StaticScanCode);
 
     mapper->setMapping(ui->advConfigHelpBtn, HelpBox::Help_ConfigurationSlot);
     mapper->setMapping(ui->advParamGenSchemeHelpBtn, HelpBox::Help_ParameterGeneration);
-    mapper->setMapping(ui->advConfigProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     mapper->setMapping(ui->advPubIdHelpBtn, HelpBox::Help_PublicID);
     mapper->setMapping(ui->advPvtIdHelpBtn, HelpBox::Help_PrivateID);
     mapper->setMapping(ui->advSecretKeyHelpBtn, HelpBox::Help_SecretKey);
 
     //Connect the mapper
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
+}
+
+void StaticPage::loadSettings() {
+    QSettings settings;
+    ui->advStrongPw1Check->setChecked(settings.value(SG_STRONG_PW1).toBool());
+    ui->advStrongPw2Check->setChecked(settings.value(SG_STRONG_PW2).toBool());
+    ui->advStrongPw3Check->setChecked(settings.value(SG_STRONG_PW3).toBool());
 }
 
 void StaticPage::helpBtn_pressed(int helpIndex) {
@@ -285,7 +291,7 @@ void StaticPage::resetQuickPage() {
     ui->quickAutoProgramKeysCheck->setChecked(false);
     ui->quickProgramMulKeysBox->setChecked(false);
 
-    ui->quickConfigProtectionCombo->setCurrentIndex(0);
+    ui->quickConfigProtectionBox->reset();
 
     ui->quickStaticLenTxt->setText("0");
     ui->quickStaticTxt->clear();
@@ -310,51 +316,6 @@ void StaticPage::freezeQuickPage(bool freeze) {
     ui->quickBackBtn->setEnabled(disable);
 }
 
-void StaticPage::on_quickConfigProtectionCombo_currentIndexChanged(int index) {
-    switch(index) {
-    case CONFIG_PROTECTION_DISABLED:
-        ui->quickCurrentAccessCodeTxt->clear();
-        ui->quickCurrentAccessCodeTxt->setEnabled(false);
-
-        ui->quickNewAccessCodeTxt->clear();
-        ui->quickNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_ENABLE:
-        ui->quickCurrentAccessCodeTxt->clear();
-        ui->quickCurrentAccessCodeTxt->setEnabled(false);
-
-        on_quickNewAccessCodeTxt_editingFinished();
-        ui->quickNewAccessCodeTxt->setEnabled(true);
-        break;
-    case CONFIG_PROTECTION_DISABLE:
-    case CONFIG_PROTECTION_ENABLED:
-        on_quickCurrentAccessCodeTxt_editingFinished();
-        ui->quickCurrentAccessCodeTxt->setEnabled(true);
-
-        ui->quickNewAccessCodeTxt->clear();
-        ui->quickNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_CHANGE:
-        on_quickCurrentAccessCodeTxt_editingFinished();
-        ui->quickCurrentAccessCodeTxt->setEnabled(true);
-
-        on_quickNewAccessCodeTxt_editingFinished();
-        ui->quickNewAccessCodeTxt->setEnabled(true);
-        break;
-    }
-}
-
-void StaticPage::on_quickCurrentAccessCodeTxt_editingFinished() {
-    QString txt = ui->quickCurrentAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->quickCurrentAccessCodeTxt->setText(txt);
-}
-
-void StaticPage::on_quickNewAccessCodeTxt_editingFinished() {
-    QString txt = ui->quickNewAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->quickNewAccessCodeTxt->setText(txt);
-}
 
 void StaticPage::on_quickHideParams_clicked(bool checked) {
     if(checked) {
@@ -488,23 +449,10 @@ bool StaticPage::validateQuickSettings() {
         }
     }
 
-    //Check if logging is disabled and
-    //configuration protection is being enabled
-    if(!settings.value(SG_ENABLE_CONF_PROTECTION).toBool() &&
-       !YubiKeyLogger::isLogging() &&
-       ui->quickConfigProtectionCombo->currentIndex() == CONFIG_PROTECTION_ENABLE) {
-        //Confirm from client
-        ConfirmBox confirm(this);
-        confirm.setConfirmIndex(ConfirmBox::Confirm_ConfigurationProtection);
-        int ret = confirm.exec();
-
-        switch (ret) {
-        case 1:     //Yes
-            break;
-        default:    //No
-            return false;
-        }
+    if(!ui->quickConfigProtectionBox->checkConfirm()) {
+        return false;
     }
+
     return true;
 }
 
@@ -588,16 +536,11 @@ void StaticPage::writeQuickConfig() {
     }
 
     //Configuration protection...
-    //Current Access Code...
-    m_ykConfig->setCurrentAccessCodeTxt(ui->quickCurrentAccessCodeTxt->text());
-
-    //New Access Code...
-    if(ui->quickConfigProtectionCombo->currentIndex()
-        == CONFIG_PROTECTION_DISABLE){
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->quickNewAccessCodeTxt->text());
-    }
+    m_ykConfig->setCurrentAccessCodeTxt(
+            ui->quickConfigProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+            ui->quickConfigProtectionBox->newAccessCode(),
+            ui->quickConfigProtectionBox->newAccMode());
 
     //Static Options...
     m_ykConfig->setShortTicket(true);
@@ -697,7 +640,7 @@ void StaticPage::resetAdvPage() {
     ui->advAutoProgramKeysCheck->setChecked(false);
     ui->advProgramMulKeysBox->setChecked(false);
 
-    ui->advConfigProtectionCombo->setCurrentIndex(0);
+    ui->advConfigProtectionBox->reset();
 
     ui->advStaticLen32Radio->setChecked(true);
     int minStaticLen = ui->advStaticLenBox->minimum();
@@ -710,10 +653,6 @@ void StaticPage::resetAdvPage() {
 
     ui->advSecretKeyTxt->clear();
     on_advSecretKeyTxt_editingFinished();
-
-    ui->advStrongPw1Check->setChecked(false);
-    ui->advStrongPw2Check->setChecked(false);
-    ui->advStrongPw3Check->setChecked(false);
 
     ui->advStopBtn->setEnabled(false);
     ui->advResetBtn->setEnabled(false);
@@ -738,54 +677,8 @@ void StaticPage::on_advProgramMulKeysBox_clicked(bool checked) {
     }
 }
 
-void StaticPage::on_advConfigParamsCombo_currentIndexChanged(int index) {
+void StaticPage::on_advConfigParamsCombo_currentIndexChanged(__attribute__((unused)) int index) {
     changeAdvConfigParams();
-}
-
-void StaticPage::on_advConfigProtectionCombo_currentIndexChanged(int index) {
-    switch(index) {
-    case CONFIG_PROTECTION_DISABLED:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_ENABLE:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    case CONFIG_PROTECTION_DISABLE:
-    case CONFIG_PROTECTION_ENABLED:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_CHANGE:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    }
-}
-
-void StaticPage::on_advCurrentAccessCodeTxt_editingFinished() {
-    QString txt = ui->advCurrentAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advCurrentAccessCodeTxt->setText(txt);
-}
-
-void StaticPage::on_advNewAccessCodeTxt_editingFinished() {
-    QString txt = ui->advNewAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advNewAccessCodeTxt->setText(txt);
 }
 
 void StaticPage::on_advStaticLenBox_valueChanged(int value) {
@@ -809,7 +702,7 @@ void StaticPage::on_advStaticLen16Radio_clicked(bool checked) {
     enablePubId(!checked);
 }
 
-void StaticPage::on_advStaticLen32Radio_clicked(bool checked) {
+void StaticPage::on_advStaticLen32Radio_clicked(__attribute__((unused)) bool checked) {
     ui->advStaticLenBox->setEnabled(true);
     on_advStaticLenBox_valueChanged(ui->advStaticLenBox->value());
 }
@@ -863,13 +756,22 @@ void StaticPage::on_advSecretKeyGenerateBtn_clicked() {
             YubiKeyUtil::generateRandomHex((size_t)KEY_SIZE * 2));
 }
 
+void StaticPage::on_advStrongPw1Check_stateChanged(int state) {
+    QSettings settings;
+    settings.setValue(SG_STRONG_PW1, state != 0);
+}
+
 void StaticPage::on_advStrongPw2Check_stateChanged(int state) {
+    QSettings settings;
+    settings.setValue(SG_STRONG_PW2, state != 0);
     if(state == 0) {
         ui->advStrongPw3Check->setChecked(false);
     }
 }
 
 void StaticPage::on_advStrongPw3Check_stateChanged(int state) {
+    QSettings settings;
+    settings.setValue(SG_STRONG_PW3, state != 0);
     if(!ui->advStrongPw2Check->isChecked() && state > 0) {
         ui->advStrongPw2Check->setChecked(true);
     }
@@ -1004,23 +906,10 @@ bool StaticPage::validateAdvSettings() {
         }
     }
 
-    //Check if logging is disabled and
-    //configuration protection is being enabled
-    if(!settings.value(SG_ENABLE_CONF_PROTECTION).toBool() &&
-       !YubiKeyLogger::isLogging() &&
-       ui->advConfigProtectionCombo->currentIndex() == CONFIG_PROTECTION_ENABLE) {
-        //Confirm from client
-        ConfirmBox confirm(this);
-        confirm.setConfirmIndex(ConfirmBox::Confirm_ConfigurationProtection);
-        int ret = confirm.exec();
-
-        switch (ret) {
-        case 1:     //Yes
-            break;
-        default:    //No
-            return false;
-        }
+    if(!ui->advConfigProtectionBox->checkConfirm()) {
+        return false;
     }
+
     return true;
 }
 
@@ -1061,16 +950,11 @@ void StaticPage::writeAdvConfig() {
     m_ykConfig->setSecretKeyTxt(ui->advSecretKeyTxt->text());
 
     //Configuration protection...
-    //Current Access Code...
-    m_ykConfig->setCurrentAccessCodeTxt(ui->advCurrentAccessCodeTxt->text());
-
-    //New Access Code...
-    if(ui->advConfigProtectionCombo->currentIndex()
-        == CONFIG_PROTECTION_DISABLE){
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->advNewAccessCodeTxt->text());
-    }
+    m_ykConfig->setCurrentAccessCodeTxt(
+            ui->advConfigProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+            ui->advConfigProtectionBox->newAccessCode(),
+            ui->advConfigProtectionBox->newAccMode());
 
     //Static Options...
     m_ykConfig->setStaticTicket(true);
@@ -1215,5 +1099,15 @@ void StaticPage::on_quickScanCodesTxt_textEdited(const QString &scanCodes) {
         ui->quickInsertTabBtn->setEnabled(false);
     } else {
         ui->quickInsertTabBtn->setEnabled(true);
+    }
+}
+
+void StaticPage::setCurrentSlot(int slot) {
+    if(m_currentPage == Page_Advanced) {
+        ui->advConfigSlot1Radio->setChecked(slot == 1);
+        ui->advConfigSlot2Radio->setChecked(slot == 2);
+    } else if(m_currentPage == Page_Quick) {
+        ui->quickConfigSlot1Radio->setChecked(slot == 1);
+        ui->quickConfigSlot2Radio->setChecked(slot == 2);
     }
 }

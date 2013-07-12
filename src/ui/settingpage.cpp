@@ -27,8 +27,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "settingpage.h"
+#include "yubikeyfinder.h"
+#include "yubikeyutil.h"
+#include "yubikeywriter.h"
+#include "yubikeylogger.h"
 #include "ui_settingpage.h"
 #include "ui/helpbox.h"
+#include "toolpage.h"
+
 #include <QFile>
 
 #include "common.h"
@@ -113,7 +119,6 @@ void SettingPage::connectHelpButtons() {
     connect(ui->outSpeedHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->srVisibilityHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->updateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    connect(ui->configProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->swapHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->manUpdateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
@@ -122,7 +127,6 @@ void SettingPage::connectHelpButtons() {
     mapper->setMapping(ui->outSpeedHelpBtn, HelpBox::Help_OutputSpeed);
     mapper->setMapping(ui->srVisibilityHelpBtn, HelpBox::Help_SrNoVisibility);
     mapper->setMapping(ui->updateHelpBtn, HelpBox::Help_AllowUpdate);
-    mapper->setMapping(ui->configProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     mapper->setMapping(ui->swapHelpBtn, HelpBox::Help_Swap);
     mapper->setMapping(ui->manUpdateHelpBtn, HelpBox::Help_ManUpdate);
 
@@ -157,6 +161,7 @@ void SettingPage::restoreDefaults() {
     settings.setValue(SG_LOG_FORMAT,            YubiKeyLogger::Format_Traditional);
 
     settings.setValue(SG_EXPORT_FILENAME,       YubiKeyWriter::defaultExportFilename());
+    settings.setValue(SG_IMPORT_FILENAME,       ToolPage::defaultImportFilename());
 
     settings.setValue(SG_TAB_FIRST,             false);
     settings.setValue(SG_APPEND_TAB1,           false);
@@ -177,6 +182,14 @@ void SettingPage::restoreDefaults() {
     settings.setValue(SG_FAST_TRIG,             false);
     settings.setValue(SG_USE_NUMERIC_KEYPAD,    false);
 
+    settings.setValue(SG_OATH_HOTP8,            false);
+    settings.setValue(SG_REQUIRE_INPUT,         false);
+    settings.setValue(SG_HMAC_LT64,             true);
+
+    settings.setValue(SG_STRONG_PW1,            false);
+    settings.setValue(SG_STRONG_PW2,            false);
+    settings.setValue(SG_STRONG_PW3,            false);
+
     settings.setValue(SG_EXPORT_PREFERENCE,     false);
 }
 
@@ -196,6 +209,11 @@ void SettingPage::load() {
     QString exportFilename = settings.value(SG_EXPORT_FILENAME).toString();
     if(!exportFilename.isEmpty()) {
         YubiKeyWriter::setExportFilename(exportFilename);
+    }
+
+    QString importFilename = settings.value(SG_IMPORT_FILENAME).toString();
+    if(!importFilename.isEmpty()) {
+        ToolPage::setImportFilename(importFilename);
     }
 
     //General settings...
@@ -447,13 +465,11 @@ void SettingPage::on_doUpdateBtn_clicked() {
     m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
 
     // access code
-    m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());
-    if(ui->configProtectionCombo->currentIndex() ==
-        CONFIG_PROTECTION_DISABLE) {
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->newAccessCodeTxt->text());
-    }
+    m_ykConfig->setCurrentAccessCodeTxt(
+        ui->configProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+        ui->configProtectionBox->newAccessCode(),
+        ui->configProtectionBox->newAccMode());
 
     if(ui->updateDormantCheck->isChecked()) {
         m_ykConfig->setDormant(true);
@@ -492,13 +508,11 @@ void SettingPage::on_swapBtn_clicked() {
     m_ykConfig->setSerial(QString::number(YubiKeyFinder::getInstance()->serial()));
 
     // access code
-    m_ykConfig->setCurrentAccessCodeTxt(ui->currentAccessCodeTxt->text());
-    if(ui->configProtectionCombo->currentIndex() ==
-        CONFIG_PROTECTION_DISABLE) {
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->newAccessCodeTxt->text());
-    }
+    m_ykConfig->setCurrentAccessCodeTxt(
+        ui->configProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+        ui->configProtectionBox->newAccessCode(),
+        ui->configProtectionBox->newAccMode());
 
     //Write
     connect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
@@ -518,53 +532,6 @@ void SettingPage::swapWritten(bool written, const QString &msg) {
         qDebug() << "Failed swapping." << msg;
         emit showStatusMessage(msg, 1);;
     }
-}
-
-
-void SettingPage::on_configProtectionCombo_currentIndexChanged(int index) {
-    switch(index) {
-    case CONFIG_PROTECTION_DISABLED:
-        ui->currentAccessCodeTxt->clear();
-        ui->currentAccessCodeTxt->setEnabled(false);
-
-        ui->newAccessCodeTxt->clear();
-        ui->newAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_ENABLE:
-        ui->currentAccessCodeTxt->clear();
-        ui->currentAccessCodeTxt->setEnabled(false);
-
-        on_newAccessCodeTxt_editingFinished();
-        ui->newAccessCodeTxt->setEnabled(true);
-        break;
-    case CONFIG_PROTECTION_DISABLE:
-    case CONFIG_PROTECTION_ENABLED:
-        on_currentAccessCodeTxt_editingFinished();
-        ui->currentAccessCodeTxt->setEnabled(true);
-
-        ui->newAccessCodeTxt->clear();
-        ui->newAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_CHANGE:
-        on_currentAccessCodeTxt_editingFinished();
-        ui->currentAccessCodeTxt->setEnabled(true);
-
-        on_newAccessCodeTxt_editingFinished();
-        ui->newAccessCodeTxt->setEnabled(true);
-        break;
-    }
-}
-
-void SettingPage::on_currentAccessCodeTxt_editingFinished() {
-    QString txt = ui->currentAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->currentAccessCodeTxt->setText(txt);
-}
-
-void SettingPage::on_newAccessCodeTxt_editingFinished() {
-    QString txt = ui->newAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->newAccessCodeTxt->setText(txt);
 }
 
 void SettingPage::keyFound(bool found, bool* featuresMatrix) {
@@ -613,4 +580,8 @@ void SettingPage::custPrefixChanged(int type, QString src) {
         ui->custPrefixModhexTxt->setText(modhex);
         ui->custPrefixHexTxt->setText(hex);
     }
+}
+
+void SettingPage::reloadSettings() {
+    load();
 }

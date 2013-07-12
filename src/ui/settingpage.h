@@ -44,20 +44,24 @@ public:
     ~SettingPage();
     void init();
 
-private:
-    Ui::SettingPage *ui;
-
     enum Page {
         Page_Base,
         Page_Update,
     };
+
+private:
+    Ui::SettingPage *ui;
+
     int m_currentPage;
 
     YubiKeyConfig *m_ykConfig;
 
+public slots:
+    void reloadSettings();
+    void setCurrentPage(int pageIndex);
+
 private slots:
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void restoreDefaults();
     void load();
@@ -73,10 +77,6 @@ private slots:
     void on_swapBtn_clicked();
     void updateConfigWritten(bool written, const QString &msg);
     void swapWritten(bool written, const QString &msg);
-
-    void on_configProtectionCombo_currentIndexChanged(int index);
-    void on_currentAccessCodeTxt_editingFinished();
-    void on_newAccessCodeTxt_editingFinished();
 
     void keyFound(bool found, bool* featuresMatrix);
 

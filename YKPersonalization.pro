@@ -1,7 +1,10 @@
 #
 # global definitions
 #
-VERSION         = "3.1.9"
+VERSION_MAJOR   = 3
+VERSION_MINOR   = 1
+VERSION_BUILD   = 10
+VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
 #
@@ -12,11 +15,13 @@ DEPLOYMENT_PLUGIN += qmng
 TEMPLATE        = app
 TARGET          = yubikey-personalization-gui
 
-DEFINES        += VERSION=\\\"$${VERSION}\\\"
+DEFINES        += VERSION_MAJOR=\\\"$${VERSION_MAJOR}\\\" VERSION_MINOR=\\\"$${VERSION_MINOR}\\\" VERSION_BUILD=\\\"$${VERSION_BUILD}\\\"
 
 CONFIG         += exceptions
 
-CONFIG         += silent
+!nosilent {
+    CONFIG         += silent
+}
 
 CONFIG(debug, debug|release) {
     message("Debug build")
@@ -55,7 +60,8 @@ FORMS += \
     src/ui/helpbox.ui \
     src/ui/confirmbox.ui \
     src/ui/chalresppage.ui \
-    src/ui/aboutpage.ui
+    src/ui/aboutpage.ui \
+    src/ui/yubiaccbox.ui
 
 HEADERS += \
     src/ui/toolpage.h \
@@ -69,6 +75,7 @@ HEADERS += \
     src/ui/confirmbox.h \
     src/ui/chalresppage.h \
     src/ui/aboutpage.h \
+    src/ui/yubiaccbox.h \
     src/yubikeywriter.h \
     src/yubikeyutil.h \
     src/yubikeylogger.h \
@@ -91,6 +98,7 @@ SOURCES += \
     src/ui/confirmbox.cpp \
     src/ui/chalresppage.cpp \
     src/ui/aboutpage.cpp \
+    src/ui/yubiaccbox.cpp \
     src/yubikeywriter.cpp \
     src/yubikeyutil.cpp \
     src/yubikeylogger.cpp \
@@ -240,7 +248,7 @@ win32 {
 #
 # *nix specific configuration
 #
-unix:!macx {
+unix:!macx|force_pkgconfig {
     message("Unix build")
 
     LIBS += -lyubikey
@@ -255,7 +263,7 @@ unix:!macx {
 #
 # MacOS X specific configuration
 #
-macx {
+macx:!force_pkgconfig {
     message("Mac build")
 
     INCLUDEPATH += libs/macx/include libs/macx/include/ykpers-1
@@ -347,9 +355,18 @@ macx {
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqmng.dylib)
 
     build_installer {
+        # the productbuild path doesn't work pre 10.8
+        for_store {
+            _INSTALLER_CMD = "productbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --component $${DESTDIR}/$${TARGET_MAC}.app /Applications/ $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg"
+        } else {
+            _INSTALLER_CMD = "rm -rf $${DESTDIR}/temp && \
+                mkdir -p $${DESTDIR}/temp/ && \
+                cp -R $${DESTDIR}/$${TARGET_MAC}.app $${DESTDIR}/temp && \
+                pkgbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --root ${DESTDIR}/temp/ --component-plist resources/mac/installer.plist --install-location '/Applications/' $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg"
+        }
         QMAKE_POST_LINK += $$quote( && codesign -s \'$$PACKAGE_SIGN_IDENTITY\' $${DESTDIR}/$${TARGET_MAC}.app \
             --entitlements resources/mac/Entitlements.plist && \
-            productbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --component $${DESTDIR}/$${TARGET_MAC}.app /Applications $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg)
+            $$_INSTALLER_CMD)
     }
 }
 

@@ -43,15 +43,16 @@ public:
     explicit StaticPage(QWidget *parent = 0);
     ~StaticPage();
 
-private:
-    Ui::StaticPage *ui;
-
     enum Page {
         Page_Base,
         Page_Quick,
         Page_Advanced,
         Page_Upload
     };
+
+private:
+    Ui::StaticPage *ui;
+
     int m_currentPage;
 
     enum State {
@@ -67,10 +68,14 @@ private:
 
     bool m_keyPresent;
 
+public slots:
+    void loadSettings();
+    void setCurrentPage(int pageIndex);
+    void setCurrentSlot(int slot);
+
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void keyFound(bool found, bool* featuresMatrix);
 
@@ -79,10 +84,6 @@ private slots:
     // Quick Page
     void resetQuickPage();
     void freezeQuickPage(bool freeze);
-
-    void on_quickConfigProtectionCombo_currentIndexChanged(int index);
-    void on_quickCurrentAccessCodeTxt_editingFinished();
-    void on_quickNewAccessCodeTxt_editingFinished();
 
     void on_quickHideParams_clicked(bool checked);
     void on_quickStaticTxt_textEdited(const QString &txt);
@@ -109,10 +110,6 @@ private slots:
     void on_advProgramMulKeysBox_clicked(bool checked);
     void on_advConfigParamsCombo_currentIndexChanged(int index);
 
-    void on_advConfigProtectionCombo_currentIndexChanged(int index);
-    void on_advCurrentAccessCodeTxt_editingFinished();
-    void on_advNewAccessCodeTxt_editingFinished();
-
     void on_advStaticLen16Radio_clicked(bool checked);
     void on_advStaticLen32Radio_clicked(bool checked);
     void on_advStaticLenBox_valueChanged(int value);
@@ -127,6 +124,7 @@ private slots:
     void on_advSecretKeyTxt_editingFinished();
     void on_advSecretKeyGenerateBtn_clicked();
 
+    void on_advStrongPw1Check_stateChanged(int state);
     void on_advStrongPw2Check_stateChanged(int state);
     void on_advStrongPw3Check_stateChanged(int state);
 
