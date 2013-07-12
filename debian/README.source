@@ -16,17 +16,18 @@ Build the package:
 
 git-buildpackage --git-pristine-tar --git-builder="pdebuild --auto-debsign --pbuilder cowbuilder -- --twice --basepath /var/cache/pbuilder/base-debian-sid.cow"
 
-Or using gitpkg:
-
-git config gitpkg.deb-export-hook /usr/share/gitpkg/hooks/quilt-patches-deb-export-hook
-git config gitpkg.pre-export-hook /usr/share/gitpkg/hooks/pristine-tar-pre-export-hook
-git config gitpkg.create-fake-orig false
-git config gitpkg.force-overwrite-orig false
-gitpkg master
-
 If all goes well, you should have newly built packages in
 /var/cache/pbuilder/result/.
 
 Update the package to a new upstream release (don't forget debian/changelog):
 
 git-import-orig --pristine-tar /path/to/new-release.tar.gz
+
+An alternative way compared to git-buildpackage is to build the
+package using gitpkg:
+
+git config gitpkg.deb-export-hook /usr/share/gitpkg/hooks/quilt-patches-deb-export-hook
+git config gitpkg.pre-export-hook /usr/share/gitpkg/hooks/pristine-tar-pre-export-hook
+git config gitpkg.create-fake-orig false
+git config gitpkg.force-overwrite-orig false
+gitpkg master
