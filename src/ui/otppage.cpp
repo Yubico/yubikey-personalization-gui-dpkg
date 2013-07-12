@@ -27,6 +27,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "otppage.h"
+#include "yubikeywriter.h"
+#include "yubikeyutil.h"
+#include "yubikeyfinder.h"
 #include "ui_otppage.h"
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
@@ -149,7 +152,6 @@ void OtpPage::connectHelpButtons() {
 
     connect(ui->advConfigHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advParamGenSchemeHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
-    connect(ui->advConfigProtectionHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advPubIdHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advPvtIdHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->advSecretKeyHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
@@ -162,7 +164,6 @@ void OtpPage::connectHelpButtons() {
 
     mapper->setMapping(ui->advConfigHelpBtn, HelpBox::Help_ConfigurationSlot);
     mapper->setMapping(ui->advParamGenSchemeHelpBtn, HelpBox::Help_ParameterGeneration);
-    mapper->setMapping(ui->advConfigProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     mapper->setMapping(ui->advPubIdHelpBtn, HelpBox::Help_PublicID);
     mapper->setMapping(ui->advPvtIdHelpBtn, HelpBox::Help_PrivateID);
     mapper->setMapping(ui->advSecretKeyHelpBtn, HelpBox::Help_SecretKey);
@@ -412,7 +413,7 @@ void OtpPage::writeQuickConfig() {
     YubiKeyWriter::getInstance()->writeConfig(m_ykConfig);
 }
 
-void OtpPage::quickConfigWritten(bool written, const QString &msg) {
+void OtpPage::quickConfigWritten(bool written, __attribute__((unused)) const QString &msg) {
     disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
                this, SLOT(quickConfigWritten(bool, const QString &)));
 
@@ -454,7 +455,7 @@ void OtpPage::resetAdvPage() {
     ui->advAutoProgramKeysCheck->setChecked(false);
     ui->advProgramMulKeysBox->setChecked(false);
 
-    ui->advConfigProtectionCombo->setCurrentIndex(0);
+    ui->advConfigProtectionBox->reset();
 
     ui->advPubIdCheck->setChecked(true);
     ui->advPubIdTxt->clear();
@@ -496,55 +497,6 @@ void OtpPage::on_advProgramMulKeysBox_clicked(bool checked) {
     }
 }
 
-void OtpPage::on_advConfigParamsCombo_currentIndexChanged(int index) {
-    changeAdvConfigParams();
-}
-
-void OtpPage::on_advConfigProtectionCombo_currentIndexChanged(int index) {
-    switch(index) {
-    case CONFIG_PROTECTION_DISABLED:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_ENABLE:
-        ui->advCurrentAccessCodeTxt->clear();
-        ui->advCurrentAccessCodeTxt->setEnabled(false);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    case CONFIG_PROTECTION_DISABLE:
-    case CONFIG_PROTECTION_ENABLED:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        ui->advNewAccessCodeTxt->clear();
-        ui->advNewAccessCodeTxt->setEnabled(false);
-        break;
-    case CONFIG_PROTECTION_CHANGE:
-        on_advCurrentAccessCodeTxt_editingFinished();
-        ui->advCurrentAccessCodeTxt->setEnabled(true);
-
-        on_advNewAccessCodeTxt_editingFinished();
-        ui->advNewAccessCodeTxt->setEnabled(true);
-        break;
-    }
-}
-
-void OtpPage::on_advCurrentAccessCodeTxt_editingFinished() {
-    QString txt = ui->advCurrentAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advCurrentAccessCodeTxt->setText(txt);
-}
-
-void OtpPage::on_advNewAccessCodeTxt_editingFinished() {
-    QString txt = ui->advNewAccessCodeTxt->text();
-    YubiKeyUtil::qstrClean(&txt, (size_t)ACC_CODE_SIZE * 2);
-    ui->advNewAccessCodeTxt->setText(txt);
-}
 
 void OtpPage::on_advPubIdCheck_stateChanged(int state) {
     bool disable = (state != 0);
@@ -782,23 +734,6 @@ bool OtpPage::validateAdvSettings() {
         }
     }
 
-    //Check if logging is disabled and
-    //configuration protection is being enabled
-    if(!settings.value(SG_ENABLE_CONF_PROTECTION).toBool() &&
-       !YubiKeyLogger::isLogging() &&
-       ui->advConfigProtectionCombo->currentIndex() == CONFIG_PROTECTION_ENABLE) {
-        //Confirm from client
-        ConfirmBox confirm(this);
-        confirm.setConfirmIndex(ConfirmBox::Confirm_ConfigurationProtection);
-        int ret = confirm.exec();
-
-        switch (ret) {
-        case 1:     //Yes
-            break;
-        default:    //No
-            return false;
-        }
-    }
 
     //Check if public id length is 6
     if (!settings.value(SG_DIFF_PUBLIC_ID_LEN).toBool() &&
@@ -815,6 +750,10 @@ bool OtpPage::validateAdvSettings() {
         default:    //No
             return false;
         }
+    }
+
+    if(!ui->advConfigProtectionBox->checkConfirm()) {
+        return false;
     }
 
     return true;
@@ -861,17 +800,11 @@ void OtpPage::writeAdvConfig(int mode) {
     m_ykConfig->setSecretKeyTxt(ui->advSecretKeyTxt->text());
 
     //Configuration protection...
-    //Current Access Code...
-    m_ykConfig->setCurrentAccessCodeTxt(ui->advCurrentAccessCodeTxt->text());
-
-    //New Access Code...
-    if(ui->advConfigProtectionCombo->currentIndex()
-        == CONFIG_PROTECTION_DISABLE){
-        m_ykConfig->setNewAccessCodeTxt(ACCESS_CODE_DEFAULT);
-    } else {
-        m_ykConfig->setNewAccessCodeTxt(ui->advNewAccessCodeTxt->text());
-    }
-
+    m_ykConfig->setCurrentAccessCodeTxt(
+        ui->advConfigProtectionBox->currentAccessCode());
+    m_ykConfig->setNewAccessCodeTxt(
+        ui->advConfigProtectionBox->newAccessCode(),
+        ui->advConfigProtectionBox->newAccMode());
 
     if(mode == WRITE_CONFIG) {
         //Write
@@ -999,4 +932,14 @@ void OtpPage::advUpdateResults(bool written, const QString &msg) {
 
     ui->advResultsWidget->resizeColumnsToContents();
     ui->advResultsWidget->resizeRowsToContents();
+}
+
+void OtpPage::setCurrentSlot(int slot) {
+    if(m_currentPage == Page_Advanced) {
+        ui->advConfigSlot1Radio->setChecked(slot == 1);
+        ui->advConfigSlot2Radio->setChecked(slot == 2);
+    } else if(m_currentPage == Page_Quick) {
+        ui->quickConfigSlot1Radio->setChecked(slot == 1);
+        ui->quickConfigSlot2Radio->setChecked(slot == 2);
+    }
 }

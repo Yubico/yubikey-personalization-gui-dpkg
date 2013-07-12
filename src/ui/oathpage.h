@@ -44,14 +44,15 @@ public:
     explicit OathPage(QWidget *parent = 0);
     ~OathPage();
 
-private:
-    Ui::OathPage *ui;
-
     enum Page {
         Page_Base,
         Page_Quick,
         Page_Advanced
     };
+
+private:
+    Ui::OathPage *ui;
+
     int m_currentPage;
 
     int m_customerPrefix;
@@ -75,11 +76,12 @@ private:
 public slots:
     void loadSettings();
     QString getPublicId(bool bcd);
+    void setCurrentPage(int pageIndex);
+    void setCurrentSlot(int slot);
 
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
     void keyFound(bool found, bool* featuresMatrix);
 
@@ -110,10 +112,6 @@ private slots:
     void on_advProgramMulKeysBox_clicked(bool checked);
     void on_advConfigParamsCombo_currentIndexChanged(int index);
 
-    void on_advConfigProtectionCombo_currentIndexChanged(int index);
-    void on_advCurrentAccessCodeTxt_editingFinished();
-    void on_advNewAccessCodeTxt_editingFinished();
-
     void on_advPubIdFormatCombo_currentIndexChanged(int index);
     void on_advPubIdCheck_stateChanged(int state);
     void updateAdvOMP(int index);
@@ -123,6 +121,8 @@ private slots:
     void updateAdvMUI(int index);
     void on_advMUITxt_editingFinished();
     void on_advMUIGenerateBtn_clicked();
+
+    void hotpLen_clicked();
 
     void on_advMovingFactorSeedCombo_currentIndexChanged(int index);
     void on_advMovingFactorSeedTxt_editingFinished();

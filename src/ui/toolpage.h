@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TOOLPAGE_H
 
 #include <QStackedWidget>
+#include <QLineEdit>
 
 namespace Ui {
     class ToolPage;
@@ -41,9 +42,8 @@ class ToolPage : public QStackedWidget {
 public:
     explicit ToolPage(QWidget *parent = 0);
     ~ToolPage();
-
-private:
-    Ui::ToolPage *ui;
+    static void setImportFilename(QString filename);
+    static QString defaultImportFilename(void);
 
     enum Page {
         Page_Base,
@@ -51,13 +51,26 @@ private:
         Page_ChalResp,
         Page_Ndef,
         Page_Zap,
+        Page_Import,
     };
+
+private:
+    Ui::ToolPage *ui;
+
     int m_currentPage;
+    QString m_serial;
+
+    static QString m_filename;
+
+    void setSerial(QLineEdit *line);
+
+public slots:
+    void loadSettings();
+    void setCurrentPage(int pageIndex);
 
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void setCurrentPage(int pageIndex);
     void helpBtn_pressed(int helpIndex);
 
     // Converter Page
@@ -83,16 +96,23 @@ private slots:
     void programNdef();
     void on_ndefTextRadio_toggled(bool checked);
     void ndefWritten(bool written, const QString &msg);
-    void on_ndefAccCodeCheckbox_toggled(bool checkd);
+    void on_ndefAccCodeCheckbox_toggled(bool checked);
+    void on_ndefUseSerial_toggled(bool checked);
 
     // zap page
     void on_zapPerformBtn_clicked();
     void on_zapAccCodeCheckbox_toggled(bool checked);
+    void on_zapUseSerial_toggled(bool checked);
     void zapDone(bool written, const QString &msg);
+
+    // import page
+    void on_importPerformBtn_clicked();
 
     void keyFound(bool found, bool* featuresMatrix);
 signals:
     void showStatusMessage(const QString &text, int status = 0);
+    void reloadSettings();
+    void switchPage(int page, int tab, int slot);
 };
 
 #endif // TOOLPAGE_H

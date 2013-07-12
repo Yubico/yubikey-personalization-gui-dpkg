@@ -32,13 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QObject>
 
 extern "C" {
-#include <ykcore.h>
-#include <ykdef.h>
 #include <ykpers.h>
-#include <yubikey.h>
 }
+
 #include "common.h"
-#include "qtimer.h"
 
 #define YK_VERSION(MAJOR, MINOR, BUILD) (MAJOR * 100 + MINOR * 10 + BUILD)
 
@@ -84,6 +81,9 @@ public:
     int touchLevel() const
     {return m_touchLevel;}
 
+    YK_STATUS *status() const
+    { return m_ykds;}
+
     QString versionStr();
     void reportError();
 
@@ -101,6 +101,7 @@ private:
 
     State m_state;
     YK_KEY *m_yk;
+    YK_STATUS *m_ykds;
     unsigned int m_version;
     unsigned int m_versionMinor;
     unsigned int m_versionMajor;

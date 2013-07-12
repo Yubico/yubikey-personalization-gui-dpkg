@@ -29,6 +29,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "yubikeywriter.h"
 #include "yubikeyfinder.h"
 #include "yubikeylogger.h"
+#include "yubikeyutil.h"
+
+#include <ykcore.h>
+#include <ykdef.h>
 
 #include <QFileDialog>
 
@@ -47,10 +51,6 @@ if(s) { if (!ykp_set_cfgflag_##f(cfg, s)) { return 0; } }
 #define EXTFLAG(f, s) \
 if(s) { if (!ykp_set_extflag_##f(cfg, s)) { return 0; } }
 
-
-static int writer(const char *buf, size_t count, void *stream) {
-    return (int)fwrite(buf, 1, count, (FILE *)stream);
-}
 
 YubiKeyWriter::YubiKeyWriter() {
 }
@@ -308,6 +308,17 @@ int YubiKeyWriter::assembleConfig(YubiKeyConfig *ykConfig, YKP_CONFIG *cfg, bool
             qDebug() << "Invalid new access code: " << ykConfig->newAccessCodeTxt();
             return 0;
         }
+        if(ykConfig->accMode() > 0) {
+            int accMode = 0;
+            if(ykConfig->accMode() == Acc_None) {
+                accMode = YKP_ACCCODE_NONE;
+            } else if(ykConfig->accMode() == Acc_Serial) {
+                accMode = YKP_ACCCODE_SERIAL;
+            } else if(ykConfig->accMode() == Acc_Random) {
+                accMode = YKP_ACCCODE_RANDOM;
+            }
+            ykp_set_acccode_type(cfg, accMode);
+        }
     }
 
     if(accessCodeLen > 0) {
@@ -363,7 +374,7 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
     YubiKeyFinder::getInstance()->stop();
 
     YK_KEY *yk = 0;
-    YK_STATUS *ykst = ykds_alloc();
+    YK_STATUS *ykst = YubiKeyFinder::getInstance()->status();
     YKP_CONFIG *cfg = ykp_alloc();
 
     bool error = false;
@@ -398,7 +409,9 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
         qDebug() << "-------------------------";
         qDebug() << "Config data to be written to key configuration...";
 
-        ykp_write_config(cfg, writer, stderr);
+        char conf_buf[1024];
+        ykp_export_config(cfg, conf_buf, 1024, YKP_FORMAT_LEGACY);
+        qDebug() << conf_buf;
 
         qDebug() << "-------------------------";
 
@@ -422,10 +435,6 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
         ykp_free_config(cfg);
     }
 
-    if(ykst) {
-        ykds_free(ykst);
-    }
-
     if (yk && !yk_close_key(yk)) {
         error = true;
     }
@@ -447,7 +456,7 @@ void YubiKeyWriter::exportConfig(YubiKeyConfig *ykConfig) {
     YubiKeyFinder::getInstance()->stop();
 
     YK_KEY *yk = 0;
-    YK_STATUS *ykst = ykds_alloc();
+    YK_STATUS *ykst = YubiKeyFinder::getInstance()->status();
     YKP_CONFIG *cfg = ykp_alloc();
 
     bool error = false;
@@ -458,8 +467,6 @@ void YubiKeyWriter::exportConfig(YubiKeyConfig *ykConfig) {
 
     try {
         if (!(yk = yk_open_first_key())) {
-            throw 0;
-        } else if (!yk_get_status(yk, ykst)) {
             throw 0;
         }
 
@@ -506,10 +513,6 @@ void YubiKeyWriter::exportConfig(YubiKeyConfig *ykConfig) {
 
     if (cfg) {
         ykp_free_config(cfg);
-    }
-
-    if(ykst) {
-        ykds_free(ykst);
     }
 
     if (yk && !yk_close_key(yk)) {
@@ -663,7 +666,7 @@ void YubiKeyWriter::writeNdef(bool uri, const QString language,
 
 void YubiKeyWriter::deleteConfig(int slot, const QString accCode) {
     bool error = false;
-    YK_KEY *yk;
+    YK_KEY *yk = NULL;
     YKP_CONFIG *cfg = ykp_alloc();
 
     YubiKeyFinder::getInstance()->stop();

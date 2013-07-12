@@ -32,12 +32,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtGui>
 
 #include "otpdef.h"
-#include "yubikeylogger.h"
-#include "yubikeyutil.h"
-#include "yubikeyfinder.h"
-#include "yubikeywriter.h"
 
 typedef std::vector<int>::size_type size_t;
+
+enum AccMode {
+  Acc_None,
+  Acc_Serial,
+  Acc_Random,
+};
 
 #define MAX_SIZE                    256
 
@@ -149,6 +151,7 @@ typedef std::vector<int>::size_type size_t;
 #define SG_LOG_FORMAT               "Log/Format"
 
 #define SG_EXPORT_FILENAME          "Export/Filename"
+#define SG_IMPORT_FILENAME          "Import/Filename"
 
 #define SG_TAB_FIRST                "Flag/TabTirst"
 #define SG_APPEND_TAB1              "Flag/AppendTab1"
@@ -170,6 +173,14 @@ typedef std::vector<int>::size_type size_t;
 #define SG_FAST_TRIG                "Flag/FastTrig"
 #define SG_USE_NUMERIC_KEYPAD       "Flag/UseNumericKeypad"
 #define SG_LED_INVERT               "Flag/LedInvert"
+
+#define SG_OATH_HOTP8               "Flag/OathHotp8"
+#define SG_REQUIRE_INPUT            "Flag/RequireInput"
+#define SG_HMAC_LT64                "Flag/HmacLt64"
+
+#define SG_STRONG_PW1               "Flag/StrongPw1"
+#define SG_STRONG_PW2               "Flag/StrongPw2"
+#define SG_STRONG_PW3               "Flag/StrongPw3"
 
 #define SG_OVERWRITE_CONF_SLOT1     "DontAsk/Slot1Overwriting"
 #define SG_DIFF_PUBLIC_ID_LEN       "DontAsk/PublicIdLen"

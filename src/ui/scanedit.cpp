@@ -27,8 +27,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "scanedit.h"
-#include "qevent.h"
-#include "qdebug.h"
+#include "yubikeyutil.h"
 #include "common.h"
 
 #define	TAB     0x2b
@@ -318,7 +317,7 @@ QString ScanEdit::scanCodesToText(const QString scanCode) {
     QString text;
     for(int i = 0; i < scanCode.length(); i += 2) {
         bool ok;
-        int code = scanCode.mid(i, 2).toInt(&ok, 16);
+        unsigned int code = scanCode.mid(i, 2).toUInt(&ok, 16);
         if(ok == true) {
             if(code < SHIFT) {
                 if(code < sizeof(usb2key1) / sizeof(char*)) {
@@ -327,7 +326,7 @@ QString ScanEdit::scanCodesToText(const QString scanCode) {
             } else {
                 code = code ^ SHIFT;
                 if(code < sizeof(usb2key2) / sizeof(char*)) {
-                    text += usb2key2[code ^ SHIFT];
+                    text += usb2key2[code];
                 }
             }
         }

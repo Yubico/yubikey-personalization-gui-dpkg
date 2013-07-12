@@ -27,11 +27,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "toolpage.h"
+#include "yubikeyfinder.h"
+#include "yubikeywriter.h"
+#include "yubikeyutil.h"
 #include "ui_toolpage.h"
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
+#include "mainwindow.h"
+#include "otppage.h"
+#include "chalresppage.h"
+#include "oathpage.h"
+#include "staticpage.h"
+
+#include <QFileDialog>
+
+#include <ykpers.h>
+#include <ykdef.h>
 
 #include "common.h"
+
+#define IMPORT_FILENAME_DEF "import.ycfg"
+
+QString ToolPage::m_filename = defaultImportFilename();
 
 ToolPage::ToolPage(QWidget *parent) :
         QStackedWidget(parent),
@@ -64,6 +81,10 @@ ToolPage::ToolPage(QWidget *parent) :
 
     ui->zapAccCodeEdit->setEnabled(false);
     ui->ndefAccCodeEdit->setEnabled(false);
+
+    ui->importBox->setVisible(false);
+
+    loadSettings();
 }
 
 ToolPage::~ToolPage() {
@@ -94,6 +115,9 @@ void ToolPage::connectPages() {
     connect(ui->zapBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->zapBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
+    connect(ui->importBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->importBackBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+
     //Set a value for each button
     mapper->setMapping(ui->converterBtn, Page_Converter);
     mapper->setMapping(ui->converterBackBtn, Page_Base);
@@ -107,6 +131,9 @@ void ToolPage::connectPages() {
     mapper->setMapping(ui->zapBtn, Page_Zap);
     mapper->setMapping(ui->zapBackBtn, Page_Base);
 
+    mapper->setMapping(ui->importBtn, Page_Import);
+    mapper->setMapping(ui->importBackBtn, Page_Base);
+
     //Connect the mapper to the widget
     //The mapper will set a value to each button and
     //set that value to the widget
@@ -116,6 +143,11 @@ void ToolPage::connectPages() {
     //Set the current page
     m_currentPage = 0;
     setCurrentIndex(Page_Base);
+}
+
+void ToolPage::loadSettings() {
+    QSettings settings;
+    ui->importBox->setVisible(settings.value(SG_EXPORT_PREFERENCE).toBool());
 }
 
 void ToolPage::setCurrentPage(int pageIndex) {
@@ -186,7 +218,7 @@ void ToolPage::resetConverterPage() {
 }
 
 void ToolPage::convert(int updatedIndex, QString txt) {
-    unsigned char buf[16];
+    unsigned char buf[32];
     memset(buf, 0, sizeof(buf));
     size_t bufLen = 0;
 
@@ -358,7 +390,7 @@ void ToolPage::programNdef() {
     writer->writeNdef(uri, language, payload, ui->ndefAccCodeEdit->text().remove(" "), slot);
 }
 
-void ToolPage::ndefWritten(bool written, const QString &msg) {
+void ToolPage::ndefWritten(bool written, __attribute__((unused)) const QString &msg) {
     disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
             this, SLOT(ndefWritten(bool, const QString &)));
     if(written) {
@@ -369,15 +401,25 @@ void ToolPage::ndefWritten(bool written, const QString &msg) {
 void ToolPage::on_ndefTextRadio_toggled(bool checked) {
     if(checked) {
         ui->ndefTextLangEdit->setEnabled(true);
+        ui->ndefEdit->setPlaceholderText("");
     } else {
         ui->ndefTextLangEdit->setText("en-US");
         ui->ndefTextLangEdit->setEnabled(false);
+        ui->ndefEdit->setPlaceholderText("http://example.com/?otp=");
     }
 }
 
 void ToolPage::on_ndefAccCodeCheckbox_toggled(bool checked) {
     ui->ndefAccCodeEdit->setText("00 00 00 00 00 00");
     ui->ndefAccCodeEdit->setEnabled(checked);
+    ui->ndefUseSerial->setChecked(false);
+    ui->ndefUseSerial->setEnabled(checked);
+}
+
+void ToolPage::on_ndefUseSerial_toggled(bool checked) {
+    if(checked) {
+        setSerial(ui->ndefAccCodeEdit);
+    }
 }
 
 void ToolPage::on_zapPerformBtn_clicked() {
@@ -397,7 +439,7 @@ void ToolPage::on_zapPerformBtn_clicked() {
     writer->deleteConfig(slot, ui->zapAccCodeEdit->text().remove(" "));
 }
 
-void ToolPage::zapDone(bool written, const QString &msg) {
+void ToolPage::zapDone(bool written, __attribute__((unused)) const QString &msg) {
     disconnect(YubiKeyWriter::getInstance(), SIGNAL(configWritten(bool, const QString &)),
             this, SLOT(zapDone(bool, const QString &)));
     if(written) {
@@ -408,6 +450,104 @@ void ToolPage::zapDone(bool written, const QString &msg) {
 void ToolPage::on_zapAccCodeCheckbox_toggled(bool checked) {
     ui->zapAccCodeEdit->setText("00 00 00 00 00 00");
     ui->zapAccCodeEdit->setEnabled(checked);
+    ui->zapUseSerial->setChecked(false);
+    ui->zapUseSerial->setEnabled(checked);
+}
+
+void ToolPage::on_zapUseSerial_toggled(bool checked) {
+    if(checked) {
+        setSerial(ui->zapAccCodeEdit);
+    }
+}
+
+void ToolPage::on_importPerformBtn_clicked() {
+    QString filename = QFileDialog::getOpenFileName(this, tr("Open file for import"), m_filename, tr("Yubico cfg format (*.ycfg);;All Files (*.*)"));
+    if(filename.isEmpty()) {
+        return;
+    }
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        showStatusMessage(tr("Failed to open selected file."), 1);
+    }
+
+    char data[1024];
+    int len = file.read(data, 1024);
+    if(!len) {
+        showStatusMessage(tr("Failed to read from selected file."), 1);
+    }
+    file.close();
+
+    YKP_CONFIG *cfg = ykp_alloc();
+    YK_STATUS *ykds = YubiKeyFinder::getInstance()->status();
+    ykp_configure_version(cfg, ykds);
+    int ret = ykp_import_config(cfg, data, len, YKP_FORMAT_YCFG);
+    if(ret) {
+        QSettings settings;
+        m_filename = filename;
+        settings.setValue(SG_IMPORT_FILENAME, filename);
+
+        MainWindow::Page page = MainWindow::Page_Otp;
+        int tab = OtpPage::Page_Advanced;
+        if(ykp_get_tktflag_OATH_HOTP(cfg)) {
+            if(ykp_get_cfgflag_CHAL_HMAC(cfg)) {
+                qDebug() << "importing mode chal-resp hmac";
+                page = MainWindow::Page_ChalResp;
+                tab = ChalRespPage::Page_Advanced;
+                settings.setValue(SG_REQUIRE_INPUT, ykp_get_cfgflag_CHAL_BTN_TRIG(cfg));
+                settings.setValue(SG_HMAC_LT64, ykp_get_cfgflag_HMAC_LT64(cfg));
+            } else if(ykp_get_cfgflag_CHAL_YUBICO(cfg)) {
+                qDebug() << "importing mode chal-resp yubico";
+                page = MainWindow::Page_ChalResp;
+                tab = ChalRespPage::Page_Quick;
+                settings.setValue(SG_REQUIRE_INPUT, ykp_get_cfgflag_CHAL_BTN_TRIG(cfg));
+            } else {
+                qDebug() << "importing mode oath hotp";
+                page = MainWindow::Page_Oath;
+                tab = OathPage::Page_Advanced;
+                settings.setValue(SG_OATH_HOTP8, ykp_get_cfgflag_OATH_HOTP8(cfg));
+                // XXX: handle seed and fixed_modhex
+            }
+        } else if(ykp_get_cfgflag_STATIC_TICKET(cfg)) {
+            qDebug() << "importing mode static";
+            page = MainWindow::Page_Static;
+            tab = StaticPage::Page_Advanced;
+            settings.setValue(SG_STRONG_PW1, ykp_get_cfgflag_STRONG_PW1(cfg));
+            if(ykp_get_cfgflag_STRONG_PW2(cfg)) {
+                settings.setValue(SG_STRONG_PW2, true);
+                settings.setValue(SG_STRONG_PW3, ykp_get_cfgflag_SEND_REF(cfg));
+            } else {
+                settings.setValue(SG_STRONG_PW2, false);
+            }
+        } else {
+            qDebug() << "importing yubico otp";
+        }
+
+        settings.setValue(SG_MAN_UPDATE, ykp_get_cfgflag_MAN_UPDATE(cfg));
+        settings.setValue(SG_PACING_10MS, ykp_get_cfgflag_PACING_10MS(cfg));
+        settings.setValue(SG_PACING_20MS, ykp_get_cfgflag_PACING_20MS(cfg));
+        settings.setValue(SG_APPEND_CR, ykp_get_tktflag_APPEND_CR(cfg));
+        settings.setValue(SG_APPEND_DELAY1, ykp_get_tktflag_APPEND_DELAY1(cfg));
+        settings.setValue(SG_APPEND_DELAY2, ykp_get_tktflag_APPEND_DELAY2(cfg));
+        settings.setValue(SG_APPEND_TAB1, ykp_get_tktflag_APPEND_TAB1(cfg));
+        settings.setValue(SG_APPEND_TAB2, ykp_get_tktflag_APPEND_TAB2(cfg));
+        settings.setValue(SG_TAB_FIRST, ykp_get_tktflag_TAB_FIRST(cfg));
+        settings.setValue(SG_SR_BTN_VISIBLE, ykp_get_extflag_SERIAL_BTN_VISIBLE(cfg));
+        settings.setValue(SG_SR_USB_VISIBLE, ykp_get_extflag_SERIAL_USB_VISIBLE(cfg));
+        settings.setValue(SG_SR_API_VISIBLE, ykp_get_extflag_SERIAL_API_VISIBLE(cfg));
+        settings.setValue(SG_USE_NUMERIC_KEYPAD, ykp_get_extflag_USE_NUMERIC_KEYPAD(cfg));
+        settings.setValue(SG_FAST_TRIG, ykp_get_extflag_FAST_TRIG(cfg));
+        settings.setValue(SG_ALLOW_UPDATE, ykp_get_extflag_ALLOW_UPDATE(cfg));
+        settings.setValue(SG_LED_INVERT, ykp_get_extflag_LED_INV(cfg));
+
+        int config = ykp_config_num(cfg);
+
+        emit switchPage(page, tab, config);
+        emit reloadSettings();
+    } else {
+        showStatusMessage(tr("Failed to parse the configuration."), 1);
+    }
+    ykp_free_config(cfg);
 }
 
 void ToolPage::keyFound(bool found, bool* featuresMatrix) {
@@ -431,4 +571,37 @@ void ToolPage::keyFound(bool found, bool* featuresMatrix) {
         ui->ndefSlot2Radio->setEnabled(false);
     }
     ui->zapPerformBtn->setEnabled(found);
+    ui->importPerformBtn->setEnabled(found);
+
+    if(found) {
+        m_serial = QString::number(YubiKeyFinder::getInstance()->serial());
+        int num = 12 - m_serial.length();
+        for(int i = 0; i < num; i++) {
+            m_serial.prepend("0");
+        }
+        if(!m_serial.isEmpty()) {
+            if(ui->ndefUseSerial->isChecked()) {
+                setSerial(ui->ndefAccCodeEdit);
+            }
+            if(ui->zapUseSerial->isChecked()) {
+                setSerial(ui->zapAccCodeEdit);
+            }
+        }
+    } else {
+        m_serial.clear();
+    }
+}
+
+void ToolPage::setImportFilename(QString filename) {
+        m_filename = filename;
+}
+
+QString ToolPage::defaultImportFilename() {
+    return QDir::homePath() + "/" + IMPORT_FILENAME_DEF;
+}
+
+void ToolPage::setSerial(QLineEdit *line) {
+    if(!m_serial.isEmpty()) {
+        line->setText(m_serial);
+    }
 }
