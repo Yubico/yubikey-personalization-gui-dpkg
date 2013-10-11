@@ -276,36 +276,97 @@ color: rgb(140, 192, 65);</string>
       <string>Log configuration output</string>
      </property>
     </widget>
-    <widget class="QRadioButton" name="logTraditionalRadio">
+    <widget class="QComboBox" name="logFormatCombo">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>200</x>
        <y>25</y>
-       <width>131</width>
-       <height>19</height>
+       <width>125</width>
+       <height>22</height>
       </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="styleSheet">
       <string notr="true">font-weight: normal;</string>
      </property>
-     <property name="text">
-      <string>Traditional format</string>
-     </property>
+     <item>
+      <property name="text">
+       <string>Traditional format</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Yubico format</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Flexible format</string>
+      </property>
+     </item>
     </widget>
-    <widget class="QRadioButton" name="logYubicoRadio">
+    <widget class="QLineEdit" name="logFormatEdit">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="geometry">
       <rect>
        <x>350</x>
        <y>25</y>
-       <width>120</width>
-       <height>19</height>
+       <width>325</width>
+       <height>20</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">font-weight: normal;</string>
      </property>
+    </widget>
+    <widget class="QPushButton" name="logFormatEditHelpBtn">
+     <property name="geometry">
+      <rect>
+       <x>680</x>
+       <y>25</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="cursor">
+      <cursorShape>PointingHandCursor</cursorShape>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::DefaultContextMenu</enum>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="autoFillBackground">
+      <bool>false</bool>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-image: url(:/res/images/question.png);
+color: lightgray;
+border-radius: 10px;
+</string>
+     </property>
      <property name="text">
-      <string>Yubico format</string>
+      <string/>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="default">
+      <bool>false</bool>
      </property>
     </widget>
    </widget>

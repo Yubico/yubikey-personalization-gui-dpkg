@@ -61,8 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     //Connect other signals and slots
     connect(ui->exitMenuBtn, SIGNAL(clicked()), qApp, SLOT(quit()));
 
-    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
-            this, SLOT(keyFound(bool, bool*)));
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
+            this, SLOT(keyFound(bool, bool*, int)));
     connect(YubiKeyWriter::getInstance(), SIGNAL(errorOccurred(QString)),
             this, SLOT(showStatusMessage(QString)));
 
@@ -296,25 +296,25 @@ void MainWindow::resetDeviceInfo() {
     ui->serialNoHexCopyBtn->setStyleSheet(blankBtnSS);
     ui->serialNoModhexCopyBtn->setStyleSheet(blankBtnSS);
 
-    ui->otpSupportLbl->setPixmap(NULL);
+    ui->otpSupportLbl->setPixmap(QPixmap());
     ui->otpSupportLbl->setText(NA);
-    ui->multiConfigSupportLbl->setPixmap(NULL);
+    ui->multiConfigSupportLbl->setPixmap(QPixmap());
     ui->multiConfigSupportLbl->setText(NA);
-    ui->oathHotpSupportLbl->setPixmap(NULL);
+    ui->oathHotpSupportLbl->setPixmap(QPixmap());
     ui->oathHotpSupportLbl->setText(NA);
-    ui->staticPwdSupportLbl->setPixmap(NULL);
+    ui->staticPwdSupportLbl->setPixmap(QPixmap());
     ui->staticPwdSupportLbl->setText(NA);
-    ui->scanCodeSupportLbl->setPixmap(NULL);
+    ui->scanCodeSupportLbl->setPixmap(QPixmap());
     ui->scanCodeSupportLbl->setText(NA);
-    ui->chalRespSupportLbl->setPixmap(NULL);
+    ui->chalRespSupportLbl->setPixmap(QPixmap());
     ui->chalRespSupportLbl->setText(NA);
-    ui->updatableSupportLbl->setPixmap(NULL);
+    ui->updatableSupportLbl->setPixmap(QPixmap());
     ui->updatableSupportLbl->setText(NA);
-    ui->ndefSupportLbl->setPixmap(NULL);
+    ui->ndefSupportLbl->setPixmap(QPixmap());
     ui->ndefSupportLbl->setText(NA);
 }
 
-void MainWindow::keyFound(bool found, bool* featuresMatrix) {
+void MainWindow::keyFound(bool found, bool* featuresMatrix, int error) {
     QString disabledMenuBtnSS = QString::fromUtf8(SS_MENU_DISABLED);
     QString checkedMenuBtnSS = QString::fromUtf8(SS_MENU_CHECKED);
     QString uncheckedMenuBtnSS = QString::fromUtf8(SS_MENU_UNCHECKED);
@@ -343,8 +343,13 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix) {
         }
 
         unsigned int version = finder->version();
-        ui->statusLbl->setText(KEY_FOUND);
-        ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_SUCCESS));
+        if(error == ERR_UNKNOWN_FIRMWARE) {
+            ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_ERROR));
+            ui->statusLbl->setText(UNKNOWN_FIRMWARE);
+        } else {
+            ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_SUCCESS));
+            ui->statusLbl->setText(KEY_FOUND);
+        }
 
         ui->versionLbl->setText(finder->versionStr());
         qDebug() << "version is" << finder->versionStr();
@@ -486,10 +491,16 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix) {
     } else {
         ui->programLbl->clear();
         if(ui->deviceImage->pixmap()) {
-            ui->deviceImage->setPixmap(NULL);
+            ui->deviceImage->setPixmap(QPixmap());
         }
         ui->deviceImage->clear();
-        ui->statusLbl->setText(NO_KEY_FOUND);
+        if(error == ERR_NOKEY) {
+            ui->statusLbl->setText(NO_KEY_FOUND);
+        } else if(error == ERR_MORETHANONE) {
+            ui->statusLbl->setText(MORE_THAN_ONE);
+        } else {
+            ui->statusLbl->setText(OTHER_ERROR);
+        }
         ui->statusLbl->setStyleSheet(QString::fromUtf8(SS_YKSTATUS_ERROR));
 
         if(m_currentPage == Page_Oath) {

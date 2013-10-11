@@ -1,3 +1,170 @@
+2013-10-09  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: release 3.1.11
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/help.h, src/yubikeylogger.cpp: add endl and tab variables to
+	logging
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: make the logging local
+	resolver take the name as string to reduce the amount of similar resolvers
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp: disable the format edit when not in
+	flexible format
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: add NEWS for flexible logging
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh: drop build-homepage script
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* BLURB: add category to BLURB
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* BLURB: BLURB for yubikey-personalization-gui
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/help.h, src/ui/helpbox.cpp, src/ui/helpbox.h,
+	src/ui/settingpage.cpp, src/ui/settingpage.ui: add help for the
+	flexible logging format
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: add getting a list of
+	lognames
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/common.h, src/help.h,
+	src/ui/helpbox.cpp: move help texts to it's own header to reduce re-compile times due to changed texts..
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp, src/ui/settingpage.ui,
+	src/yubikeylogger.cpp, src/yubikeylogger.h: add a flexible logformat
+	with configurable input
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.cpp, src/ui/settingpage.ui: change the radio
+	buttons for logformat to a combobox
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/yubiaccbox.cpp: move defines for accbox to
+	yubiaccbox.cpp from common.h
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/settingpage.cpp: localize OUT_CHAR_RATE
+	defines to settingpage.cpp
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: refactor building of
+	the logging string to use a lookup table and format-strings, calling methods in the
+	YubikeyConfig class by name instead. This will allow building more
+	flexible logging schemes.
+
+2013-09-26  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyconfig.h: make YubikeyConfig a QObject and it's getter
+	methods invokable this will make the getter methods available for calling by name
+	through the meta object.
+
+2013-09-20  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: add NEWS for the next version
+
+2013-09-19  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeyfinder.h: fix so we recheck the
+	key after regaining focus add a new state to the finder NoFocus, when running the find cycle
+	re-read all info if NoFocus is set as well.
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* resources/win/resources.rc, src/version.h: and change around again utf8 in src/version.h latin1 in resources/win/resources.rc
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/aboutpage.cpp, src/version.h: revert back to latin1 for the
+	copyright sign but use tr() utf8 broke in the windows resource file and in some versions of qt.
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, resources/win/resources.rc: make version
+	numbering work on windows
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* : Merge pull request #24 from eworm-de/encoding fix encoding for copyright sign
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/mainwindow.cpp, src/yubikeyfinder.cpp,
+	src/yubikeywriter.cpp: Allow writing of keys with unknown firmware Print a warning in place of "YubiKey inserted" fixes #23
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/ui/confirmbox.cpp,
+	src/ui/mainwindow.cpp, src/ui/otppage.cpp, src/ui/scanedit.cpp,
+	src/ui/settingpage.cpp, src/ui/staticpage.cpp,
+	src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.h, src/yubikeyfinder.cpp,
+	src/yubikeywriter.cpp: support qt5
+
+2013-09-17  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/aboutpage.cpp, src/ui/chalresppage.cpp,
+	src/ui/mainwindow.cpp, src/ui/mainwindow.h, src/ui/mainwindow.ui,
+	src/ui/oathpage.cpp, src/ui/otppage.cpp, src/ui/settingpage.cpp,
+	src/ui/staticpage.cpp, src/ui/toolpage.cpp, src/ui/yubiaccbox.cpp,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: handle error messages
+	when opening key Adds proper output for the case when there's more than one key
+	present fixes #9
+
+2013-08-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.ui: re-add the importBox as a qWidget fixes compilation errors and hopefully doesn't show the box fixes
+	#22
+
+2013-07-05  Klas Lindfors <klas@yubico.com>
+
+	* build-homepage.sh: drop news file from homepage
+
+2013-07-24  Simon Josefsson <simon@josefsson.org>
+
+	* resources/lin/yubikey-personalization-gui.desktop: Add Keywords to
+	desktop file.
+
+2013-07-04  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.ui: drop box around import
+
+2013-07-04  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/version.h: fix windows build by
+	fiddling some with version
+
+2013-07-04  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions post-release
+
+2013-07-04  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: fix release script for new VERSION format
+
 2013-07-04  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: release 3.1.10

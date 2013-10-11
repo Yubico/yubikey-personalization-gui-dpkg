@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ykdef.h>
 
 #include <QTimer>
+#include <QApplication>
 
 YubiKeyFinder* YubiKeyFinder::_instance = 0;
 
@@ -118,23 +119,6 @@ QString YubiKeyFinder::versionStr() {
     return "";
 }
 
-void YubiKeyFinder::reportError() {
-    if (ykp_errno) {
-        //qDebug("Yubikey personalization error: %s\n", ykp_strerror(ykp_errno));
-        ykp_errno = 0;
-    } else if (yk_errno) {
-        if (yk_errno == YK_EUSBERR) {
-            //qDebug("USB error: %s\n", yk_usb_strerror());
-        } else {
-            //qDebug("Yubikey core error: %s\n", yk_strerror(yk_errno));
-        }
-
-        yk_errno = 0;
-    }
-
-    emit errorOccurred(ERR_KEY_NOT_FOUND);
-}
-
 bool YubiKeyFinder::checkFeatureSupport(Feature feature) {
     if(m_version > 0 &&
        (unsigned int) feature < sizeof(FEATURE_MATRIX)/sizeof(FEATURE_MATRIX[0])) {
@@ -207,6 +191,7 @@ bool YubiKeyFinder::closeKey() {
 void YubiKeyFinder::findKey() {
     if(QApplication::activeWindow() == 0) {
         //No focus, avoid locking the YubiKey.
+        m_state = State_NoFocus;
         return;
     }
 
@@ -228,7 +213,7 @@ void YubiKeyFinder::findKey() {
         //qDebug() << "Key found";
 
         //Check pervious state
-        if(m_state == State_Absent) {
+        if(m_state == State_Absent || m_state == State_NoFocus) {
 
             m_state = State_Present;
 
@@ -258,7 +243,12 @@ void YubiKeyFinder::findKey() {
                 featuresMatrix[i] = checkFeatureSupport((Feature)i);
             }
 
-            emit keyFound(true, featuresMatrix);
+            int error = ERR_NOERROR;
+            if(!yk_check_firmware_version2(m_ykds)) {
+                error = ERR_UNKNOWN_FIRMWARE;
+            }
+
+            emit keyFound(true, featuresMatrix, error);
         }
     }
     catch(...) {
@@ -270,8 +260,15 @@ void YubiKeyFinder::findKey() {
     if(error) {
         init();
         m_state = State_Absent;
-        reportError();
-        emit keyFound(false, NULL);
+        int error = ERR_OTHER;
+        if(yk_errno == YK_EMORETHANONE) {
+            error = ERR_MORETHANONE;
+        } else if(yk_errno == YK_ENOKEY) {
+            error = ERR_NOKEY;
+        }
+        yk_errno = 0;
+        ykp_errno = 0;
+        emit keyFound(false, NULL, error);
     }
 
     //qDebug() << "-------------------------";

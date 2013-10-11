@@ -30,6 +30,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_helpbox.h"
 
 #include "common.h"
+#include "help.h"
+#include "yubikeylogger.h"
 
 HelpBox::HelpBox(QWidget *parent) :
         QDialog(parent),
@@ -122,6 +124,15 @@ void HelpBox::setHelpIndex(Help helpIndex) {
     case Help_ManUpdate:
         title = tr("Manual Update");
         helpMsg = HELP_MAN_UPDATE_OPTION;
+        break;
+    case Help_LogFormat:
+        {
+            title = tr("Flexible Log Format");
+            helpMsg = HELP_LOG_FORMAT;
+            QStringList names = YubiKeyLogger::getLogNames();
+            helpMsg.append(names.join(", "));
+            helpMsg.append("</p>");
+        }
         break;
 
     default:

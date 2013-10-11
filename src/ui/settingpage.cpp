@@ -36,12 +36,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "toolpage.h"
 
 #include <QFile>
+#include <QMessageBox>
 
 #include "common.h"
 
 #define DECIMAL 0
 #define MODHEX 1
 #define HEX 2
+
+#define OUT_CHAR_RATE_STD 0
+#define OUT_CHAR_RATE_SLOWDOWN_20 1
+#define OUT_CHAR_RATE_SLOWDOWN_40 2
+#define OUT_CHAR_RATE_SLOWDOWN_60 3
 
 SettingPage::SettingPage(QWidget *parent) :
         QStackedWidget(parent),
@@ -84,12 +90,12 @@ SettingPage::SettingPage(QWidget *parent) :
     connect(ui->fastTrigCheck, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->ledInvertCheck, SIGNAL(clicked()), this, SLOT(save()));
     connect(ui->useNumericKeypadCheck, SIGNAL(clicked()), this, SLOT(save()));
-    connect(ui->logTraditionalRadio, SIGNAL(clicked()), this, SLOT(save()));
-    connect(ui->logYubicoRadio, SIGNAL(clicked()), this, SLOT(save()));
+    connect(ui->logFormatCombo, SIGNAL(activated(int)), this, SLOT(save()));
+    connect(ui->logFormatEdit, SIGNAL(textEdited(QString)), this, SLOT(save()));
     connect(ui->outCharRateCombo, SIGNAL(activated(int)), this, SLOT(save()));
     connect(ui->exportCheck, SIGNAL(clicked()), this, SLOT(save()));
 
-    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
             this, SLOT(keyFound(bool, bool*)));
 
     QRegExp modHexRx("^[cbdefghijklnrtuv]{0,4}$");
@@ -121,6 +127,7 @@ void SettingPage::connectHelpButtons() {
     connect(ui->updateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->swapHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
     connect(ui->manUpdateHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
+    connect(ui->logFormatEditHelpBtn, SIGNAL(clicked()), mapper, SLOT(map()));
 
     //Set a value for each button
     mapper->setMapping(ui->outFormatHelpBtn, HelpBox::Help_OutputFormat);
@@ -129,6 +136,7 @@ void SettingPage::connectHelpButtons() {
     mapper->setMapping(ui->updateHelpBtn, HelpBox::Help_AllowUpdate);
     mapper->setMapping(ui->swapHelpBtn, HelpBox::Help_Swap);
     mapper->setMapping(ui->manUpdateHelpBtn, HelpBox::Help_ManUpdate);
+    mapper->setMapping(ui->logFormatEditHelpBtn, HelpBox::Help_LogFormat);
 
     //Connect the mapper
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
@@ -290,20 +298,22 @@ void SettingPage::load() {
         YubiKeyLogger::disableLogging();
 
         ui->logOutputCheck->setChecked(false);
-        ui->logTraditionalRadio->setEnabled(false);
-        ui->logYubicoRadio->setEnabled(false);
+        ui->logFormatCombo->setEnabled(false);
+        ui->logFormatEdit->setEnabled(false);
     } else {
         YubiKeyLogger::enableLogging();
 
         ui->logOutputCheck->setChecked(true);
-        ui->logTraditionalRadio->setEnabled(true);
-        ui->logYubicoRadio->setEnabled(true);
-        if(logFormat == YubiKeyLogger::Format_Yubico) {
-            ui->logYubicoRadio->setChecked(true);
-            YubiKeyLogger::setLogFormat(YubiKeyLogger::Format_Yubico);
+        ui->logFormatCombo->setEnabled(true);
+        ui->logFormatCombo->setCurrentIndex(logFormat);
+        YubiKeyLogger::setLogFormat((YubiKeyLogger::Format)logFormat);
+        if(logFormat == YubiKeyLogger::Format_Flexible) {
+            QString format = settings.value(SG_LOG_FLEXIBLE).toString();
+            ui->logFormatEdit->setEnabled(true);
+            ui->logFormatEdit->setText(format);
+            YubiKeyLogger::setFlexibleFormat(format);
         } else {
-            ui->logTraditionalRadio->setChecked(true);
-            YubiKeyLogger::setLogFormat(YubiKeyLogger::Format_Traditional);
+            ui->logFormatEdit->setEnabled(false);
         }
     }
 
@@ -375,11 +385,9 @@ void SettingPage::save() {
     //Logging settings...
     if(ui->logOutputCheck->isChecked()) {
         settings.setValue(SG_LOG_DISABLED,  false);
-
-        if(ui->logYubicoRadio->isChecked()) {
-            settings.setValue(SG_LOG_FORMAT, YubiKeyLogger::Format_Yubico);
-        } else {
-            settings.setValue(SG_LOG_FORMAT, YubiKeyLogger::Format_Traditional);
+        settings.setValue(SG_LOG_FORMAT, ui->logFormatCombo->currentIndex());
+        if(ui->logFormatCombo->currentIndex() == YubiKeyLogger::Format_Flexible) {
+            settings.setValue(SG_LOG_FLEXIBLE, ui->logFormatEdit->text());
         }
     } else {
         settings.setValue(SG_LOG_DISABLED,  true);

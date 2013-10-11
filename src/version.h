@@ -30,11 +30,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VERSION_H
 
 #define VER_PRODUCTVERSION          VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,0
-#define VER_PRODUCTVERSION_STR      VERSION_MAJOR "." VERSION_MINOR "." VERSION_BUILD "\0"
+#define VER_PRODUCTVERSION_STR      VERSION "\0"
 
 #define VER_FILEDESCRIPTION_STR     "YubiKey Personalization Tool"
 #define VER_INTERNALNAME_STR        "YKPersonalization"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011-2013 Yubico"
+#define VER_LEGALCOPYRIGHT          trUtf8("Copyright Â© 2011-2013 Yubico")
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_ORIGINALFILENAME_STR    "YKPersonalization.exe"
 #define VER_PRODUCTNAME_STR         "YKPersonalization"

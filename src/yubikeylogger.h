@@ -33,9 +33,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <QTextStream>
 #include <QFile>
+#include <QStringList>
 
 #include "common.h"
 #include "yubikeyconfig.h"
+
+struct logging_st {
+    const char *name;
+    const char *configName;
+    int returnType;
+    QString (*resolver)(YubiKeyConfig*, QString);
+};
 
 class YubiKeyLogger : public QObject {
 
@@ -45,6 +53,7 @@ public:
     enum Format {
         Format_Traditional,
         Format_Yubico,
+        Format_Flexible,
     };
     static void logConfig(YubiKeyConfig *ykConfig);
 
@@ -56,18 +65,26 @@ public:
     static QString logFilename();
     static QString defaultLogFilename();
     static void setLogFormat(Format format);
+    static void setFlexibleFormat(QString);
+    static QStringList getLogNames();
 
 private:
     static bool m_enabled;
     static QString m_filename;
     static bool m_started;
     static Format m_format;
+    static QString m_flexibleFormat;
+    static logging_st logging_map[];
 
-    static void logConfigTraditional(YubiKeyConfig *ykConfig, QTextStream &out);
-    static void logConfigYubico(YubiKeyConfig *ykConfig, QTextStream &out);
+    static QString formatLog(YubiKeyConfig *ykConfig, QString format);
 
     static QFile *m_logFile;
     static QFile *getLogFile(void);
+
+    static QString resolve_eventType(YubiKeyConfig*, QString);
+    static QString resolve_timestamp(YubiKeyConfig*, QString);
+    static QString resolve_hotpDigits(YubiKeyConfig*, QString);
+    static QString resolve_symbol(YubiKeyConfig*, QString);
 };
 
 #endif // YUBIKEYLOGGER_H

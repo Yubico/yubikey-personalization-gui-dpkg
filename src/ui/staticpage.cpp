@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "scanedit.h"
 
 #include <QDesktopServices>
+#include <QMessageBox>
 #include "common.h"
 
 StaticPage::StaticPage(QWidget *parent) :
@@ -55,7 +56,7 @@ StaticPage::StaticPage(QWidget *parent) :
     connectHelpButtons();
 
     //Connect other signals and slots
-    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
             this, SLOT(keyFound(bool, bool*)));
 
     connect(ui->quickResetBtn, SIGNAL(clicked()),

@@ -264,7 +264,7 @@ font-weight: bold;</string>
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QGroupBox" name="importBox">
+    <widget class="QWidget" name="importBox">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -272,9 +272,6 @@ font-weight: bold;</string>
        <width>650</width>
        <height>80</height>
       </rect>
-     </property>
-     <property name="title">
-      <string/>
      </property>
      <widget class="QPushButton" name="importBtn">
       <property name="geometry">

@@ -3,7 +3,7 @@
 #
 VERSION_MAJOR   = 3
 VERSION_MINOR   = 1
-VERSION_BUILD   = 10
+VERSION_BUILD   = 11
 VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
@@ -15,9 +15,12 @@ DEPLOYMENT_PLUGIN += qmng
 TEMPLATE        = app
 TARGET          = yubikey-personalization-gui
 
-DEFINES        += VERSION_MAJOR=\\\"$${VERSION_MAJOR}\\\" VERSION_MINOR=\\\"$${VERSION_MINOR}\\\" VERSION_BUILD=\\\"$${VERSION_BUILD}\\\"
+DEFINES        += VERSION_MAJOR=\\\"$${VERSION_MAJOR}\\\" VERSION_MINOR=\\\"$${VERSION_MINOR}\\\" VERSION_BUILD=\\\"$${VERSION_BUILD}\\\" VERSION=\\\"$${VERSION}\\\"
 
 CONFIG         += exceptions
+
+# if this is qt5, add widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 !nosilent {
     CONFIG         += silent
@@ -83,6 +86,7 @@ HEADERS += \
     src/yubikeyconfig.h \
     src/version.h \
     src/otpdef.h \
+    src/help.h \
     src/common.h
 
 SOURCES += \
@@ -132,7 +136,7 @@ cross {
 
     win32 {
         QMAKE_LIB = $$(TARGET_ARCH)-ar -ru
-        QMAKE_RC = $$(TARGET_ARCH)-windres
+        QMAKE_RC = $$(TARGET_ARCH)-windres $$quote(-DVERSION_WIN_STR=\'\\\"$${VERSION}\\0\\\"\')
 
         QMAKE_MOC = $$[QT_INSTALL_BINS]/moc
         QMAKE_UIC = $$[QT_INSTALL_BINS]/uic

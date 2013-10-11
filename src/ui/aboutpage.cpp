@@ -66,7 +66,7 @@ AboutPage::AboutPage(QWidget *parent) :
 
     //Set copyright
     QString copyright = tr("%1. %2.").
-                        arg(VER_LEGALCOPYRIGHT_STR).
+                        arg(VER_LEGALCOPYRIGHT).
                         arg(VER_LEGALTRADEMARKS1_STR);
 
     ui->copyrightLbl->setText(copyright);
@@ -74,7 +74,7 @@ AboutPage::AboutPage(QWidget *parent) :
     connectButtons();
 
     //Connect other signals and slots
-    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
             this, SLOT(keyFound(bool, bool*)));
 }
 
