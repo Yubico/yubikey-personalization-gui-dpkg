@@ -1,3 +1,9 @@
+yubikey-personalization-gui (3.1.11-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Simon Josefsson <simon@yubico.com>  Fri, 11 Oct 2013 13:42:23 +0200
+
 yubikey-personalization-gui (3.1.10-1) unstable; urgency=low
 
   * New upstream release.
