@@ -49,7 +49,8 @@ public:
     enum State {
         State_Absent,
         State_Present,
-        State_Processing
+        State_Processing,
+        State_NoFocus,
     };
 
     enum Feature {
@@ -118,7 +119,7 @@ public slots:
     void stop();
 
 signals:
-    void keyFound(bool found, bool* featuresMatrix);
+    void keyFound(bool found, bool* featuresMatrix, int error);
     void errorOccurred(const QString &text);
 };
 

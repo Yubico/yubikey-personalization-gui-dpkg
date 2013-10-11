@@ -26,7 +26,6 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QSettings>
 #include "yubiaccbox.h"
 #include "ui_yubiaccbox.h"
 #include "ui/helpbox.h"
@@ -34,6 +33,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "yubikeyfinder.h"
 #include "yubikeyutil.h"
 #include "yubikeylogger.h"
+
+#include <QSettings>
+#include <QLineEdit>
+
+#define CONFIG_PROTECTION_DISABLED  0
+#define CONFIG_PROTECTION_ENABLE    1
+#define CONFIG_PROTECTION_DISABLE   2
+#define CONFIG_PROTECTION_ENABLED   3
+#define CONFIG_PROTECTION_CHANGE    4
 
 YubiAccBox::YubiAccBox(QWidget *parent) :
     QWidget(parent),
@@ -46,7 +54,7 @@ YubiAccBox::YubiAccBox(QWidget *parent) :
     mapper->setMapping(ui->configProtectionHelpBtn, HelpBox::Help_ConfigurationProtection);
     connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
 
-    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*)),
+    connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
             this, SLOT(keyFound(bool, bool*)));
 }
 
