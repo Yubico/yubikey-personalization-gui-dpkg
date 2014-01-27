@@ -1,3 +1,39 @@
+2013-12-30  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.12
+
+2013-12-30  Klas Lindfors <klas@yubico.com>
+
+	* : commit b9e5bdcd47f777e7bd29b1021f9d9cfa627527c2 Author:
+	mistertoh <mralvintoh@gmail.com> Date:   Mon Dec 30 14:24:16 2013
+	+0100
+
+2013-12-02  Klas Lindfors <klas@yubico.com>
+
+	* src/help.h: fix typo defer -> differ
+
+2013-12-02  Klas Lindfors <klas@yubico.com>
+
+	* : commit 90de271eb1dd877f4db807e3645b9a2b6c73f27a Author:
+	mistertoh <mralvintoh@gmail.com> Date:   Mon Dec 2 14:41:49 2013
+	+0100
+
+2013-10-28  Klas Lindfors <klas@yubico.com>
+
+	* : Merge pull request #28 from mistertoh/master Fix Icon Position
+
+2013-10-28  Klas Lindfors <klas@yubico.com>
+
+	* : Merge pull request #27 from mistertoh/master Fix Typo Challenge Response -> Challenge-Response
+
+2013-10-28  Klas Lindfors <klas@yubico.com>
+
+	* : Merge pull request #26 from mistertoh/master Fix Typo
+
+2013-10-09  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2013-10-09  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: release 3.1.11
