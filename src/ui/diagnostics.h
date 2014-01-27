@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2013-2014 Yubico AB.  All rights reserved.
+Copyright (C) 2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -26,45 +26,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef YUBIACCBOX_H
-#define YUBIACCBOX_H
+#ifndef DIAGNOSTICS_H
+#define DIAGNOSTICS_H
 
-#include <QWidget>
-#include <QLineEdit>
-
-#include "common.h"
+#include <QDialog>
+#include <QAbstractButton>
 
 namespace Ui {
-class YubiAccBox;
+    class Diagnostics;
 }
 
-class YubiAccBox : public QWidget
-{
+class Diagnostics : public QDialog {
     Q_OBJECT
 
 public:
-    explicit YubiAccBox(QWidget *parent = 0);
-    ~YubiAccBox();
-    void reset();
-    bool checkConfirm();
-    QString newAccessCode();
-    QString currentAccessCode();
-    AccMode newAccMode();
+    explicit Diagnostics(QWidget *parent = 0);
+    ~Diagnostics();
 
 private:
-    Ui::YubiAccBox *ui;
-    QString m_serial;
-    void setSerial(QLineEdit* line);
+    Ui::Diagnostics *ui;
+    QString osVersion();
+    void setup();
 
 private slots:
-    void keyFound(bool found, bool* featuresMatrix);
-    void on_currentUseSerial_clicked(bool checked);
-    void on_newUseSerial_clicked(bool checked);
-    void on_configProtectionCombo_currentIndexChanged(int index);
-    void on_currentAccessCodeTxt_editingFinished();
-    void on_newAccessCodeTxt_editingFinished();
-signals:
-    void showHelp(int helpIndex);
+    void addDiagnostic(QString text);
+    void clicked(QAbstractButton *button);
 };
 
-#endif // YUBIACCBOX_H
+#endif // DIAGNOSTICS_H

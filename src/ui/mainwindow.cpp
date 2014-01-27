@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui/toolpage.h"
 #include "ui/settingpage.h"
 #include "ui/aboutpage.h"
+#include "ui/diagnostics.h"
+#include "ui/helpbox.h"
 
 #include "common.h"
 #include "version.h"
@@ -81,6 +83,13 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_aboutPage, SIGNAL(changePage(int)),
             this, SLOT(setCurrentPage(int)));
 
+    connect(m_otpPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+    connect(m_oathPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+    connect(m_staticPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+    connect(m_chalRespPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+    connect(m_settingPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+    connect(m_toolPage, SIGNAL(showHelp(int)), this, SLOT(triggerHelp(int)));
+
     connect(m_settingPage, SIGNAL(settingsChanged()),
             m_otpPage, SLOT(loadSettings()));
     connect(m_settingPage, SIGNAL(settingsChanged()),
@@ -111,6 +120,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(animationAction, SIGNAL(triggered(bool)), this, SLOT(toggleAnimation(bool)));
     ui->deviceImage->addAction(animationAction);
 
+    // add action for diagnostics
+    diagnosticsAction = new QAction(this);
+    diagnosticsAction->setText("Show detailed diagnostics");
+    connect(diagnosticsAction, SIGNAL(triggered()), this, SLOT(triggerDiagnostics()));
+    ui->logoImg->addAction(diagnosticsAction);
+
     QSettings settings;
     if(settings.value(SG_ANIMATIONS_PREFERENCE, true).toBool()) {
         animationAction->setChecked(true);
@@ -132,7 +147,11 @@ MainWindow::~MainWindow()
     delete m_toolPage;
     delete m_aboutPage;
 
+    delete m_diagnostics;
+    delete m_help;
+
     delete animationAction;
+    delete diagnosticsAction;
 
     delete ui;
 }
@@ -150,6 +169,9 @@ void MainWindow::createPages() {
     m_settingPage = new SettingPage(this);
     m_toolPage = new ToolPage(this);
     m_aboutPage = new AboutPage(this);
+
+    m_diagnostics = new Diagnostics(this);
+    m_help = new HelpBox(this);
 
     //Add pages to the pages widget
     ui->pagesWidget->addWidget(m_otpPage);
@@ -603,4 +625,13 @@ void MainWindow::toggleAnimation(bool checked) {
             ui->deviceImage->movie()->stop();
         }
     }
+}
+
+void MainWindow::triggerDiagnostics() {
+    m_diagnostics->show();
+}
+
+void MainWindow::triggerHelp(int index) {
+    m_help->setHelpIndex((HelpBox::Help)index);
+    m_help->show();
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -73,6 +73,7 @@ QString YubiKeyWriter::reportError(bool chalresp = false) {
 
     if (ykp_errno) {
         qDebug("Yubikey personalization error: %s\n", ykp_strerror(ykp_errno));
+        emit diagnostics(ykp_strerror(ykp_errno));
 
         switch(ykp_errno) {
         case YKP_EYUBIKEYVER:
@@ -87,8 +88,10 @@ QString YubiKeyWriter::reportError(bool chalresp = false) {
     } else if (yk_errno) {
         if (yk_errno == YK_EUSBERR) {
             qDebug("USB error: %s\n", yk_usb_strerror());
+            emit diagnostics(QString("USB error: %1").arg(yk_usb_strerror()));
         } else {
             qDebug("Yubikey core error: %s\n", yk_strerror(yk_errno));
+            emit diagnostics(yk_strerror(yk_errno));
         }
 
         switch(yk_errno) {
@@ -419,6 +422,7 @@ void YubiKeyWriter::writeConfig(YubiKeyConfig *ykConfig) {
             throw 0;
         }
         qDebug() << "Success... config written";
+        emit diagnostics(QString("Successfully wrote config to slot %1").arg(ykp_config_num(cfg)));
 
         YubiKeyLogger::logConfig(ykConfig);
         emit configWritten(true, NULL);
@@ -498,6 +502,7 @@ void YubiKeyWriter::exportConfig(YubiKeyConfig *ykConfig) {
         settings.setValue(SG_EXPORT_FILENAME, m_filename);
 
         emit configWritten(true, NULL);
+        emit diagnostics(QString("Exported config to file %1").arg(m_filename));
     }
     catch(...) {
         error = true;
@@ -561,6 +566,7 @@ void YubiKeyWriter::doChallengeResponse(const QString challenge, QString  &respo
         } else {
             response = YubiKeyUtil::qstrModhexEncode(resp, 16);
         }
+        emit diagnostics(QString("Successful challenge response with slot %1").arg(slot));
     } catch(...) {
         error = true;
     }
@@ -626,6 +632,7 @@ void YubiKeyWriter::writeNdef(bool uri, const QString language,
             throw 0;
         }
         emit configWritten(true, NULL);
+        emit diagnostics(QString("Wrote NDEF for slot %1").arg(slot));
     } catch(...) {
         error = true;
     }
@@ -680,6 +687,7 @@ void YubiKeyWriter::deleteConfig(int slot, const QString accCode) {
         }
         emit configWritten(true, NULL);
         qDebug() << "successfully deleted slot " << slot;
+        emit diagnostics(QString("Deleted slot %1").arg(slot));
     } catch(...) {
         error = true;
     }

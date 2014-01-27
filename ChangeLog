@@ -1,3 +1,104 @@
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.13
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* : commit be3540fa8b3c5e9dc45b5587b4b427f28dde9fd8 Author:
+	mistertoh <mralvintoh@gmail.com> Date:   Fri Jan 10 11:20:10 2014
+	+0100
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui: don't use placeholder for
+	the default neo url, just set it as text and improve reset on Ndef page
+
+2014-01-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.cpp, src/ui/toolpage.ui: change the NDEF example
+	to be the default string
+
+2014-01-07  Klas Lindfors <klas@yubico.com>
+
+	* COPYING, resources/win/resources.rc, src/ui/chalresppage.cpp,
+	src/ui/chalresppage.h, src/ui/mainwindow.cpp, src/ui/mainwindow.h,
+	src/ui/oathpage.cpp, src/ui/oathpage.h, src/ui/otppage.cpp,
+	src/ui/otppage.h, src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp,
+	src/ui/toolpage.h, src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.h,
+	src/version.h, src/yubikeyfinder.cpp, src/yubikeyfinder.h,
+	src/yubikeywriter.cpp, src/yubikeywriter.h: bump copyright
+
+2014-01-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/chalresppage.h,
+	src/ui/helpbox.ui, src/ui/mainwindow.cpp, src/ui/mainwindow.h,
+	src/ui/oathpage.cpp, src/ui/oathpage.h, src/ui/otppage.cpp,
+	src/ui/otppage.h, src/ui/settingpage.cpp, src/ui/settingpage.h,
+	src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/toolpage.cpp,
+	src/ui/toolpage.h, src/ui/yubiaccbox.cpp, src/ui/yubiaccbox.h: make
+	the help pages non-modal and make it a child of mainwindow and just send signals there when
+	we want it shown.
+
+2014-01-07  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/diagnostics.ui, src/ui/mainwindow.cpp: make the diagnostics
+	window non-modal
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: clear touchLevel when initing
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: add touch level to key diagnostics
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeywriter.cpp: more diagnostics for successful write-key
+	operations
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/diagnostics.cpp, src/ui/diagnostics.h: add an info
+	diagnostics message with varios versions
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: force serial to a string in diagnostic
+	message otherwise we will call the wrong arg()
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeywriter.cpp: add qualifier to usb
+	errors.
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/diagnostics.cpp: add date to the diagnostic messages
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: add diagnostic message when a key is
+	inserted
+
+2014-01-03  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, src/ui/diagnostics.cpp,
+	src/ui/diagnostics.h, src/ui/diagnostics.ui, src/ui/mainwindow.cpp,
+	src/ui/mainwindow.h, src/ui/mainwindow.ui, src/yubikeyfinder.cpp,
+	src/yubikeyfinder.h, src/yubikeywriter.cpp, src/yubikeywriter.h: add
+	a diagnostics view with more complete error messages
+
+2014-01-02  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui: try to make version compability on
+	settingpage clearer
+
+2013-12-30  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions after release
+
 2013-12-30  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.12

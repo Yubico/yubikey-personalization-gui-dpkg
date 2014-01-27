@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -165,12 +165,6 @@ void ToolPage::setCurrentPage(int pageIndex) {
 }
 
 void ToolPage::connectHelpButtons() {
-}
-
-void ToolPage::helpBtn_pressed(int helpIndex) {
-    HelpBox help(this);
-    help.setHelpIndex((HelpBox::Help)helpIndex);
-    help.exec();
 }
 
 void ToolPage::resetChalRespPage() {
@@ -342,9 +336,12 @@ void ToolPage::on_converterDecCopyBtn_clicked() {
 }
 
 void ToolPage::resetNdefPage() {
-    ui->ndefEdit->clear();
+    ui->ndefEdit->setText("https://my.yubico.com/neo/");
     ui->ndefTextLangEdit->setText("en-US");
     ui->ndefUriRadio->setChecked(true);
+    ui->ndefAccCodeCheckbox->setChecked(false);
+    ui->ndefSlot1Radio->setChecked(false);
+    ui->ndefSlot2Radio->setChecked(false);
 }
 
 void ToolPage::programNdef() {
@@ -401,11 +398,11 @@ void ToolPage::ndefWritten(bool written, __attribute__((unused)) const QString &
 void ToolPage::on_ndefTextRadio_toggled(bool checked) {
     if(checked) {
         ui->ndefTextLangEdit->setEnabled(true);
-        ui->ndefEdit->setPlaceholderText("");
+        ui->ndefEdit->setText("");
     } else {
         ui->ndefTextLangEdit->setText("en-US");
         ui->ndefTextLangEdit->setEnabled(false);
-        ui->ndefEdit->setPlaceholderText("http://example.com/?otp=");
+        ui->ndefEdit->setText("https://my.yubico.com/neo/");
     }
 }
 

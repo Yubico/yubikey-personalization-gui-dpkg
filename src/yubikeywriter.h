@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -71,7 +71,7 @@ public slots:
 signals:
     void configWritten(bool written, const QString &msg);
     void errorOccurred(const QString &text);
-
+    void diagnostics(const QString &text);
 };
 
 #endif // YUBIKEYWRITER_H

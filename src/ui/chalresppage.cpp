@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -194,13 +194,9 @@ void ChalRespPage::connectHelpButtons() {
     mapper->setMapping(ui->advSecretKeyHelpBtn, HelpBox::Help_SecretKey);
 
     //Connect the mapper
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
-}
-
-void ChalRespPage::helpBtn_pressed(int helpIndex) {
-    HelpBox help(this);
-    help.setHelpIndex((HelpBox::Help)helpIndex);
-    help.exec();
+    connect(mapper, SIGNAL(mapped(int)), this, SIGNAL(showHelp(int)));
+    connect(ui->quickConfigProtectionBox, SIGNAL(showHelp(int)), this, SIGNAL(showHelp(int)));
+    connect(ui->advConfigProtectionBox, SIGNAL(showHelp(int)), this, SIGNAL(showHelp(int)));
 }
 
 void ChalRespPage::keyFound(bool found, bool* featuresMatrix) {

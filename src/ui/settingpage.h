@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -62,7 +62,6 @@ public slots:
 
 private slots:
     void connectHelpButtons();
-    void helpBtn_pressed(int helpIndex);
     void restoreDefaults();
     void load();
     void save();
@@ -84,6 +83,7 @@ private slots:
 signals:
     void settingsChanged();
     void showStatusMessage(const QString &text, int status = 0);
+    void showHelp(int helpIndex);
 };
 
 #endif // SETTINGPAGE_H
