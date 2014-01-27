@@ -1,2 +1,3 @@
 version=3
-http://yubico.github.com/yubikey-personalization-gui/releases.html .*/yubikey-personalization-gui-(\d[\d.]*)\.(?:zip|tgz|tbz2|txz|tar\.gz|tar\.bz2|tar\.xz)
+opts=pgpsigurlmangle=s/$/.sig/ \
+  http://opensource.yubico.com/yubikey-personalization-gui/releases.html releases/yubikey-personalization-gui-.*\.tar\.gz

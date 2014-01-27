@@ -1,6 +1,9 @@
 yubikey-personalization-gui (3.1.14-1) unstable; urgency=low
 
   * New upstream release.
+    - Update Standards-Version to 3.9.5.
+    - Update watch file, adding pgpsigurlmangle.
+    - Add upstream-signing-key.pgp.
 
  -- Simon Josefsson <simon@yubico.com>  Mon, 27 Jan 2014 12:30:00 +0100
 
