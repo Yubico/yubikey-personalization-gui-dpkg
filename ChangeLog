@@ -1,5 +1,29 @@
 2014-01-10  Klas Lindfors <klas@yubico.com>
 
+	* NEWS: news for 3.1.14
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/confirmbox.ui: set a minimum width for the confirmbox text
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/confirmbox.ui: let the confirmbox expand
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/toolpage.ui: drop the placeholdertext completely
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/diagnostics.cpp: fixup mac version
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions after release
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
 	* NEWS: NEWS for 3.1.13
 
 2014-01-10  Klas Lindfors <klas@yubico.com>
