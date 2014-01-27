@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -139,18 +139,13 @@ void SettingPage::connectHelpButtons() {
     mapper->setMapping(ui->logFormatEditHelpBtn, HelpBox::Help_LogFormat);
 
     //Connect the mapper
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(helpBtn_pressed(int)));
+    connect(mapper, SIGNAL(mapped(int)), this, SIGNAL(showHelp(int)));
+    connect(ui->configProtectionBox, SIGNAL(showHelp(int)), this, SIGNAL(showHelp(int)));
 }
 
 void SettingPage::setCurrentPage(int pageIndex) {
     m_currentPage = pageIndex;
     setCurrentIndex(pageIndex);
-}
-
-void SettingPage::helpBtn_pressed(int helpIndex) {
-    HelpBox help(this);
-    help.setHelpIndex((HelpBox::Help)helpIndex);
-    help.exec();
 }
 
 void SettingPage::init() {

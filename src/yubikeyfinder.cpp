@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -144,6 +144,7 @@ void YubiKeyFinder::init() {
     m_versionMinor = 0;
     m_versionBuild = 0;
     m_serial = 0;
+    m_touchLevel = 0;
 
     m_ykds = ykds_alloc();
 }
@@ -249,6 +250,8 @@ void YubiKeyFinder::findKey() {
             }
 
             emit keyFound(true, featuresMatrix, error);
+            emit diagnostics(QString("Found key with version %1, serial %2 and touch %3.")
+                .arg(versionStr(), QString::number(m_serial), QString::number(m_touchLevel)));
         }
     }
     catch(...) {
@@ -265,6 +268,10 @@ void YubiKeyFinder::findKey() {
             error = ERR_MORETHANONE;
         } else if(yk_errno == YK_ENOKEY) {
             error = ERR_NOKEY;
+        } else if(yk_errno == YK_EUSBERR) {
+            emit diagnostics(QString("USB Error: %1").arg(yk_usb_strerror()));
+        } else if(yk_errno) {
+            emit diagnostics(yk_strerror(yk_errno));
         }
         yk_errno = 0;
         ykp_errno = 0;

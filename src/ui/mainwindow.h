@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -40,6 +40,9 @@ class ChalRespPage;
 class SettingPage;
 class AboutPage;
 
+class Diagnostics;
+class HelpBox;
+
 class QStackedWidget;
 
 namespace Ui {
@@ -76,9 +79,13 @@ private:
     ToolPage *m_toolPage;
     AboutPage *m_aboutPage;
 
+    Diagnostics *m_diagnostics;
+    HelpBox *m_help;
+
     QTimer *m_timer;
 
     QAction *animationAction;
+    QAction *diagnosticsAction;
 
     void createPages();
 
@@ -99,6 +106,8 @@ private slots:
     void on_serialNoModhexCopyBtn_clicked();
 
     void toggleAnimation(bool checked);
+    void triggerDiagnostics();
+    void triggerHelp(int index);
 };
 
 #endif // MAINWINDOW_H

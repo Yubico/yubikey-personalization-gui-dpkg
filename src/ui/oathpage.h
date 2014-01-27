@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2011-2014 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -82,7 +82,6 @@ public slots:
 private slots:
     void connectPages();
     void connectHelpButtons();
-    void helpBtn_pressed(int helpIndex);
     void keyFound(bool found, bool* featuresMatrix);
 
     void updatePrefix();
@@ -145,6 +144,7 @@ private slots:
 
 signals:
     void showStatusMessage(const QString &text, int status = 0);
+    void showHelp(int helpIndex);
 };
 
 #endif // OATHPAGE_H
