@@ -1,3 +1,9 @@
+yubikey-personalization-gui (3.1.14-2) UNRELEASED; urgency=low
+
+  * Fix watch file.
+
+ -- Simon Josefsson <simon@yubico.com>  Thu, 13 Mar 2014 12:59:03 +0100
+
 yubikey-personalization-gui (3.1.14-1) unstable; urgency=low
 
   * New upstream release.
