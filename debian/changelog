@@ -1,6 +1,7 @@
-yubikey-personalization-gui (3.1.14-2) UNRELEASED; urgency=low
+yubikey-personalization-gui (3.1.14-2) unstable; urgency=low
 
   * Fix watch file.
+  * Fix homepage URL.
 
  -- Simon Josefsson <simon@yubico.com>  Thu, 13 Mar 2014 12:59:03 +0100
 
