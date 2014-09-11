@@ -1,3 +1,9 @@
+yubikey-personalization-gui (3.1.15-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Simon Josefsson <simon@josefsson.org>  Thu, 11 Sep 2014 16:12:29 +0200
+
 yubikey-personalization-gui (3.1.14-2) unstable; urgency=low
 
   * Fix watch file.

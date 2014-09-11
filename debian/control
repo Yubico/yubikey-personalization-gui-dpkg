@@ -1,6 +1,6 @@
 Source: yubikey-personalization-gui
 Maintainer: Debian Authentication Maintainers <pkg-auth-maintainers@lists.alioth.debian.org>
-Uploaders: Simon Josefsson <simon@yubico.com>, Klas Lindfors <klas@yubico.com>, Dain Nilsson <dain@yubico.com>
+Uploaders: Simon Josefsson <simon@josefsson.org>, Klas Lindfors <klas@yubico.com>, Dain Nilsson <dain@yubico.com>
 Section: utils
 Priority: extra
 Build-Depends: debhelper (>= 9), pkg-config, qt4-qmake, libqt4-dev, libyubikey-dev, libykpers-1-dev (>= 1.14.0)
