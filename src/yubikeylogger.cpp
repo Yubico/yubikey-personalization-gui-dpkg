@@ -56,6 +56,7 @@ struct logging_st YubiKeyLogger::logging_map[] = {
     { "pubIdTxt", "pubIdTxt", STRING, NULL },
     { "pvtIdTxt", "pvtIdTxt", STRING, NULL },
     { "secretKeyTxt", "secretKeyTxt", STRING, NULL },
+    { "secretKeyB64", NULL, STRING, YubiKeyLogger::resolve_secretKeyB64 },
     { "currentAccessCodeTxt", "currentAccessCodeTxt", STRING, NULL },
     { "newAccessCodeTxt", "newAccessCodeTxt", STRING, NULL },
     { "hotpDigits", NULL, STRING, YubiKeyLogger::resolve_hotpDigits },
@@ -69,6 +70,7 @@ struct logging_st YubiKeyLogger::logging_map[] = {
     { "oathFixedModhex1", "oathFixedModhex1", BOOL, NULL },
     { "oathFixedModhex2", "oathFixedModhex2", BOOL, NULL },
     { "oathFixedModhex", "oathFixedModhex", BOOL, NULL },
+    { "tokenLength", NULL, STRING, YubiKeyLogger::resolve_tokenLength },
     { "serial", "serial", STRING, NULL },
     { "endl", NULL, STRING, YubiKeyLogger::resolve_symbol },
     { "tab", NULL, STRING, YubiKeyLogger::resolve_symbol },
@@ -93,6 +95,18 @@ QFile *YubiKeyLogger::getLogFile() {
         settings.setValue(SG_LOG_FILENAME, m_filename);
     }
     return m_logFile;
+}
+
+void YubiKeyLogger::closeLogFile() {
+    if(m_logFile != NULL) {
+        if(m_format == Format_PSKC) {
+            endPSKC();
+        }
+        m_logFile->close();
+        delete(m_logFile);
+        m_logFile = NULL;
+        m_started = true;
+    }
 }
 
 QString YubiKeyLogger::formatLog(YubiKeyConfig *ykConfig, QString format) {
@@ -138,13 +152,6 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
         return;
     }
 
-    QFile *file = getLogFile();
-    if(file == NULL) {
-        return;
-    }
-
-    QTextStream out(file);
-
     QString format = "";
     if(m_format == Format_Traditional) {
         if(m_started) {
@@ -165,6 +172,30 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
             format += ",,";
         }
         format += "{secretKeyTxt},{newAccessCodeTxt},{timestampFixed},";
+    } else if(m_format == Format_PSKC) {
+        if(m_started) {
+            format += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>{endl}<KeyContainer Version=\"1.0\" xmlns=\"urn:ietf:params:xml:ns:keyprov:pskc\">{endl}";
+            m_started = false;
+        }
+        format += "<KeyPackage><DeviceInfo><Manufacturer>Yubico</Manufacturer><SerialNo>{serial}</SerialNo></DeviceInfo>";
+        format += "<CryptoModuleInfo><Id>{configSlot}</Id></CryptoModuleInfo><Key Id=\"{serial}:{configSlot}\"";
+        if(ykConfig->programmingMode() == YubiKeyConfig::Mode_YubicoOtp) {
+            format += " Algorithm=\"http://www.yubico.com/#yubikey-aes\"><AlgorithmParameters><ResponseFormat Length=\"{tokenLength}\" Encoding=\"ALPHANUMERIC\"/></AlgorithmParameters>";
+        } else if(ykConfig->programmingMode() == YubiKeyConfig::Mode_OathHotp) {
+            format += " Algorithm=\"urn:ietf:params:xml:ns:keyprov:pskc:hotp\"><AlgorithmParameters><ResponseFormat Length=\"{tokenLength}\" Encoding=\"DECIMAL\"/></AlgorithmParameters>";
+        } else {
+            qDebug() << "PSKC is primarily for Oath-HOTP and Yubico-OTP";
+            format += ">";
+        }
+        format += "<Data><Secret><PlainValue>{secretKeyB64}</PlainValue></Secret>";
+        if(ykConfig->programmingMode() == YubiKeyConfig::Mode_OathHotp) {
+            format += "<Counter><PlainValue>{oathMovingFactorSeed}</PlainValue></Counter>";
+        }
+        format += "</Data>";
+        if(ykConfig->programmingMode() == YubiKeyConfig::Mode_YubicoOtp) {
+            format += "<UserId>CN={pubIdTxt}, UID={pvtIdTxt}</UserId>";
+        }
+        format += "</Key></KeyPackage>";
     } else if(m_format == Format_Flexible) {
         format = m_flexibleFormat;
     } else {
@@ -172,8 +203,7 @@ void YubiKeyLogger::logConfig(YubiKeyConfig *ykConfig) {
         return;
     }
     format = formatLog(ykConfig, format);
-    out << format << endl;
-    file->flush();
+    logString(format);
 }
 
 void YubiKeyLogger::enableLogging() {
@@ -189,6 +219,7 @@ bool YubiKeyLogger::isLogging() {
 }
 
 void YubiKeyLogger::setLogFilename(const QString &filename) {
+    closeLogFile();
     m_filename = filename;
 }
 
@@ -201,6 +232,7 @@ QString YubiKeyLogger::defaultLogFilename() {
 }
 
 void YubiKeyLogger::setLogFormat(Format format) {
+    closeLogFile();
     m_format = format;
 }
 
@@ -217,29 +249,31 @@ QString YubiKeyLogger::resolve_hotpDigits(YubiKeyConfig *ykConfig, QString name 
 }
 
 QString YubiKeyLogger::resolve_eventType(YubiKeyConfig *ykConfig, QString name __attribute__((unused))) {
-    int mode = ykConfig->programmingMode();
-    if(mode == YubiKeyConfig::Mode_YubicoOtp) {
-        return(tr("Yubico OTP"));
-    } else if(mode == YubiKeyConfig::Mode_Static) {
-        QString eventType = tr("Static Password");
-        if(ykConfig->shortTicket()) {
-            if(ykConfig->staticTicket()) {
-                eventType.append(tr(": Short"));
-            } else {
-                eventType.append(tr(": Scan Code"));
+    switch(ykConfig->programmingMode()) {
+        case YubiKeyConfig::Mode_YubicoOtp:
+            return(tr("Yubico OTP"));
+        case YubiKeyConfig::Mode_Static:
+            {
+                QString eventType = tr("Static Password");
+                if(ykConfig->shortTicket()) {
+                    if(ykConfig->staticTicket()) {
+                        eventType.append(tr(": Short"));
+                    } else {
+                        eventType.append(tr(": Scan Code"));
+                    }
+                }
+                return eventType;
             }
-        }
-        return eventType;
-    } else if(mode == YubiKeyConfig::Mode_OathHotp) {
-        return(tr("OATH-HOTP"));
-    } else if(mode == YubiKeyConfig::Mode_ChalRespHmac) {
-        return(tr("Challenge-Response: Yubico OTP"));
-    } else if(mode == YubiKeyConfig::Mode_ChalRespHmac) {
-        return(tr("Challenge-Response: HMAC-SHA1"));
-    } else if(mode == YubiKeyConfig::Mode_Update) {
-        return(tr("Configuration Update"));
-    } else if(mode == YubiKeyConfig::Mode_Swap) {
-        return(tr("Configuration Swap"));
+        case YubiKeyConfig::Mode_OathHotp:
+            return(tr("OATH-HOTP"));
+        case YubiKeyConfig::Mode_ChalRespYubico:
+            return(tr("Challenge-Response: Yubico OTP"));
+        case YubiKeyConfig::Mode_ChalRespHmac:
+            return(tr("Challenge-Response: HMAC-SHA1"));
+        case YubiKeyConfig::Mode_Update:
+            return(tr("Configuration Update"));
+        case YubiKeyConfig::Mode_Swap:
+            return(tr("Configuration Swap"));
     }
     return(tr("Unknown programming mode"));
 }
@@ -262,10 +296,42 @@ QString YubiKeyLogger::resolve_symbol(YubiKeyConfig *ykConfig __attribute__((unu
     return "";
 }
 
+QString YubiKeyLogger::resolve_secretKeyB64(YubiKeyConfig *ykConfig, QString name __attribute__((unused))) {
+    QByteArray decodedSecret = QByteArray::fromHex(ykConfig->secretKeyTxt().toLatin1());
+    return decodedSecret.toBase64();
+}
+
+QString YubiKeyLogger::resolve_tokenLength(YubiKeyConfig *ykConfig, QString name __attribute__((unused))) {
+    int len = ykConfig->pubIdTxt().length();
+
+    if(ykConfig->programmingMode() == YubiKeyConfig::Mode_YubicoOtp) {
+        len += 32;
+    } else if(ykConfig->programmingMode() == YubiKeyConfig::Mode_OathHotp) {
+        len += ykConfig->oathHotp8() ? 8 : 6;
+    }
+    return QString::number(len);
+}
+
 QStringList YubiKeyLogger::getLogNames() {
     QStringList list;
     for(unsigned int i = 0; i < (sizeof(logging_map) / sizeof(logging_st)); i++) {
         list << logging_map[i].name;
     }
     return list;
+}
+
+void YubiKeyLogger::endPSKC() {
+    logString("</KeyContainer>");
+}
+
+void YubiKeyLogger::logString(QString string) {
+    QFile *file = getLogFile();
+    if(file == NULL) {
+        qDebug() << "Failed to get logfile";
+        return;
+    }
+
+    QTextStream out(file);
+    out << string << endl;
+    file->flush();
 }
