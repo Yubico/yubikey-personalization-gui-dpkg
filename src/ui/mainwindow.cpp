@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "yubikeyfinder.h"
 #include "yubikeywriter.h"
 #include "yubikeyutil.h"
+#include "yubikeylogger.h"
 #include "ui/otppage.h"
 #include "ui/oathpage.h"
 #include "ui/staticpage.h"
@@ -62,6 +63,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //Connect other signals and slots
     connect(ui->exitMenuBtn, SIGNAL(clicked()), qApp, SLOT(quit()));
+
+    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(aboutToQuit()));
 
     connect(YubiKeyFinder::getInstance(), SIGNAL(keyFound(bool, bool*, int)),
             this, SLOT(keyFound(bool, bool*, int)));
@@ -391,8 +394,10 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix, int error) {
             movie->setFileName(":/res/images/v2-2-animated.mng");
         } else if(version < YK_VERSION(3,0,0)){
             movie->setFileName(":/res/images/v2-3-animated.mng");
-        } else { // only case left should be version over 3, that is neo
+        } else if(version < YK_VERSION(3,3,0)){
             pixmap.load(":/res/images/neo_production.png");
+        } else { // only case left should be version over 3.3, that is neo + u2f
+            pixmap.load(":/res/images/neo_production_33.png");
         }
         if(pixmap.isNull()) {
             ui->deviceImage->setMovie(movie);
@@ -634,4 +639,8 @@ void MainWindow::triggerDiagnostics() {
 void MainWindow::triggerHelp(int index) {
     m_help->setHelpIndex((HelpBox::Help)index);
     m_help->show();
+}
+
+void MainWindow::aboutToQuit() {
+    YubiKeyLogger::closeLogFile();
 }

@@ -1,3 +1,126 @@
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.15
+
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: new picture for
+	version 3.3+ with u2f logo
+
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: make sure the qtgui is writable
+
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: switch the
+	windows build to qt5
+
+2014-09-09  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/aboutpage.ui: move the support link to it's own line
+
+2014-09-09  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/ui/aboutpage.cpp: fixup support link since it's
+	no longer mail
+
+2014-09-04  mistertoh <mralvintoh@gmail.com>
+
+	* src/ui/aboutpage.ui: Update Link for Help and Discussion
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: fixup xml syntax
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: add CryptoModuleInfo with configSlot
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: add tokenLength
+	formatter to get responseFormat correct
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: user serial:slot for Key@Id
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: write start and end of
+	PSKC info
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.h, src/yubikeylogger.h: 
+	register aboutToQuit() handler and call closeLogFile() there
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: close the logFile when
+	things change
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: implement secret key
+	in base64 for logging specifically for the pskc format
+
+2014-08-28  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/settingpage.ui, src/yubikeylogger.cpp, src/yubikeylogger.h: 
+	add a first stab at an experimental PSKC output format this is clearly a naive least-effort implementation..  relates to #4
+
+2014-07-15  Alessio Di Mauro <dimauro.alessio@gmail.com>
+
+	* src/ui/staticpage.cpp, src/ui/staticpage.ui: Added graying out of
+	text boxes and buttons when no layout is selected.
+
+2014-07-07  Alessio Di Mauro <dimauro.alessio@gmail.com>
+
+	* src/ui/staticpage.cpp, src/ui/staticpage.h, src/ui/staticpage.ui: 
+	Added dropdown menu for keyboard layout selection.
+
+2014-04-23  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyconfig.cpp: make sure to initialize all variables in
+	constructor specifically m_hmacLT64
+
+2014-04-23  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyutil.cpp: reduce scope of val
+
+2014-04-23  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/diagnostics.cpp: put the "unknown os" in #else
+
+2014-04-23  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: fixup logging so all modes are logged use a switch-case instead of if to get warnings if we miss a case.
+	resolves #36
+
+2014-04-22  Klas Lindfors <klas@yubico.com>
+
+	* : Merge pull request #35 from dudebout/patch-1 Adds a missind dependency in the README
+
+2014-04-16  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h: add head to html template
+
+2014-02-27  David Wittman <david@wittman.com>
+
+	* src/ui/oathpage.ui, src/ui/otppage.ui, src/ui/staticpage.ui: Typo
+	fix in UI: s/Quicky/Quickly/
+
+2014-01-28  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyutil.cpp: change around qDebug() usage to get rid of
+	warnings
+
+2014-01-10  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2014-01-10  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: news for 3.1.14

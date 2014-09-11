@@ -3,7 +3,7 @@
 #
 VERSION_MAJOR   = 3
 VERSION_MINOR   = 1
-VERSION_BUILD   = 14
+VERSION_BUILD   = 15
 VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
@@ -191,22 +191,32 @@ win32 {
         LIBS += $$quote(-L./libs/win64/bin) -llibyubikey-0 -llibykpers-1-1
     }
 
+    LIBS += $$quote(-L$$_QT_BINDIR) $$quote(-L$$_QT_LIBDIR)
+
     CONFIG(debug, debug|release) {
         LIB_FILES += \
-             $$_QT_BINDIR$${DIR_SEPARATOR}QtCored4.dll \
-             $$_QT_BINDIR$${DIR_SEPARATOR}QtGuid4.dll \
-             $$_QT_BINDIR$${DIR_SEPARATOR}QtTestd4.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmngd4.dll
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Cored.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Guid.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Widgetsd.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Testd.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}platforms$${DIR_SEPARATOR}qwindowsd.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmngd.dll
     } else {
         LIB_FILES += \
-             $$_QT_BINDIR$${DIR_SEPARATOR}QtCore4.dll \
-             $$_QT_BINDIR$${DIR_SEPARATOR}QtGui4.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmng4.dll
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Core.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Gui.dll \
+             $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Widgets.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}platforms$${DIR_SEPARATOR}qwindows.dll \
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmng.dll
     }
 
     LIB_FILES += \
         $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
-        $$_QT_BINDIR$${DIR_SEPARATOR}mingwm10.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}libwinpthread-1.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}libstdc++-6.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icuin52.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icuuc52.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icudt52.dll \
         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libjson-c-2.dll \
         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libyubikey-0.dll \
         libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libykpers-1-1.dll
@@ -357,6 +367,7 @@ macx:!force_pkgconfig {
     }
     QMAKE_POST_LINK += $$quote( && $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_BASEDIR/MacOS/$$TARGET_MAC && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_BASEDIR/MacOS/$$TARGET_MAC && \
+        chmod +w $$_FRAMEWORKDIR/$$_QTGUI && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_FRAMEWORKDIR/$$_QTGUI && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/$$_QTCORE $$_PLUGINDIR/imageformats/libqmng.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/$$_QTGUI $$_PLUGINDIR/imageformats/libqmng.dylib)
