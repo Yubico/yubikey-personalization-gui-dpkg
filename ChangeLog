@@ -1,3 +1,26 @@
+2014-09-16  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: 3.1.16
+
+2014-09-16  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyutil.cpp: Q_WS_* is not supported on qt5 change to
+	Q_OS_* fixes #40
+
+2014-09-12  Klas Lindfors <klas@yubico.com>
+
+	* : commit 8fb1b1dfcea2c9e1a8abfd19157cc97f2c74bcfa Author: Klas
+	Lindfors <klas@yubico.com> Date:   Fri Sep 12 07:51:28 2014 +0100
+
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: drop some more debug stuff from qtgui on
+	mac
+
+2014-09-11  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2014-09-11  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.15
