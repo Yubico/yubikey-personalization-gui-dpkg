@@ -1,6 +1,7 @@
 yubikey-personalization-gui (3.1.16-1) unstable; urgency=low
 
   * New upstream release.
+  * Update Standards-Version to 3.9.6.
 
  -- Simon Josefsson <simon@josefsson.org>  Wed, 01 Oct 2014 16:59:16 +0200
 
