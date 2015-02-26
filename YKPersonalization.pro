@@ -3,7 +3,7 @@
 #
 VERSION_MAJOR   = 3
 VERSION_MINOR   = 1
-VERSION_BUILD   = 17
+VERSION_BUILD   = 18
 VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
@@ -11,7 +11,6 @@ APP_NAME        = $$quote(YubiKey Personalization Tool)
 # common configuration
 #
 QT             += core gui
-QTPLUGIN       += qtaccessiblewidgets qmng
 TEMPLATE        = app
 TARGET          = yubikey-personalization-gui
 
@@ -384,6 +383,9 @@ macx:!force_pkgconfig {
         $$_INSTALL_NAME_TOOL -change $$_QTPRINTSUPPORT $$_BASE/QtPrintSupport $$_BASEDIR/MacOS/$$TARGET_MAC && \
         $$_INSTALL_NAME_TOOL -change $$_LIBBASE/libykpers-1.1.dylib $$_BASE/libykpers-1.1.dylib $$_BASEDIR/MacOS/$$TARGET_MAC && \
         $$_INSTALL_NAME_TOOL -change $$_LIBBASE/libyubikey.0.dylib $$_BASE/libyubikey.0.dylib $$_BASEDIR/MacOS/$$TARGET_MAC && \
+        $$_INSTALL_NAME_TOOL -id $$_BASE/libjson-c.2.dylib $$_LIBDIR/libjson-c.2.dylib && \
+        $$_INSTALL_NAME_TOOL -id $$_BASE/libyubikey.0.dylib $$_LIBDIR/libyubikey.0.dylib && \
+        $$_INSTALL_NAME_TOOL -id $$_BASE/libykpers-1.1.dylib $$_LIBDIR/libykpers-1.1.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_LIBBASE/libyubikey.0.dylib $$_BASE/libyubikey.0.dylib $$_LIBDIR/libykpers-1.1.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_LIBBASE/libjson-c.2.dylib $$_BASE/libjson-c.2.dylib $$_LIBDIR/libykpers-1.1.dylib && \
         $$_INSTALL_NAME_TOOL -id $$_BASE/QtCore $$_LIBDIR/QtCore && \
@@ -405,6 +407,12 @@ macx:!force_pkgconfig {
         $$_INSTALL_NAME_TOOL -change $$_QTWIDGETS $$_BASE/QtWidgets $$_PLUGINDIR/platforms/libqcocoa.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/QtGui $$_PLUGINDIR/platforms/libqcocoa.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTPRINTSUPPORT $$_BASE/QtPrintSupport $$_PLUGINDIR/platforms/libqcocoa.dylib)
+
+    QMAKE_POST_LINK += $$quote( && \
+        if otool -L $$_LIBDIR/* $$_PLUGINDIR/*/* $$_BASEDIR/MacOS/$$TARGET_MAC | grep -e '$$_QT_LIBDIR' -e '$$_LIBBASE' | grep -q compatibility; then \
+            echo "Something is incorrectly linked!"; \
+            exit 1; \
+        fi)
 
     build_installer {
         # the productbuild path doesn't work pre 10.8
