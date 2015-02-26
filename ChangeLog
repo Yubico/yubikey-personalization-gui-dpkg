@@ -1,3 +1,40 @@
+2014-11-28  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.18
+
+2014-11-28  Klas Lindfors <klas@yubico.com>
+
+	* resources/images/README.mng: update text about creating mng
+
+2014-11-28  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: image for plus
+
+2014-11-24  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp, src/yubikeyfinder.h: no support for ndef in
+	yk4 so the exclusion struct has to be expanded to hold a second range
+	for every feature..
+
+2014-11-11  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: drop QTPLUGIN line, caused the plugins to
+	be linked in at times fixes #46
+
+2014-10-31  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: check that the binaries are correctly
+	linked
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* resources/mac/Info.plist.in: apparently the app store doesn't
+	allow build number so I wonder in what field that should go..
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions.
+
 2014-10-30  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.17
