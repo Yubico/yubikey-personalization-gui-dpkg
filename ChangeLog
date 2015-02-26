@@ -1,3 +1,86 @@
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.17
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, resources/mac/Info.plist.in: add so a build
+	number can be set for osX builds
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: try to get by with codesign --deep
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: more mac fixups
+
+2014-10-30  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: switch mac build to qt5
+
+2014-10-29  Henrik Stråth <minisu@users.noreply.github.com>
+
+	* README: Update README
+
+2014-10-29  Henrik Stråth <minisu@users.noreply.github.com>
+
+	* README: Update README
+
+2014-10-29  Henrik Stråth <minisu@users.noreply.github.com>
+
+	* README: Update README
+
+2014-10-29  Henrik Stråth <minisu@users.noreply.github.com>
+
+	* README: Update README
+
+2014-10-29  Henrik Stråth <henrik@yubico.com>
+
+	* README.adoc: symlinked README
+
+2014-10-23  Christian Hesse <mail@eworm.de>
+
+	* src/ui/mainwindow.cpp, src/ui/mainwindow.ui,
+	src/yubikeyfinder.cpp, src/yubikeyfinder.h: show U2F in supported
+	features
+
+2014-10-23  Klas Lindfors <klas@yubico.com>
+
+	* src/common.h, src/help.h, src/ui/aboutpage.cpp,
+	src/ui/chalresppage.cpp, src/ui/confirmbox.cpp, src/ui/helpbox.cpp,
+	src/ui/mainwindow.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/settingpage.cpp, src/ui/staticpage.cpp, src/ui/toolpage.cpp,
+	src/version.h, src/yubikeywriter.cpp: restructure to get rid of
+	lupdate warnings for translations relates to #42
+
+2014-10-23  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro, installer/win-nsis/ykpers.nsi: include the
+	qtaccessiblewidgets plugin when bundling fixes #43
+
+2014-10-23  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.h: Q_OBJECT has to be declared before public..  fixes #44
+
+2014-10-22  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp: add another tr()
+
+2014-10-22  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.h: add forgotten Q_OBJECT macro to yubikeylogger
+
+2014-10-01  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeylogger.cpp, src/yubikeylogger.h: add two new logfields,
+	accesscodes padded out with 12 characters to be used for the Yubico format that specifies that the access code
+	is always 12 characters, zeroes if unset.  fixes #41
+
+2014-09-16  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2014-09-16  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: 3.1.16

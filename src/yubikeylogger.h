@@ -46,7 +46,7 @@ struct logging_st {
 };
 
 class YubiKeyLogger : public QObject {
-
+    Q_OBJECT
 public:
     ~YubiKeyLogger();
 
@@ -92,6 +92,7 @@ private:
     static QString resolve_symbol(YubiKeyConfig*, QString);
     static QString resolve_secretKeyB64(YubiKeyConfig*, QString);
     static QString resolve_tokenLength(YubiKeyConfig*, QString);
+    static QString resolve_accessCode(YubiKeyConfig*, QString);
 };
 
 #endif // YUBIKEYLOGGER_H
