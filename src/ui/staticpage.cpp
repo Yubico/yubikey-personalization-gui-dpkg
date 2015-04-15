@@ -37,6 +37,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QDateTime>
+#include <QDebug>
+#include <QSettings>
+#include <QSignalMapper>
+#include <QRegExpValidator>
+#include <QTableWidgetItem>
+
 #include "common.h"
 
 StaticPage::StaticPage(QWidget *parent) :

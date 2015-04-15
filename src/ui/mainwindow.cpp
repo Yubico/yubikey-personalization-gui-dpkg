@@ -42,6 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui/diagnostics.h"
 #include "ui/helpbox.h"
 
+#include <QMovie>
+#include <QClipboard>
+#include <QDebug>
+#include <QSignalMapper>
+#include <QSettings>
+#include <QAction>
+#include <QApplication>
+
 #include "common.h"
 #include "version.h"
 
@@ -387,8 +395,7 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix, int error) {
             pixmap.load(":/res/images/v1-3-not-animated.png");
         } else if(version < YK_VERSION(2,1,4)) {
             movie->setFileName(":/res/images/V2-0-2-1-animated.mng");
-        } else if(version < YK_VERSION(2,2,0)) {
-            // YubiKey NEO
+        } else if(version < YK_VERSION(2,2,0)) { // NEO Beta
             pixmap.load(":/res/images/neo_transparent.png");
         } else if(version % 10 == 9){
             pixmap.load(":/res/images/yubikey_devel.png");
@@ -402,6 +409,8 @@ void MainWindow::keyFound(bool found, bool* featuresMatrix, int error) {
             movie->setFileName(":/res/images/neo_production_33.mng");
         } else if(version < YK_VERSION(4,1,0)) {
             movie->setFileName(":/res/images/plus.mng");
+        } else if(version < YK_VERSION(4,2,0)) {
+            movie->setFileName(":/res/images/edge.mng");
         } else {
             pixmap.load(":/res/images/blank.png");
         }

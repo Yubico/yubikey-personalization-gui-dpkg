@@ -1,3 +1,139 @@
+2015-04-01  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.20
+
+2015-04-01  Klas Lindfors <klas@yubico.com>
+
+	* do-source-release.sh: fixup release script
+
+2015-04-01  Klas Lindfors <klas@yubico.com>
+
+	* src/src.pro: correct search path
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* : update neo pictures
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* : update plus pictures
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: add edge graphics
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* lib/yubikeyutil.cpp, lib/yubikeyutil.h: drop unused hexdump
+	function
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: adding test
+	that the random function returns different stuff
+
+2015-03-30  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.cpp: mark more ver 4 as not supporting ndef
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/chalresppage.cpp, src/ui/diagnostics.cpp,
+	src/ui/mainwindow.cpp, src/ui/oathpage.cpp, src/ui/otppage.cpp,
+	src/ui/settingpage.cpp, src/ui/staticpage.cpp, src/ui/toolpage.cpp: 
+	add more includes
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* .travis.yml: format changes
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* .travis.yml: split travis script and install
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* lib/yubikeyutil.cpp: simplify getNextModhex() by having it call
+	getNextHex() needs to do some coding-decoding, but less logic
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: some tests for
+	getNextHex() and getNextModhex()
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* lib/yubikeyutil.cpp: include QRegExp
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore, tests/scanedittest.cpp, tests/test.cpp,
+	tests/tests.pro, tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: 
+	refactor tests a bit so we can have several classes and add a simple test of YubikeyUtil
+
+2015-03-26  Klas Lindfors <klas@yubico.com>
+
+	* lib/common.h, lib/yubikeyutil.cpp, src/ui/aboutpage.cpp,
+	src/ui/chalresppage.cpp, src/ui/confirmbox.cpp,
+	src/ui/diagnostics.cpp, src/ui/mainwindow.cpp, src/ui/oathpage.cpp,
+	src/ui/otppage.cpp, src/ui/settingpage.cpp, src/ui/staticpage.cpp,
+	src/ui/toolpage.cpp, src/ui/yubiaccbox.cpp, src/yubikeyconfig.cpp,
+	src/yubikeyconfig.h, src/yubikeyfinder.cpp, src/yubikeyfinder.h,
+	src/yubikeywriter.cpp: refactor so common.h pulls in less of qt
+
+2015-03-25  Klas Lindfors <klas@yubico.com>
+
+	* .travis.yml: all needed before check
+
+2015-03-25  Klas Lindfors <klas@yubico.com>
+
+	* .travis.yml: add travis.yml
+
+2015-03-25  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignore
+
+2015-03-25  Klas Lindfors <klas@yubico.com>
+
+	* lib/lib.pro, src/src.pro, tests/tests.pro: re-enable silent
+	compilation and add warn_on for debug
+
+2015-03-24  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore, YKPersonalization.pro, {src => lib}/common.h, {src =>
+	lib}/crandom.cpp, {src => lib}/crandom.h, lib/lib.pro, {src =>
+	lib}/otpdef.h, {src/ui => lib}/scanedit.cpp, {src/ui =>
+	lib}/scanedit.h, {src => lib}/yubikeyutil.cpp, {src =>
+	lib}/yubikeyutil.h, src/src.pro, tests/scanedittest.cpp,
+	tests/scanedittest.h, tests/tests.pro: refactor for testability, and
+	add a simple test this breaks the application up in a library part and an application
+	part, the library part is statically linked and pulled in for both
+	tests and the gui app.
+
+2015-03-24  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/scanedit.cpp: | was at wrong position so translation from scancode to text got wrong
+
+2015-03-16  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: switch timestamp url
+
+2015-03-16  Klas Lindfors <klas@yubico.com>
+
+	* : new logo for installer
+
+2015-03-16  Klas Lindfors <klas@yubico.com>
+
+	* : new logo
+
+2015-03-16  Klas Lindfors <klas@yubico.com>
+
+	* src/version.h: bump copyrights for 2015
+
+2015-03-13  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2015-03-13  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.19
