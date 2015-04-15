@@ -1,3 +1,26 @@
+2015-03-13  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.19
+
+2015-03-13  Klas Lindfors <klas@yubico.com>
+
+	* YKPersonalization.pro: switch to osslsigncode for signing windows
+	binaries
+
+2015-03-05  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/aboutpage.cpp, src/ui/aboutpage.ui: remove the build
+	timestamp fixes #48
+
+2014-11-28  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: include neo-n in
+	neo 3.3 picture
+
+2014-11-28  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, YKPersonalization.pro: bump versions
+
 2014-11-28  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.18
