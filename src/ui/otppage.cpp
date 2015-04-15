@@ -35,6 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui/confirmbox.h"
 
 #include <QDesktopServices>
+#include <QDateTime>
+#include <QDebug>
+#include <QSignalMapper>
+#include <QSettings>
+#include <QUrl>
+#include <QDir>
+#include <QTableWidgetItem>
+
 #include "common.h"
 
 OtpPage::OtpPage(QWidget *parent) :

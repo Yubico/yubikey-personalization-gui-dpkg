@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2015 Yubico AB.  All rights reserved.
+Copyright (C) 2015 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -26,19 +26,19 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef VERSION_H
-#define VERSION_H
+#include "scanedittest.h"
+#include "scanedit.h"
 
-#define VER_PRODUCTVERSION          VERSION_MAJOR,VERSION_MINOR,VERSION_BUILD,0
-#define VER_PRODUCTVERSION_STR      VERSION "\0"
+void TestScanEdit::testCharacters() {
+  QString characters = "abcdefghijklmnopqrstuvwxyz1234567890\\n\\t -=[]\\\\;'`,./";
+  QString scancodes = ScanEdit::textToScanCodes(characters);
+  QString result = ScanEdit::scanCodesToText(scancodes);
+  QCOMPARE(result, characters);
+}
 
-#define VER_FILEDESCRIPTION_STR     "YubiKey Personalization Tool"
-#define VER_INTERNALNAME_STR        "YKPersonalization"
-#define VER_LEGALCOPYRIGHT          "Copyright © 2011-2015 Yubico"
-#define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
-#define VER_ORIGINALFILENAME_STR    "YKPersonalization.exe"
-#define VER_PRODUCTNAME_STR         "YKPersonalization"
-#define VER_COMPANYNAME_STR         "Yubico"
-#define VER_COMPANYDOMAIN_STR       "yubico.com"
-
-#endif // VERSION_H
+void TestScanEdit::testCharacters2() {
+  QString characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()_+{}|:\"~<>?";
+  QString scancodes = ScanEdit::textToScanCodes(characters);
+  QString result = ScanEdit::scanCodesToText(scancodes);
+  QCOMPARE(result, characters);
+}
