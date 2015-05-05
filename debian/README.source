@@ -2,11 +2,11 @@ We describe here one way to work with the package sources.
 
 Initialize cowbuilder:
 
-sudo cowbuilder --create --distribution sid --mirror http://http.debian.net/debian --debootstrapopts "--keyring=/usr/share/keyrings/debian-archive-keyring.gpg" --basepath /var/cache/pbuilder/base-debian-sid.cow
+git-pbuilder create
 
 Optionally update cowbuilder:
 
-sudo cowbuilder --update --basepath /var/cache/pbuilder/base-debian-sid.cow
+git-pbuilder update
 
 Clone the repository:
 
@@ -14,14 +14,13 @@ git clone git@github.com:Yubico/yubikey-personalization-gui-dpkg.git
 
 Build the package:
 
-git-buildpackage --git-pristine-tar --git-builder="pdebuild --auto-debsign --pbuilder cowbuilder -- --twice --basepath /var/cache/pbuilder/base-debian-sid.cow"
+gbp buildpackage --git-pbuilder --git-pbuilder-options=--twice
 
-If all goes well, you should have newly built packages in
-/var/cache/pbuilder/result/.
+If all goes well, you should have newly built packages in ../.
 
 Update the package to a new upstream release (don't forget debian/changelog):
 
-git-import-orig --pristine-tar /path/to/new-release.tar.gz
+gbp import-orig /path/to/new-release.tar.gz
 
 An alternative way compared to git-buildpackage is to build the
 package using gitpkg:
