@@ -1,8 +1,10 @@
 yubikey-personalization-gui (3.1.20-1) unstable; urgency=low
 
   * New upstream release.
+  * Add 0001-add-no_testcase_installs-for-tests-to-avoid-installa.patch
+    from upstream to deal with installation issue.
 
- -- Simon Josefsson <simon@josefsson.org>  Wed, 15 Apr 2015 15:23:25 +0200
+ -- Simon Josefsson <simon@josefsson.org>  Tue, 05 May 2015 13:15:01 +0200
 
 yubikey-personalization-gui (3.1.18-1) unstable; urgency=low
 
