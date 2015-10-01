@@ -1,3 +1,9 @@
+yubikey-personalization-gui (3.1.21-2) UNRELEASED; urgency=low
+
+  * Add gbp.conf.
+
+ -- Simon Josefsson <simon@josefsson.org>  Thu, 01 Oct 2015 07:38:28 +0200
+
 yubikey-personalization-gui (3.1.21-1) unstable; urgency=low
 
   * New upstream release.
