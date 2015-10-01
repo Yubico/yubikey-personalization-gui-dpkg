@@ -1,6 +1,8 @@
-yubikey-personalization-gui (3.1.21-2) UNRELEASED; urgency=low
+yubikey-personalization-gui (3.1.22-1) UNRELEASED; urgency=low
 
+  * New upstream release.
   * Add gbp.conf.
+  * Update upstream-signing-key.pgp.
 
  -- Simon Josefsson <simon@josefsson.org>  Thu, 01 Oct 2015 07:38:28 +0200
 
