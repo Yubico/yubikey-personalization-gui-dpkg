@@ -26,23 +26,13 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QtTest/QtTest>
+#include "versiontest.h"
+#include "common.h"
 
-class TestYubikeyUtil : public QObject {
-  Q_OBJECT
-
-private slots:
-  void testHexDecode();
-  void testHexEncode();
-  void testModhexDecode();
-  void testModhexEncode();
-  void testGetNextHex1();
-  void testGetNextHex2();
-  void testGetNextHex3();
-  void testGetNextModhex1();
-  void testGetNextModhex2();
-  void testGetNextModhex3();
-  void testGetNextModhex4();
-  void testGenerateRandomHex();
-  void testGenerateRandomModhex();
-};
+void TestVersion::testVersions() {
+   QVERIFY(YK_VERSION(2,2,3) < YK_VERSION(2,2,4));
+   QVERIFY(YK_VERSION(0,9,9) < YK_VERSION(1,3,0));
+   QVERIFY(YK_VERSION(3,0,0) < YK_VERSION(4,0,0));
+   QVERIFY(YK_VERSION(2,99,99) < YK_VERSION(3,0,0));
+   QVERIFY(YK_VERSION(4,1,10) < YK_VERSION(4,2,0));
+}

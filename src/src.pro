@@ -3,7 +3,7 @@
 #
 VERSION_MAJOR   = 3
 VERSION_MINOR   = 1
-VERSION_BUILD   = 21
+VERSION_BUILD   = 22
 VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
@@ -120,8 +120,8 @@ OTHER_FILES += \
     ../resources/mac/Info.plist.in \
     ../resources/mac/qt.conf
 
-QMAKE_CXXFLAGS += $$(CXXFLAGS) $$(CPPFLAGS)
-QMAKE_LFLAGS += $$(LDFLAGS)
+QMAKE_CXXFLAGS += $$CXXFLAGS $$CPPFLAGS
+QMAKE_LFLAGS += $$LDFLAGS
 
 cross {
     message("Doing a cross platform build..")

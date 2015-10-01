@@ -16,16 +16,20 @@ CONFIG(debug, debug|release) {
 
 HEADERS += \
     scanedit.h \
+    us-scanedit.h \
+    de-scanedit.h \
     common.h \
     otpdef.h \
     yubikeyutil.h
 
 SOURCES += \
     scanedit.cpp \
+    us-scanedit.cpp \
+    de-scanedit.cpp \
     yubikeyutil.cpp
 
-QMAKE_CXXFLAGS += $$(CXXFLAGS) $$(CPPFLAGS)
-QMAKE_LFLAGS += $$(LDFLAGS)
+QMAKE_CXXFLAGS += $$CXXFLAGS $$CPPFLAGS
+QMAKE_LFLAGS += $$LDFLAGS
 
 cross {
     message("Doing a cross platform build..")

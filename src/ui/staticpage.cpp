@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ui_staticpage.h"
 #include "ui/helpbox.h"
 #include "ui/confirmbox.h"
-#include "scanedit.h"
 
 #include <QDesktopServices>
 #include <QMessageBox>
@@ -43,6 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QSignalMapper>
 #include <QRegExpValidator>
 #include <QTableWidgetItem>
+
+#include "us-scanedit.h"
+#include "de-scanedit.h"
 
 #include "common.h"
 
@@ -83,7 +85,12 @@ StaticPage::~StaticPage() {
         delete m_ykConfig;
         m_ykConfig = 0;
     }
+
     delete ui;
+
+    if(scanedit) {
+        delete scanedit;
+    }
 }
 
 /*
@@ -335,7 +342,7 @@ void StaticPage::on_quickHideParams_clicked(bool checked) {
 }
 
 void StaticPage::on_quickStaticTxt_textEdited(const QString &txt) {
-    QString scanCodes = ScanEdit::textToScanCodes(txt);
+    QString scanCodes = scanedit->textToScanCodes(txt);
     ui->quickScanCodesTxt->setText(scanCodes);
 
     int len = scanCodes.length() / 2;
@@ -1096,7 +1103,7 @@ void StaticPage::advUpdateResults(bool written, const QString &msg) {
 }
 
 void StaticPage::on_quickScanCodesTxt_textEdited(const QString &scanCodes) {
-    QString text = ScanEdit::scanCodesToText(scanCodes);
+    QString text = scanedit->scanCodesToText(scanCodes);
     ui->quickStaticTxt->setText(text);
 
     int len = scanCodes.length() / 2;
@@ -1126,13 +1133,22 @@ void StaticPage::on_quickKeymapCmb_currentIndexChanged(int index)
     ui->quickStaticTxt->clear();
     ui->quickScanCodesTxt->clear();
 
-    if (index == 0) {
+    if(scanedit) {
+        delete scanedit;
+        scanedit = NULL;
+    }
+    if (index == KEYMAP_NONE) {
         ui->quickStaticTxt->setEnabled(false);
         ui->quickScanCodesTxt->setEnabled(false);
         ui->quickInsertTabBtn->setEnabled(false);
         ui->quickClearBtn->setEnabled(false);
     }
     else {
+        if(index == KEYMAP_US) {
+            scanedit = new UsScanEdit();
+        } else if(index == KEYMAP_DE) {
+            scanedit = new DeScanEdit();
+        }
         ui->quickStaticTxt->setEnabled(true);
         ui->quickScanCodesTxt->setEnabled(true);
         ui->quickInsertTabBtn->setEnabled(true);

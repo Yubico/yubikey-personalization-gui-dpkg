@@ -16,6 +16,8 @@ lib/debug/
 lib/release/
 tests/tests.pro.user
 lib/scanedit.o
+lib/de-scanedit.o
+lib/us-scanedit.o
 lib/yubikeyutil.o
 tests/moc_scanedittest.cpp
 tests/moc_scanedittest.o
@@ -24,3 +26,8 @@ tests/moc_yubikeyutiltest.cpp
 tests/moc_yubikeyutiltest.o
 tests/test.o
 tests/yubikeyutiltest.o
+tests/versiontest.o
+tests/moc_versiontest.cpp
+tests/moc_versiontest.o
+tests/release/
+tests/debug/

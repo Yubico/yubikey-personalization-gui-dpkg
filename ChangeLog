@@ -1,3 +1,85 @@
+2015-09-25  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.22
+
+2015-09-23  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore: ignore
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* : fixup neo picture
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* lib/scanedit.cpp: remove debugging for every encode case and add
+	debug for failure
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* lib/de-scanedit.cpp: add <> for german layout
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore, lib/common.h, lib/de-scanedit.cpp, lib/de-scanedit.h,
+	lib/lib.pro, lib/scanedit.cpp, src/ui/staticpage.cpp,
+	src/ui/staticpage.ui: add german layout to scancode passwords
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* lib/common.h, src/ui/staticpage.cpp: modularize scanedit so it's
+	instantiated when selected
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore, lib/lib.pro, lib/scanedit.cpp, lib/scanedit.h,
+	lib/us-scanedit.cpp, lib/us-scanedit.h, src/ui/staticpage.cpp,
+	tests/scanedittest.cpp: add inheritance for scanedit parts
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* lib/scanedit.cpp, lib/scanedit.h, src/ui/staticpage.cpp,
+	src/ui/staticpage.h, tests/scanedittest.cpp: refactor scanedit to
+	only use one lookup table
+
+2015-09-22  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp: use edge picture for 4.2
+
+2015-09-04  Klas Lindfors <klas@yubico.com>
+
+	* .gitignore, lib/common.h, src/yubikeyfinder.h, tests/test.cpp,
+	tests/tests.pro, tests/versiontest.cpp, tests/versiontest.h: move
+	YK_VERSION macro to common, add tests for it and fix it
+
+2015-09-04  Klas Lindfors <klas@yubico.com>
+
+	* src/yubikeyfinder.h: fixup YK_VERSION macro so higher versions are
+	recognized
+
+2015-07-09  Klas Lindfors <klas@yubico.com>
+
+	* lib/yubikeyutil.cpp, src/ui/toolpage.cpp: take some care to set
+	resultLen on errors
+
+2015-07-09  Klas Lindfors <klas@yubico.com>
+
+	* tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: test
+	getNextModhex() with uneven amount
+
+2015-05-29  Klas Lindfors <klas@yubico.com>
+
+	* lib/lib.pro, src/src.pro, tests/tests.pro: change syntax for
+	accepting CXXFLAGS and LDFLAGS they now have to be given as options to qmake, instead of env
+
+2015-06-23  Konstantinos Georgantas <kostas@yubico.com>
+
+	* README: fix typo
+
+2015-05-29  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/src.pro: bump versions
+
 2015-05-29  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.21

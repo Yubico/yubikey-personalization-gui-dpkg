@@ -1,7 +1,7 @@
 QT += testlib
 QT -= gui
-SOURCES += test.cpp scanedittest.cpp yubikeyutiltest.cpp
-HEADERS += scanedittest.h yubikeyutiltest.h
+SOURCES += test.cpp scanedittest.cpp yubikeyutiltest.cpp versiontest.cpp
+HEADERS += scanedittest.h yubikeyutiltest.h versiontest.h
 CONFIG += testcase no_testcase_installs
 CONFIG += console
 CONFIG -= app_bundle
@@ -23,8 +23,8 @@ CONFIG(debug, debug|release) {
 
 DESTDIR         = "$$TARGET_DIR"
 
-QMAKE_CXXFLAGS += $$(CXXFLAGS) $$(CPPFLAGS)
-QMAKE_LFLAGS += $$(LDFLAGS)
+QMAKE_CXXFLAGS += $$CXXFLAGS $$CPPFLAGS
+QMAKE_LFLAGS += $$LDFLAGS
 
 cross {
     message("Doing a cross platform build..")

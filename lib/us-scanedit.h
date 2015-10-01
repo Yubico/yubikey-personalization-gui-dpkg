@@ -26,23 +26,15 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <QtTest/QtTest>
+#ifndef US_SCANEDIT_H
+#define US_SCANEDIT_H
 
-class TestYubikeyUtil : public QObject {
-  Q_OBJECT
+#include "scanedit.h"
 
-private slots:
-  void testHexDecode();
-  void testHexEncode();
-  void testModhexDecode();
-  void testModhexEncode();
-  void testGetNextHex1();
-  void testGetNextHex2();
-  void testGetNextHex3();
-  void testGetNextModhex1();
-  void testGetNextModhex2();
-  void testGetNextModhex3();
-  void testGetNextModhex4();
-  void testGenerateRandomHex();
-  void testGenerateRandomModhex();
+class UsScanEdit : public ScanEdit
+{
+public:
+    UsScanEdit();
 };
+
+#endif // US_SCANEDIT_H
