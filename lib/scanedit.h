@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2013 Yubico AB.  All rights reserved.
+Copyright (C) 2015 Yubico AB.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -30,12 +30,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SCANEDIT_H
 
 #include <QString>
+#include <QMap>
 
 class ScanEdit
 {
+protected:
+    QMap<int, int> keyMap;
+    ScanEdit();
 public:
-    static QString textToScanCodes(const QString text);
-    static QString scanCodesToText(const QString scanCode);
+    QString textToScanCodes(const QString text);
+    QString scanCodesToText(const QString scanCode);
 };
 
 #endif // SCANEDIT_H

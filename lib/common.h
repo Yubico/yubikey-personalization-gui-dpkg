@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "otpdef.h"
 
+#define YK_VERSION(MAJOR, MINOR, BUILD) (MAJOR * 10000 + MINOR * 100 + BUILD)
+
 //typedef std::vector<int>::size_type size_t;
 
 enum AccMode {
@@ -63,6 +65,10 @@ enum AccMode {
 #define ERR_NOKEY                   2
 #define ERR_MORETHANONE             3
 #define ERR_UNKNOWN_FIRMWARE        4
+
+#define KEYMAP_NONE                 0
+#define KEYMAP_US                   1
+#define KEYMAP_DE                   2
 
 //Timeouts
 
