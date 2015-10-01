@@ -1,3 +1,19 @@
+2015-10-01  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.23
+
+2015-09-30  Klas Lindfors <klas@yubico.com>
+
+	* tests/scanedittest.cpp: simplify test by not using new/delete
+
+2015-09-30  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/staticpage.cpp: make sure scanedit is initialized fixes #56
+
+2015-09-25  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/src.pro: bump versions
+
 2015-09-25  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.22
