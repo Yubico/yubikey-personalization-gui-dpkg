@@ -12,6 +12,7 @@ Vcs-Browser: https://github.com/Yubico/yubikey-personalization-gui-dpkg
 Package: yubikey-personalization-gui
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: qt5-image-formats-plugins
 Description: Graphical personalization tool for YubiKey tokens
  YubiKeys are USB tokens that act like keyboards and generate one-time
  passwords, static passwords or work in challenge-response mode.
