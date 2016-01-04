@@ -1,3 +1,78 @@
+2016-01-04  Klas Lindfors <klas@yubico.com>
+
+	* NEWS: NEWS for 3.1.24
+
+2016-01-04  Klas Lindfors <klas@yubico.com>
+
+	* src/version.h: update copyright years
+
+2015-12-30  Klas Lindfors <klas@yubico.com>
+
+	* src/src.pro: name mac installer correctly
+
+2015-12-30  Klas Lindfors <klas@yubico.com>
+
+	* src/ui/mainwindow.cpp: don't show a key if version is 0
+
+2015-12-28  Klas Lindfors <klas@yubico.com>
+
+	* src/src.pro: fixup sed invocation
+
+2015-12-28  Klas Lindfors <klas@yubico.com>
+
+	* installer/win-nsis/ykpers.nsi, src/src.pro: newer qt has
+	qtaccessiblewidgets included and new names on some dlls on mac libqtcocoa also depends on QtDBus
+
+2015-12-29  Klas Lindfors <klas@yubico.com>
+
+	* resources/resources.qrc, src/ui/mainwindow.cpp: drop devel key
+
+2015-12-28  Klas Lindfors <klas@yubico.com>
+
+	* : new images for 2.3, neo, plus and edge
+
+2015-12-28  Klas Lindfors <klas@yubico.com>
+
+	* resources/lin/yubikey-personalization-gui.xpm: new application
+	icons
+
+2015-12-21  Klas Lindfors <klas@yubico.com>
+
+	* tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: add tests for
+	getNextHex()/getNextModhex() with random output
+
+2015-12-21  Klas Lindfors <klas@yubico.com>
+
+	* lib/yubikeyutil.cpp: getNextModhex() has to call qstrModhexClean()
+
+2015-12-21  Klas Lindfors <klas@yubico.com>
+
+	* tests/yubikeyutiltest.cpp, tests/yubikeyutiltest.h: add tests that
+	show that getNextModhex() is broken
+
+2015-10-09  Klas Lindfors <klas@yubico.com>
+
+	* src/src.pro: for osx always set ICON, for pkgconfig set
+	QMAKE_INFO_PLIST
+
+2015-10-09  Klas Lindfors <klas@yubico.com>
+
+	* resources/mac/Info.plist.in, src/src.pro: use @SHORT_VERSION@ and
+	@FULL_VERSION@ for Info.plist
+
+2015-10-09  Klas Lindfors <klas@yubico.com>
+
+	* prepare-travis.sh, src/src.pro: if we're using pkgconfig it makes
+	sense to enable it always
+
+2015-10-08  Klas Lindfors <klas@yubico.com>
+
+	* .travis.yml, prepare-travis.sh: add travis build for osx
+
+2015-10-01  Klas Lindfors <klas@yubico.com>
+
+	* NEWS, src/src.pro: bump versions
+
 2015-10-01  Klas Lindfors <klas@yubico.com>
 
 	* NEWS: NEWS for 3.1.23

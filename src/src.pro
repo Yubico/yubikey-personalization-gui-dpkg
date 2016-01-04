@@ -3,7 +3,7 @@
 #
 VERSION_MAJOR   = 3
 VERSION_MINOR   = 1
-VERSION_BUILD   = 23
+VERSION_BUILD   = 24
 VERSION         = "$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}"
 APP_NAME        = $$quote(YubiKey Personalization Tool)
 
@@ -196,8 +196,7 @@ win32 {
              $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Widgetsd.dll \
              $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Testd.dll \
              $$_QT_PLUGINDIR$${DIR_SEPARATOR}platforms$${DIR_SEPARATOR}qwindowsd.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmngd.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}accessible$${DIR_SEPARATOR}qtaccessiblewidgetsd.dll
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmngd.dll
     } else {
         LIB_FILES += \
              $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Core.dll \
@@ -205,17 +204,16 @@ win32 {
              $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Widgets.dll \
              $$_QT_BINDIR$${DIR_SEPARATOR}Qt5Test.dll \
              $$_QT_PLUGINDIR$${DIR_SEPARATOR}platforms$${DIR_SEPARATOR}qwindows.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmng.dll \
-             $$_QT_PLUGINDIR$${DIR_SEPARATOR}accessible$${DIR_SEPARATOR}qtaccessiblewidgets.dll
+             $$_QT_PLUGINDIR$${DIR_SEPARATOR}imageformats$${DIR_SEPARATOR}qmng.dll
     }
 
     LIB_FILES += \
         $$_QT_BINDIR$${DIR_SEPARATOR}libgcc_s_dw2-1.dll \
         $$_QT_BINDIR$${DIR_SEPARATOR}libwinpthread-1.dll \
         $$_QT_BINDIR$${DIR_SEPARATOR}libstdc++-6.dll \
-        $$_QT_BINDIR$${DIR_SEPARATOR}icuin52.dll \
-        $$_QT_BINDIR$${DIR_SEPARATOR}icuuc52.dll \
-        $$_QT_BINDIR$${DIR_SEPARATOR}icudt52.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icuin54.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icuuc54.dll \
+        $$_QT_BINDIR$${DIR_SEPARATOR}icudt54.dll \
         ..$${DIR_SEPARATOR}libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libjson-c-2.dll \
         ..$${DIR_SEPARATOR}libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libyubikey-0.dll \
         ..$${DIR_SEPARATOR}libs$${DIR_SEPARATOR}win32$${DIR_SEPARATOR}bin$${DIR_SEPARATOR}libykpers-1-1.dll
@@ -267,12 +265,19 @@ unix:!macx|force_pkgconfig {
     LIBS += -lyubikey
 
     CONFIG += link_pkgconfig
+    QT_CONFIG -= no-pkg-config
     PKGCONFIG += ykpers-1
+    macx {
+        QMAKE_INFO_PLIST = ../resources/mac/Info.plist.in
+    }
 }
 
 #
 # MacOS X specific configuration
 #
+macx {
+    ICON = ../resources/mac/Yubico.icns
+}
 macx:!force_pkgconfig {
     message("Mac build")
 
@@ -306,9 +311,6 @@ macx:!force_pkgconfig {
     TARGET_MAC = $${TARGET}
     TARGET_MAC ~= s, ,\\ ,g
 
-    # The application icon
-    ICON = ../resources/mac/Yubico.icns
-
     BUILD = $$(BUILD)
     isEmpty(BUILD) {
         BUILD = 1
@@ -319,7 +321,7 @@ macx:!force_pkgconfig {
     QMAKE_POST_LINK += $$quote(mkdir -p $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources && \
         cp -R ../resources/mac/Yubico.icns $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/. && \
         cp ../resources/mac/qt.conf $${DESTDIR}/$${TARGET_MAC}.app/Contents/Resources/. && \
-        sed -e \'s|@@version@@|$$VERSION|g\' -e \'s|@@build@@|$$BUILD|g\' \
+        sed -e \'s|@SHORT_VERSION@|$$VERSION|g\' -e \'s|@FULL_VERSION@|$$VERSION|g\' \
         < ../resources/mac/Info.plist.in  > $${DESTDIR}/$${TARGET_MAC}.app/Contents/Info.plist)
 
     # copy the QT libraries into our bundle
@@ -331,10 +333,9 @@ macx:!force_pkgconfig {
         cp $$_QT_LIBDIR/QtGui.framework/Versions/5/QtGui $$_LIBDIR && \
         cp $$_QT_LIBDIR/QtWidgets.framework/Versions/5/QtWidgets $$_LIBDIR && \
 	cp $$_QT_LIBDIR/QtPrintSupport.framework/Versions/5/QtPrintSupport $$_LIBDIR && \
+	cp $$_QT_LIBDIR/QtDBus.framework/Versions/5/QtDBus $$_LIBDIR && \
         mkdir -p $$_PLUGINDIR/imageformats && \
         cp -R $$_QT_PLUGINDIR/imageformats/libqmng.dylib $$_PLUGINDIR/imageformats && \
-        mkdir -p $$_PLUGINDIR/accessible && \
-        cp -R $$_QT_PLUGINDIR/accessible/libqtaccessiblewidgets.dylib $$_PLUGINDIR/accessible && \
 	mkdir -p $$_PLUGINDIR/platforms && \
 	cp -R $$_QT_PLUGINDIR/platforms/libqcocoa.dylib $$_PLUGINDIR/platforms)
 
@@ -354,10 +355,11 @@ macx:!force_pkgconfig {
     # fixup all library paths..
     _BASE = $$quote(@executable_path/../Frameworks)
     _LIBBASE = $$quote(@executable_path/../lib)
-    _QTCORE = $$quote($${_QT_LIBDIR}/QtCore.framework/Versions/5/QtCore)
-    _QTGUI = $$quote($${_QT_LIBDIR}/QtGui.framework/Versions/5/QtGui)
-    _QTWIDGETS = $$quote($${_QT_LIBDIR}/QtWidgets.framework/Versions/5/QtWidgets)
-    _QTPRINTSUPPORT = $$quote($${_QT_LIBDIR}/QtPrintSupport.framework/Versions/5/QtPrintSupport)
+    _QTCORE = $$quote(@rpath/QtCore.framework/Versions/5/QtCore)
+    _QTGUI = $$quote(@rpath/QtGui.framework/Versions/5/QtGui)
+    _QTWIDGETS = $$quote(@rpath/QtWidgets.framework/Versions/5/QtWidgets)
+    _QTPRINTSUPPORT = $$quote(@rpath/QtPrintSupport.framework/Versions/5/QtPrintSupport)
+    _QTDBUS = $$quote(@rpath/QtDBus.framework/Versions/5/QtDBus)
     isEmpty(TARGET_ARCH) {
         _INSTALL_NAME_TOOL = install_name_tool
     } else {
@@ -384,14 +386,14 @@ macx:!force_pkgconfig {
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/QtGui $$_LIBDIR/QtPrintSupport && \
         $$_INSTALL_NAME_TOOL -change $$_QTWIDGETS $$_BASE/QtWidgets $$_LIBDIR/QtPrintSupport && \
         $$_INSTALL_NAME_TOOL -id $$_BASE/QtPrintSupport $$_LIBDIR/QtPrintSupport && \
+        $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/QtCore $$_LIBDIR/QtDBus && \
+        $$_INSTALL_NAME_TOOL -id $$_BASE/QtDBus $$_LIBDIR/QtDBus && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/QtCore $$_PLUGINDIR/imageformats/libqmng.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/QtGui $$_PLUGINDIR/imageformats/libqmng.dylib && \
-        $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/QtCore $$_PLUGINDIR/accessible/libqtaccessiblewidgets.dylib && \
-        $$_INSTALL_NAME_TOOL -change $$_QTWIDGETS $$_BASE/QtWidgets $$_PLUGINDIR/accessible/libqtaccessiblewidgets.dylib && \
-        $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/QtGui $$_PLUGINDIR/accessible/libqtaccessiblewidgets.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTCORE $$_BASE/QtCore $$_PLUGINDIR/platforms/libqcocoa.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTWIDGETS $$_BASE/QtWidgets $$_PLUGINDIR/platforms/libqcocoa.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTGUI $$_BASE/QtGui $$_PLUGINDIR/platforms/libqcocoa.dylib && \
+        $$_INSTALL_NAME_TOOL -change $$_QTDBUS $$_BASE/QtDBus $$_PLUGINDIR/platforms/libqcocoa.dylib && \
         $$_INSTALL_NAME_TOOL -change $$_QTPRINTSUPPORT $$_BASE/QtPrintSupport $$_PLUGINDIR/platforms/libqcocoa.dylib)
 
     QMAKE_POST_LINK += $$quote( && \
@@ -403,12 +405,12 @@ macx:!force_pkgconfig {
     build_installer {
         # the productbuild path doesn't work pre 10.8
         for_store {
-            _INSTALLER_CMD = "productbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --component $${DESTDIR}/$${TARGET_MAC}.app /Applications/ $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg"
+            _INSTALLER_CMD = "productbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --component $${DESTDIR}/$${TARGET_MAC}.app /Applications/ $${DESTDIR}/yubikey-personalization-gui-$${VERSION}.pkg"
         } else {
             _INSTALLER_CMD = "rm -rf $${DESTDIR}/temp && \
                 mkdir -p $${DESTDIR}/temp/ && \
                 cp -R $${DESTDIR}/$${TARGET_MAC}.app $${DESTDIR}/temp && \
-                pkgbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --root ${DESTDIR}/temp/ --component-plist ../resources/mac/installer.plist --install-location '/Applications/' $${DESTDIR}/$${TARGET_MAC}-$${VERSION}.pkg"
+                pkgbuild --sign \'$$INSTALLER_SIGN_IDENTITY\' --root ${DESTDIR}/temp/ --component-plist ../resources/mac/installer.plist --install-location '/Applications/' $${DESTDIR}/yubikey-personalization-gui-$${VERSION}.pkg"
         }
         QMAKE_POST_LINK += $$quote( && \
             codesign --deep -s \'$$PACKAGE_SIGN_IDENTITY\' $${DESTDIR}/$${TARGET_MAC}.app \
