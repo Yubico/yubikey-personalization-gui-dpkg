@@ -3,6 +3,8 @@ yubikey-personalization-gui (3.1.24-1) unstable; urgency=low
   * New upstream release.
   * Use https URLs in Vcs-Git.
   * Update Standards-Version from 3.9.6 to 3.9.8.
+  * Drop yubikey-personalization-gui.menu as suggested by
+    lintian command-in-menu-file-and-desktop-file.
 
  -- Simon Josefsson <simon@josefsson.org>  Wed, 10 Aug 2016 09:19:10 +0200
 

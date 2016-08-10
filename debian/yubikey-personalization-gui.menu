@@ -1,4 +1,0 @@
-?package(yubikey-personalization-gui):needs="X11" section="Applications/System/Administration" \
-                        title="YubiKey Personalization Tool" command="/usr/bin/yubikey-personalization-gui" \
-                        longtitle="Graphical interface for programing a YubiKey" \
-                        icon="/usr/share/pixmaps/yubikey-personalization-gui.xpm"
