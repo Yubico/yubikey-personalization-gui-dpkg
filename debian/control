@@ -2,7 +2,7 @@ Source: yubikey-personalization-gui
 Maintainer: Debian Authentication Maintainers <pkg-auth-maintainers@lists.alioth.debian.org>
 Uploaders: Simon Josefsson <simon@josefsson.org>, Klas Lindfors <klas@yubico.com>, Dain Nilsson <dain@yubico.com>
 Section: utils
-Priority: extra
+Priority: optional
 Build-Depends: debhelper-compat (= 12), pkg-config, qt5-qmake, qtbase5-dev, libyubikey-dev, libykpers-1-dev (>= 1.14.0)
 Standards-Version: 3.9.8
 Homepage: https://developers.yubico.com/yubikey-personalization-gui/
