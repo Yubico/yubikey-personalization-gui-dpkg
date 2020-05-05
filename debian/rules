@@ -4,7 +4,7 @@ export QT_SELECT := qt5
 export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 
 %:
-	dh $@ --buildsystem=qmake --parallel
+	dh $@ --buildsystem=qmake
 
 override_dh_auto_configure:
 	dh_auto_configure -- CONFIG+=nosilent
